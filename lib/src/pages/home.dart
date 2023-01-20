@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                "Good Morning!",
+                'Good Morning!',
                 textAlign: TextAlign.start,
                 style: Theme.of(context)
                     .textTheme
@@ -44,10 +44,11 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      "Latest:",
+                      'Latest:',
                       textAlign: TextAlign.start,
                       style: Theme.of(context).textTheme.titleLarge!.apply(
-                          color: Theme.of(context).colorScheme.onSurface),
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -55,15 +56,16 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Petrol Station",
+                            'Petrol Station',
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
                           ),
                           Text(
-                            "-\$16.50",
+                            r'-$16.50',
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.bodyLarge!.apply(
                                   color: const Color(0xffbd1c1c),
@@ -74,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     OutlinedButton(
                       onPressed: () {},
-                      child: const Text("Details"),
+                      child: const Text('Details'),
                     )
                   ],
                 ),
@@ -91,13 +93,14 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Today",
+                          'Today',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.titleLarge!.apply(
-                              color: Theme.of(context).colorScheme.onSurface),
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
                         Text(
-                          "-\$55.04",
+                          r'-$55.04',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.titleLarge!.apply(
                                 color: const Color(0xff199225),
@@ -111,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                         foregroundColor:
                             Theme.of(context).colorScheme.onPrimary,
                         backgroundColor: Theme.of(context).colorScheme.primary,
-                      ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
+                      ).copyWith(elevation: ButtonStyleButton.allOrNull(0)),
                       onPressed: () {},
                       icon: const Icon(Icons.add),
                       label: const Text('Filled'),

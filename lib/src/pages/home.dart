@@ -37,10 +37,11 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Card(
+              color: Theme.of(context).colorScheme.surface,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
                       "Latest:",
@@ -48,26 +49,33 @@ class _HomePageState extends State<HomePage> {
                       style: Theme.of(context).textTheme.titleLarge!.apply(
                           color: Theme.of(context).colorScheme.onSurface),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Petrol Station",
-                          textAlign: TextAlign.start,
-                          style: Theme.of(context).textTheme.bodyLarge!.apply(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant),
-                        ),
-                        Text(
-                          "-\$16.50",
-                          textAlign: TextAlign.start,
-                          style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                color: const Color(0xffbd1c1c),
-                              ),
-                        ),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Petrol Station",
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant),
+                          ),
+                          Text(
+                            "-\$16.50",
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                  color: const Color(0xffbd1c1c),
+                                ),
+                          ),
+                        ],
+                      ),
                     ),
+                    OutlinedButton(
+                      onPressed: () {},
+                      child: const Text("Details"),
+                    )
                   ],
                 ),
               ),
@@ -77,33 +85,36 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      "Latest:",
-                      textAlign: TextAlign.start,
-                      style: Theme.of(context).textTheme.titleLarge!.apply(
-                          color: Theme.of(context).colorScheme.onSurface),
-                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Petrol Station",
+                          "Today",
                           textAlign: TextAlign.start,
-                          style: Theme.of(context).textTheme.bodyLarge!.apply(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant),
+                          style: Theme.of(context).textTheme.titleLarge!.apply(
+                              color: Theme.of(context).colorScheme.onSurface),
                         ),
                         Text(
-                          "-\$16.50",
+                          "-\$55.04",
                           textAlign: TextAlign.start,
-                          style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                color: const Color(0xffbd1c1c),
+                          style: Theme.of(context).textTheme.titleLarge!.apply(
+                                color: const Color(0xff199225),
                               ),
                         ),
                       ],
+                    ),
+                    // TODO: Filled Buttons don't exist yet
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ).copyWith(elevation: ButtonStyleButton.allOrNull(0.0)),
+                      onPressed: () {},
+                      icon: const Icon(Icons.add),
+                      label: const Text('Filled'),
                     ),
                   ],
                 ),

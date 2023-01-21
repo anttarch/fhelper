@@ -1,3 +1,4 @@
+import 'package:fhelper/src/views/head/history.dart';
 import 'package:fhelper/src/views/head/home.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,9 @@ class HeadView extends StatefulWidget {
 
 class _HeadViewState extends State<HeadView> {
   final PageController _pageCtrl = PageController();
+
+  int? _pageIndex;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,9 +42,14 @@ class _HeadViewState extends State<HeadView> {
         controller: _pageCtrl,
         children: const [
           HomePage(),
+          HistoryPage(),
         ],
+        onPageChanged: (page) => setState(() {
+          _pageIndex = page;
+        }),
       ),
       bottomNavigationBar: NavigationBar(
+        selectedIndex: _pageIndex ?? 0,
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.history), label: 'History'),
@@ -49,8 +58,8 @@ class _HeadViewState extends State<HeadView> {
         onDestinationSelected: (dest) {
           _pageCtrl.animateToPage(
             dest,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInBack,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeInOut,
           );
         },
       ),

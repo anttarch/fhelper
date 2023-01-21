@@ -81,12 +81,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // TODO: Filled Buttons don't exist yet
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                    ).copyWith(elevation: ButtonStyleButton.allOrNull(0)),
+                  FilledButton.icon(
                     onPressed: () {},
                     icon: const Icon(Icons.add),
                     label: const Text('Add'),

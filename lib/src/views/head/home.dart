@@ -89,7 +89,7 @@ class HomePage extends StatelessWidget {
                     ).copyWith(elevation: ButtonStyleButton.allOrNull(0)),
                     onPressed: () {},
                     icon: const Icon(Icons.add),
-                    label: const Text('Filled'),
+                    label: const Text('Add'),
                   ),
                 ],
               ),

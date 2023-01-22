@@ -26,7 +26,7 @@ class HistoryList extends StatelessWidget {
             children: [
               Text(day, style: Theme.of(context).textTheme.titleLarge),
               Text(
-                dayTotal.toString(),
+                dayTotal.toStringAsFixed(2),
                 style: Theme.of(context).textTheme.titleLarge!.apply(
                       color: const Color(0xff199225)
                           .harmonizeWith(Theme.of(context).colorScheme.primary),

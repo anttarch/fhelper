@@ -69,23 +69,95 @@ class _HistoryPageState extends State<HistoryPage> {
             controller: _pageCtrl,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 24),
-                child: HistoryList(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                  day: 'Today',
-                  dayTotal: 55.04,
-                  items: {
-                    'Petrol Station': -16.5,
-                    'Football bet': 45.64,
-                    'Stock Exchange': 25.9,
-                  },
+              const SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: HistoryList(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                    day: 'Today',
+                    dayTotal: 55.04,
+                    items: {
+                      'Petrol Station': -16.5,
+                      'Football bet': 45.64,
+                      'Stock Exchange': 25.9,
+                    },
+                  ),
                 ),
               ),
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                color: Colors.red,
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                      child: Card(
+                        elevation: 0,
+                        color: Theme.of(context).colorScheme.surface,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Today',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .apply(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                              ),
+                              Text(
+                                r'-$55.04',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .apply(
+                                      color: const Color(0xff199225),
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: HistoryList(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                        day: 'Today',
+                        dayTotal: 55.04,
+                        items: {
+                          'Petrol Station': -16.5,
+                          'Football bet': 45.64,
+                          'Stock Exchange': 25.9,
+                        },
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: HistoryList(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                        day: 'Yesterday',
+                        dayTotal: -36.50,
+                        items: {
+                          'Energy Bill': -78.5,
+                          'Week Bonus': 32,
+                          'Friends bet': 10,
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Container(
                 height: double.infinity,

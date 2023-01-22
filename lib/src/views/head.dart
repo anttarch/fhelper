@@ -23,7 +23,7 @@ class _HeadViewState extends State<HeadView> {
             Size(double.infinity, MediaQuery.of(context).size.height / 8),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(

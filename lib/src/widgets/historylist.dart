@@ -67,16 +67,16 @@ class HistoryList extends StatelessWidget {
                 ),
                 if (index == items.length - 1)
                   Divider(
-                    height: 0,
-                    thickness: .1,
+                    height: 1,
+                    thickness: 1,
                     color: Theme.of(context).colorScheme.outlineVariant,
                   ),
               ],
             );
           },
           separatorBuilder: (_, __) => Divider(
-            height: 0,
-            thickness: .1,
+            height: 1,
+            thickness: 1,
             color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),

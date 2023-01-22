@@ -1,3 +1,4 @@
+import 'package:fhelper/src/widgets/historylist.dart';
 import 'package:flutter/material.dart';
 
 enum _Date { today, week, month }
@@ -68,10 +69,18 @@ class _HistoryPageState extends State<HistoryPage> {
             controller: _pageCtrl,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                color: Colors.black,
+              const Padding(
+                padding: EdgeInsets.only(top: 24),
+                child: HistoryList(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                  day: 'Today',
+                  dayTotal: 55.04,
+                  items: {
+                    'Petrol Station': -16.5,
+                    'Football bet': 45.64,
+                    'Stock Exchange': 25.9,
+                  },
+                ),
               ),
               Container(
                 height: double.infinity,

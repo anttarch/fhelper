@@ -11,6 +11,43 @@ class HeadView extends StatefulWidget {
 
 class _HeadViewState extends State<HeadView> {
   final PageController _pageCtrl = PageController();
+  final List<String> _homeTitle = ['Good Morning!', 'Good Afternoon!'];
+  final List<String> _headline = [_getHomeString(), 'History', 'Settings'];
+
+  static String _getHomeString() {
+    final int hour = TimeOfDay.now().hour;
+    switch (hour) {
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      case 11:
+        return 'Good Morning!';
+      case 12:
+      case 13:
+      case 14:
+      case 15:
+      case 16:
+      case 17:
+        return 'Good Afternoon!';
+      case 18:
+      case 19:
+      case 20:
+      case 21:
+      case 22:
+      case 23:
+      case 0:
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+        return 'Good Evening!';
+      default:
+        return 'Home';
+    }
+  }
 
   int? _pageIndex;
 
@@ -27,7 +64,7 @@ class _HeadViewState extends State<HeadView> {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                'Good Morning!',
+                _headline[_pageIndex ?? 0],
                 textAlign: TextAlign.start,
                 style: Theme.of(context)
                     .textTheme

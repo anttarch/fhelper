@@ -1,5 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:fhelper/src/views/head.dart';
+import 'package:fhelper/src/views/head/head.dart';
 import 'package:flutter/material.dart';
 
 void main() {

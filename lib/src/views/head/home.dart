@@ -1,3 +1,4 @@
+import 'package:fhelper/src/views/add/add.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -82,7 +83,8 @@ class HomePage extends StatelessWidget {
                     ],
                   ),
                   FilledButton.icon(
-                    onPressed: () {},
+                    onPressed: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => AddView())),
                     icon: const Icon(Icons.add),
                     label: const Text('Add'),
                   ),

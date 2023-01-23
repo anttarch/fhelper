@@ -104,7 +104,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Today',
+                                'This Week',
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context)
                                     .textTheme
@@ -116,7 +116,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                     ),
                               ),
                               Text(
-                                r'-$55.04',
+                                r'+$18.46',
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context)
                                     .textTheme
@@ -159,10 +159,80 @@ class _HistoryPageState extends State<HistoryPage> {
                   ],
                 ),
               ),
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                color: Colors.blue,
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                      child: Card(
+                        elevation: 0,
+                        color: Theme.of(context).colorScheme.surface,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'This Month',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .apply(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                    ),
+                              ),
+                              Text(
+                                r'+$18.46',
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .apply(
+                                      color: const Color(0xff199225),
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: HistoryList(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                        day: 'Today',
+                        dayTotal: 55.04,
+                        items: {
+                          'Petrol Station': -16.5,
+                          'Football bet': 45.64,
+                          'Stock Exchange': 25.9,
+                        },
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 20),
+                      child: HistoryList(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                        day: 'Yesterday',
+                        dayTotal: -36.50,
+                        items: {
+                          'Energy Bill': -78.5,
+                          'Week Bonus': 32,
+                          'Friends bet': 10,
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

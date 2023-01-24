@@ -83,8 +83,12 @@ class HomePage extends StatelessWidget {
                     ],
                   ),
                   FilledButton.icon(
-                    onPressed: () => Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AddView())),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<AddView>(
+                        builder: (context) => const AddView(),
+                      ),
+                    ),
                     icon: const Icon(Icons.add),
                     label: const Text('Add'),
                   ),

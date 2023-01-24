@@ -11,7 +11,7 @@ class HeadView extends StatefulWidget {
 
 class _HeadViewState extends State<HeadView> {
   final PageController _pageCtrl = PageController();
-  final List<String> _homeTitle = ['Good Morning!', 'Good Afternoon!'];
+  //final List<String> _homeTitle = ['Good Morning!', 'Good Afternoon!'];
   final List<String> _headline = [_getHomeString(), 'History', 'Settings'];
 
   static String _getHomeString() {

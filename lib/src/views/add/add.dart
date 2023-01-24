@@ -47,7 +47,7 @@ class _AddViewState extends State<AddView> {
         MediaQuery.of(context).padding.bottom -
         MediaQuery.of(context).padding.top;
     const double treeHeight = 572;
-    if (availableHeight - treeHeight > 88) {
+    if (availableHeight - treeHeight > 0) {
       return availableHeight - treeHeight;
     } else {
       return 0;

@@ -23,3 +23,8 @@
 ## Housekeeping
 - Review code
 - Unit testing?
+- Making every page it's own file
+
+### AddPage
+- Switch enums to real world enums
+- Figure out display of read only text fields

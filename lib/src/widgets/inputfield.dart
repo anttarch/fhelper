@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 
 class InputField extends StatelessWidget {
-  const InputField({super.key, required this.label});
+  const InputField({
+    super.key,
+    required this.label,
+    this.onTap,
+    this.readOnly = false,
+  });
   final String label;
+  final VoidCallback? onTap;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +27,14 @@ class InputField extends StatelessWidget {
                   .apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
           ),
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            decoration: const InputDecoration(
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.all(16),
             ),
             textCapitalization: TextCapitalization.sentences,
+            onTap: onTap,
+            readOnly: readOnly,
           ),
         ],
       ),

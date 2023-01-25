@@ -4,41 +4,45 @@ import 'package:flutter/material.dart';
 class HistoryList extends StatelessWidget {
   const HistoryList({
     super.key,
+    this.contentPadding = EdgeInsets.zero,
     required this.day,
     required this.dayTotal,
     required this.items,
-    this.contentPadding = EdgeInsets.zero,
+    this.showTotal = true,
   });
+  final EdgeInsets contentPadding;
   final String day;
   final double dayTotal;
   final Map<String, double> items;
-  final EdgeInsets contentPadding;
+  final bool showTotal;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: contentPadding,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(day, style: Theme.of(context).textTheme.titleLarge),
-              Text(
-                dayTotal.isNegative
-                    ? dayTotal.toStringAsFixed(2).replaceAll('-', r'-$')
-                    : r'+$' + dayTotal.toStringAsFixed(2),
-                style: Theme.of(context).textTheme.titleLarge!.apply(
-                      color: const Color(0xff199225)
-                          .harmonizeWith(Theme.of(context).colorScheme.primary),
-                    ),
-              ),
-            ],
+        if (showTotal)
+          Padding(
+            padding: contentPadding,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(day, style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  dayTotal.isNegative
+                      ? dayTotal.toStringAsFixed(2).replaceAll('-', r'-$')
+                      : r'+$' + dayTotal.toStringAsFixed(2),
+                  style: Theme.of(context).textTheme.titleLarge!.apply(
+                        color: const Color(0xff199225).harmonizeWith(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                ),
+              ],
+            ),
           ),
-        ),
         ListView.separated(
-          padding: const EdgeInsets.only(top: 6),
+          padding: showTotal ? const EdgeInsets.only(top: 6) : EdgeInsets.zero,
           shrinkWrap: true,
           itemCount: items.length,
           physics: const NeverScrollableScrollPhysics(),

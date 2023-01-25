@@ -1,4 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
 
 class HistoryList extends StatelessWidget {
@@ -75,7 +76,14 @@ class HistoryList extends StatelessWidget {
                     Icons.arrow_right,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
-                  onTap: () {},
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<DetailsView>(
+                      builder: (context) => DetailsView(
+                        item: Map.fromEntries({items.entries.elementAt(index)}),
+                      ),
+                    ),
+                  ),
                 ),
                 if (index == items.length - 1)
                   Divider(

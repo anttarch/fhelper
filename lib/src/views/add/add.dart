@@ -22,6 +22,16 @@ class _AddViewState extends State<AddView> {
     _Type.income: 0,
     _Type.expense: 1,
   };
+  final List<String?> displayText = [
+    // Date
+    DateTime.now().toString(),
+    // Type,
+    null,
+    // Account,
+    null,
+    // Card
+    null,
+  ];
 
   // `_getPageHeight()` is a hard coded function
   // Some kind of hack to allow resizing of the view
@@ -86,7 +96,9 @@ class _AddViewState extends State<AddView> {
                         onSelectionChanged: (p0) {
                           setState(() {
                             _type = p0;
+                            displayText[0] = DateTime.now().toString();
                           });
+                          displayText.fillRange(1, 4, null);
                           _pageCtrl.animateToPage(
                             _indexMap.entries
                                 .firstWhere((e) => e.key == p0.single)
@@ -123,6 +135,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Date',
                                     readOnly: true,
+                                    placeholder: displayText[0],
                                     onTap: () async {
                                       final DateTime? picked =
                                           await showDatePicker(
@@ -133,6 +146,12 @@ class _AddViewState extends State<AddView> {
                                         lastDate:
                                             DateTime(DateTime.now().year + 1),
                                       );
+                                      if (picked != null) {
+                                        setState(
+                                          () => displayText[0] =
+                                              picked.toString(),
+                                        );
+                                      }
                                     },
                                   ),
                                 ),
@@ -141,6 +160,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Type',
                                     readOnly: true,
+                                    placeholder: displayText[1],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
@@ -172,6 +192,7 @@ class _AddViewState extends State<AddView> {
                                                     setState(() {
                                                       _itype = value!;
                                                     });
+                                                    Navigator.pop(context);
                                                   },
                                                   items: const {
                                                     'Present': _IType.present,
@@ -183,6 +204,11 @@ class _AddViewState extends State<AddView> {
                                           },
                                         );
                                       },
+                                    ).then(
+                                      (_) => setState(
+                                        () =>
+                                            displayText[1] = _itype.toString(),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -191,6 +217,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Account',
                                     readOnly: true,
+                                    placeholder: displayText[2],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
@@ -222,6 +249,7 @@ class _AddViewState extends State<AddView> {
                                                     setState(() {
                                                       _itype = value!;
                                                     });
+                                                    Navigator.pop(context);
                                                   },
                                                   items: const {
                                                     'Wallet': _IType.present,
@@ -233,6 +261,11 @@ class _AddViewState extends State<AddView> {
                                           },
                                         );
                                       },
+                                    ).then(
+                                      (_) => setState(
+                                        () =>
+                                            displayText[2] = _itype.toString(),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -256,6 +289,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Date',
                                     readOnly: true,
+                                    placeholder: displayText[0],
                                     onTap: () async {
                                       final DateTime? picked =
                                           await showDatePicker(
@@ -266,6 +300,11 @@ class _AddViewState extends State<AddView> {
                                         lastDate:
                                             DateTime(DateTime.now().year + 1),
                                       );
+                                      if (picked != null) {
+                                        setState(() {
+                                          displayText[0] = picked.toString();
+                                        });
+                                      }
                                     },
                                   ),
                                 ),
@@ -274,6 +313,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Type',
                                     readOnly: true,
+                                    placeholder: displayText[1],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
@@ -305,6 +345,7 @@ class _AddViewState extends State<AddView> {
                                                     setState(() {
                                                       _itype = value!;
                                                     });
+                                                    Navigator.pop(context);
                                                   },
                                                   items: const {
                                                     'Present': _IType.present,
@@ -316,6 +357,11 @@ class _AddViewState extends State<AddView> {
                                           },
                                         );
                                       },
+                                    ).then(
+                                      (_) => setState(
+                                        () =>
+                                            displayText[1] = _itype.toString(),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -324,6 +370,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Card',
                                     readOnly: true,
+                                    placeholder: displayText[3],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
@@ -355,6 +402,7 @@ class _AddViewState extends State<AddView> {
                                                     setState(() {
                                                       _itype = value!;
                                                     });
+                                                    Navigator.pop(context);
                                                   },
                                                   items: const {
                                                     'Card 1': _IType.present,
@@ -366,6 +414,11 @@ class _AddViewState extends State<AddView> {
                                           },
                                         );
                                       },
+                                    ).then(
+                                      (_) => setState(
+                                        () =>
+                                            displayText[3] = _itype.toString(),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -374,6 +427,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Account',
                                     readOnly: true,
+                                    placeholder: displayText[2],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
@@ -405,6 +459,7 @@ class _AddViewState extends State<AddView> {
                                                     setState(() {
                                                       _itype = value!;
                                                     });
+                                                    Navigator.pop(context);
                                                   },
                                                   items: const {
                                                     'Wallet': _IType.present,
@@ -416,6 +471,11 @@ class _AddViewState extends State<AddView> {
                                           },
                                         );
                                       },
+                                    ).then(
+                                      (_) => setState(
+                                        () =>
+                                            displayText[2] = _itype.toString(),
+                                      ),
                                     ),
                                   ),
                                 ),

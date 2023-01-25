@@ -13,7 +13,7 @@
 - [ ] Create Graphic on Home Page
 - [ ] Mention Transfer View on Home Page
 - [ ] Internationalize Headline greetings
-- [ ] ~~Figure out~~ Implement display of read only text fields
+- [x] ~~Figure out~~ Implement display of read only text fields
 
 ## App Logic
 - [ ] Implement Isar
@@ -27,6 +27,8 @@
 
 ### AddPage
 - [ ] Switch enums to real world enums
+- [ ] Add text formatting for date
+- [ ] Add intl DateFormat for displaying date
 
 ### DetailsPage
 - [ ] Fix InputFields for selectable options

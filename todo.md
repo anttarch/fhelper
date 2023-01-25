@@ -1,30 +1,32 @@
 # TODO
 
 ## Views/Pages
-- Add View
-- Transfer View
-- Details View
-- Edit View?
-- Settings Page
-- Customize View
+- [x] Add View
+- [ ] Transfer View
+- [x] Details View
+- [x] Settings Page
+- [ ] Customize View
 
 ## Widgets
-- Send id to HistoryList
-- Migrate DatePicker to MD3 (as of 23/1/2023)
-- Create Graphic on Home Page
-- Mention Transfer View on Home Page
-- Internationalize Headline greetings
+- [ ] Send id to HistoryList
+- [ ] Migrate DatePicker to MD3 (as of 25/1/2023)
+- [ ] Create Graphic on Home Page
+- [ ] Mention Transfer View on Home Page
+- [ ] Internationalize Headline greetings
+- [ ] ~~Figure out~~ Implement display of read only text fields
 
 ## App Logic
-- Implement Isar
-- Implement internationalization
-- Implement Bloc
+- [ ] Implement Isar
+- [ ] Implement internationalization
+- [ ] Implement Bloc
 
 ## Housekeeping
-- Review code
-- Unit testing?
-- Making every page it's own file
+- [ ] Review code
+- [ ] Unit testing?
+- [ ] Making every page it's own file
 
 ### AddPage
-- Switch enums to real world enums
-- Figure out display of read only text fields
+- [ ] Switch enums to real world enums
+
+### DetailsPage
+- [ ] Fix InputFields for selectable options

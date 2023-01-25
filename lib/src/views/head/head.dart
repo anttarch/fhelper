@@ -1,5 +1,6 @@
 import 'package:fhelper/src/views/head/history.dart';
 import 'package:fhelper/src/views/head/home.dart';
+import 'package:fhelper/src/views/head/settings.dart';
 import 'package:flutter/material.dart';
 
 class HeadView extends StatefulWidget {
@@ -80,6 +81,7 @@ class _HeadViewState extends State<HeadView> {
         children: const [
           HomePage(),
           HistoryPage(),
+          SettingsPage(),
         ],
         onPageChanged: (page) => setState(() {
           _pageIndex = page;
@@ -96,7 +98,7 @@ class _HeadViewState extends State<HeadView> {
           _pageCtrl.animateToPage(
             dest,
             duration: const Duration(milliseconds: 250),
-            curve: Curves.easeInOut,
+            curve: Curves.easeIn,
           );
         },
       ),

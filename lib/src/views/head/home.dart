@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/views/add/add.dart';
+import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -52,7 +53,14 @@ class HomePage extends StatelessWidget {
                     ),
                   ),
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<DetailsView>(
+                        builder: (context) => DetailsView(
+                          item: const {'Petrol Station': -16.5},
+                        ),
+                      ),
+                    ),
                     child: const Text('Details'),
                   )
                 ],

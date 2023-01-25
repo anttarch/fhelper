@@ -5,11 +5,15 @@ class InputField extends StatelessWidget {
     super.key,
     required this.label,
     this.onTap,
+    this.placeholder,
     this.readOnly = false,
+    this.textColor,
   });
   final String label;
   final VoidCallback? onTap;
+  final String? placeholder;
   final bool readOnly;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +32,7 @@ class InputField extends StatelessWidget {
             ),
           ),
           TextField(
+            controller: TextEditingController(text: placeholder),
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.all(16),
@@ -35,6 +40,9 @@ class InputField extends StatelessWidget {
             textCapitalization: TextCapitalization.sentences,
             onTap: onTap,
             readOnly: readOnly,
+            style: TextStyle(
+              color: textColor ?? Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       ),

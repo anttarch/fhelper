@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:flutter/material.dart';
 
@@ -42,7 +43,9 @@ class HomePage extends StatelessWidget {
                           r'-$16.50',
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                color: const Color(0xffbd1c1c),
+                                color: const Color(0xffbd1c1c).harmonizeWith(
+                                  Theme.of(context).colorScheme.primary,
+                                ),
                               ),
                         ),
                       ],
@@ -74,10 +77,12 @@ class HomePage extends StatelessWidget {
                             ),
                       ),
                       Text(
-                        r'-$55.04',
+                        r'+$55.04',
                         textAlign: TextAlign.start,
                         style: Theme.of(context).textTheme.titleLarge!.apply(
-                              color: const Color(0xff199225),
+                              color: const Color(0xff199225).harmonizeWith(
+                                Theme.of(context).colorScheme.primary,
+                              ),
                             ),
                       ),
                     ],

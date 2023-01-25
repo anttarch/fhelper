@@ -26,7 +26,9 @@ class HistoryList extends StatelessWidget {
             children: [
               Text(day, style: Theme.of(context).textTheme.titleLarge),
               Text(
-                dayTotal.toStringAsFixed(2),
+                dayTotal.isNegative
+                    ? dayTotal.toStringAsFixed(2).replaceAll('-', r'-$')
+                    : r'+$' + dayTotal.toStringAsFixed(2),
                 style: Theme.of(context).textTheme.titleLarge!.apply(
                       color: const Color(0xff199225)
                           .harmonizeWith(Theme.of(context).colorScheme.primary),
@@ -56,7 +58,13 @@ class HistoryList extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   subtitle: Text(
-                    items.values.elementAt(index).toStringAsFixed(2),
+                    items.values.elementAt(index).isNegative
+                        ? items.values
+                            .elementAt(index)
+                            .toStringAsFixed(2)
+                            .replaceAll('-', r'-$')
+                        : r'+$' +
+                            items.values.elementAt(index).toStringAsFixed(2),
                     style: TextStyle(color: valueColor),
                   ),
                   trailing: Icon(

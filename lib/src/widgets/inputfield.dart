@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 class InputField extends StatelessWidget {
   const InputField({
     super.key,
+    this.controller,
+    this.keyboardType = TextInputType.text,
     required this.label,
     this.onTap,
     this.placeholder,
     this.readOnly = false,
     this.textColor,
-  });
+  }) : assert(!(controller != null && placeholder != null));
+  final TextEditingController? controller;
+  final TextInputType keyboardType;
   final String label;
   final VoidCallback? onTap;
   final String? placeholder;
@@ -32,12 +36,14 @@ class InputField extends StatelessWidget {
             ),
           ),
           TextField(
-            controller: TextEditingController(text: placeholder),
+            controller: controller ?? TextEditingController(text: placeholder),
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.all(16),
             ),
+            keyboardType: keyboardType,
             textCapitalization: TextCapitalization.sentences,
+            textInputAction: TextInputAction.next,
             onTap: onTap,
             readOnly: readOnly,
             style: TextStyle(

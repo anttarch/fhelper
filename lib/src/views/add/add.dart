@@ -1,7 +1,9 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/sheetchoice.dart';
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 
 class AddView extends StatefulWidget {
   const AddView({super.key});
@@ -10,17 +12,15 @@ class AddView extends StatefulWidget {
   State<AddView> createState() => _AddViewState();
 }
 
-enum _Type { income, expense }
-
 enum _IType { present, wage }
 
 class _AddViewState extends State<AddView> {
-  Set<_Type> _type = {_Type.income};
+  Set<EType> _eType = {EType.income};
   _IType _itype = _IType.present;
   final PageController _pageCtrl = PageController();
-  final Map<_Type, int> _indexMap = {
-    _Type.income: 0,
-    _Type.expense: 1,
+  final Map<EType, int> _indexMap = {
+    EType.income: 0,
+    EType.expense: 1,
   };
   final List<String?> displayText = [
     // Date
@@ -31,6 +31,10 @@ class _AddViewState extends State<AddView> {
     null,
     // Card
     null,
+  ];
+  final List<TextEditingController> textController = [
+    TextEditingController(),
+    TextEditingController(),
   ];
 
   // `_getPageHeight()` is a hard coded function
@@ -46,7 +50,7 @@ class _AddViewState extends State<AddView> {
         260 -
         MediaQuery.of(context).padding.bottom -
         MediaQuery.of(context).padding.top;
-    final double treeHeight = _type.single == _Type.income ? 484 : 580;
+    final double treeHeight = _eType.single == EType.income ? 484 : 580;
     if (availableHeight > treeHeight) {
       return availableHeight;
     } else {
@@ -84,21 +88,24 @@ class _AddViewState extends State<AddView> {
                       child: SegmentedButton(
                         segments: const [
                           ButtonSegment(
-                            value: _Type.income,
+                            value: EType.income,
                             label: Text('Income'),
                           ),
                           ButtonSegment(
-                            value: _Type.expense,
+                            value: EType.expense,
                             label: Text('Expense'),
                           ),
                         ],
-                        selected: _type,
+                        selected: _eType,
                         onSelectionChanged: (p0) {
                           setState(() {
-                            _type = p0;
+                            _eType = p0;
                             displayText[0] = DateTime.now().toString();
                           });
                           displayText.fillRange(1, 4, null);
+                          for (final element in textController) {
+                            element.clear();
+                          }
                           _pageCtrl.animateToPage(
                             _indexMap.entries
                                 .firstWhere((e) => e.key == p0.single)
@@ -122,13 +129,20 @@ class _AddViewState extends State<AddView> {
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Column(
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 24),
-                                  child: InputField(label: 'Description'),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 24),
+                                  child: InputField(
+                                    controller: textController[0],
+                                    label: 'Description',
+                                  ),
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 20),
-                                  child: InputField(label: 'Amount'),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    controller: textController[1],
+                                    label: 'Amount',
+                                    keyboardType: TextInputType.number,
+                                  ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
@@ -282,7 +296,10 @@ class _AddViewState extends State<AddView> {
                                 ),
                                 const Padding(
                                   padding: EdgeInsets.only(top: 20),
-                                  child: InputField(label: 'Price'),
+                                  child: InputField(
+                                    label: 'Price',
+                                    keyboardType: TextInputType.number,
+                                  ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
@@ -503,16 +520,34 @@ class _AddViewState extends State<AddView> {
                   const SizedBox(width: 20),
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final Isar isar = Isar.getInstance()!;
+                        final Exchange exchange = Exchange(
+                          eType: _eType.single,
+                          description: textController[0].text,
+                          value: double.parse(textController[1].text),
+                          date: DateTime.parse(displayText[0]!),
+                          type: displayText[1]!,
+                          account: displayText[2]!,
+                        );
+                        await isar.writeTxn(() async {
+                          await isar.exchanges.put(exchange);
+                        }).then((_) => Navigator.pop(context));
+                      },
                       icon: const Icon(Icons.add),
                       label: const Text('Add'),
                       style: ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll<Color>(
                           Color(
-                            _type.single == _Type.income
+                            _eType.single == EType.income
                                 ? 0xff199225
                                 : 0xffbd1c1c,
                           ).harmonizeWith(
+                            Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        foregroundColor: MaterialStatePropertyAll<Color>(
+                          Colors.white.harmonizeWith(
                             Theme.of(context).colorScheme.primary,
                           ),
                         ),

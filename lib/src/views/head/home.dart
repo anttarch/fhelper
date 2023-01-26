@@ -1,7 +1,9 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -57,7 +59,11 @@ class HomePage extends StatelessWidget {
                       context,
                       MaterialPageRoute<DetailsView>(
                         builder: (context) => DetailsView(
-                          item: const {'Petrol Station': -16.5},
+                          item: Isar.getInstance()!
+                              .exchanges
+                              .where()
+                              .sortByDateDesc()
+                              .findFirstSync()!,
                         ),
                       ),
                     ),

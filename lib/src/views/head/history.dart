@@ -1,6 +1,8 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/historylist.dart';
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 
 enum _Date { today, week, month }
 
@@ -14,6 +16,7 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   Set<_Date> _date = {_Date.today};
   final PageController _pageCtrl = PageController();
+  Isar isar = Isar.getInstance()!;
 
   final Map<_Date, int> _indexMap = {
     _Date.today: 0,
@@ -65,235 +68,264 @@ class _HistoryPageState extends State<HistoryPage> {
             },
           ),
         ),
-        Expanded(
-          child: PageView(
-            controller: _pageCtrl,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-                      child: Card(
-                        elevation: 0,
-                        color: Theme.of(context).colorScheme.surface,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Today',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .apply(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                              ),
-                              Text(
-                                r'+$55.04',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .apply(
-                                      color:
-                                          const Color(0xff199225).harmonizeWith(
-                                        Theme.of(context).colorScheme.primary,
+        StreamBuilder(
+          stream: isar.exchanges.watchLazy(),
+          builder: (context, snapshot) {
+            return Expanded(
+              child: PageView(
+                controller: _pageCtrl,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        FutureBuilder(
+                          future: getSumValue(isar),
+                          builder: (context, snapshot) {
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                              child: Card(
+                                elevation: 0,
+                                color: Theme.of(context).colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Today',
+                                        textAlign: TextAlign.start,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .apply(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
                                       ),
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: HistoryList(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                        day: 'Today',
-                        dayTotal: 55.04,
-                        showTotal: false,
-                        items: {
-                          'Petrol Station': -16.5,
-                          'Football bet': 45.64,
-                          'Stock Exchange': 25.9,
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-                      child: Card(
-                        elevation: 0,
-                        color: Theme.of(context).colorScheme.surface,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'This Week',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .apply(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                              ),
-                              Text(
-                                r'+$18.46',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .apply(
-                                      color:
-                                          const Color(0xff199225).harmonizeWith(
-                                        Theme.of(context).colorScheme.primary,
+                                      Text(
+                                        snapshot.data?.toStringAsFixed(2) ??
+                                            0.toStringAsFixed(2),
+                                        textAlign: TextAlign.start,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .apply(
+                                              color: const Color(0xff199225)
+                                                  .harmonizeWith(
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                              ),
+                                            ),
                                       ),
-                                    ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ],
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: HistoryList(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 20),
+                            day: 'Today',
+                            dayTotal: 55.04,
+                            showTotal: false,
+                            items: isar.exchanges.where().findAllSync(),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: HistoryList(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                        day: 'Today',
-                        dayTotal: 55.04,
-                        items: {
-                          'Petrol Station': -16.5,
-                          'Football bet': 45.64,
-                          'Stock Exchange': 25.9,
-                        },
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: HistoryList(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                        day: 'Yesterday',
-                        dayTotal: -36.50,
-                        items: {
-                          'Energy Bill': -78.5,
-                          'Week Bonus': 32,
-                          'Friends bet': 10,
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-                      child: Card(
-                        elevation: 0,
-                        color: Theme.of(context).colorScheme.surface,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'This Month',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .apply(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                              ),
-                              Text(
-                                r'+$18.46',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .apply(
-                                      color:
-                                          const Color(0xff199225).harmonizeWith(
-                                        Theme.of(context).colorScheme.primary,
+                  ),
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        FutureBuilder(
+                          future: getSumValue(isar, time: 1),
+                          builder: (context, snapshot) {
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                              child: Card(
+                                elevation: 0,
+                                color: Theme.of(context).colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'This Week',
+                                        textAlign: TextAlign.start,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .apply(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
                                       ),
-                                    ),
+                                      Text(
+                                        snapshot.data?.toStringAsFixed(2) ??
+                                            0.toStringAsFixed(2),
+                                        textAlign: TextAlign.start,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .apply(
+                                              color: const Color(0xff199225)
+                                                  .harmonizeWith(
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                              ),
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ],
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: HistoryList(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 20),
+                            day: 'Today',
+                            dayTotal: isar.exchanges
+                                .where()
+                                .valueProperty()
+                                .sumSync(),
+                            items: isar.exchanges.where().findAllSync(),
                           ),
                         ),
-                      ),
+                        // const Padding(
+                        //   padding: EdgeInsets.only(top: 20),
+                        //   child: HistoryList(
+                        //     contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                        //     day: 'Yesterday',
+                        //     dayTotal: -36.50,
+                        //     items: {
+                        //       'Energy Bill': -78.5,
+                        //       'Week Bonus': 32,
+                        //       'Friends bet': 10,
+                        //     },
+                        //   ),
+                        // ),
+                      ],
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: HistoryList(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                        day: 'Today',
-                        dayTotal: 55.04,
-                        items: {
-                          'Petrol Station': -16.5,
-                          'Football bet': 45.64,
-                          'Stock Exchange': 25.9,
-                        },
-                      ),
+                  ),
+                  SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        FutureBuilder(
+                          future: getSumValue(isar, time: 2),
+                          builder: (context, snapshot) {
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                              child: Card(
+                                elevation: 0,
+                                color: Theme.of(context).colorScheme.surface,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'This Month',
+                                        textAlign: TextAlign.start,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .apply(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
+                                      ),
+                                      Text(
+                                        snapshot.data?.toStringAsFixed(2) ??
+                                            0.toStringAsFixed(2),
+                                        textAlign: TextAlign.start,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .apply(
+                                              color: const Color(0xff199225)
+                                                  .harmonizeWith(
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                              ),
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: HistoryList(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 20),
+                            day: 'Today',
+                            dayTotal: 55.04,
+                            items: isar.exchanges.where().findAllSync(),
+                          ),
+                        ),
+                        // const Padding(
+                        //   padding: EdgeInsets.only(top: 20),
+                        //   child: HistoryList(
+                        //     contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                        //     day: 'Yesterday',
+                        //     dayTotal: -36.50,
+                        //     items: {
+                        //       'Energy Bill': -78.5,
+                        //       'Week Bonus': 32,
+                        //       'Friends bet': 10,
+                        //     },
+                        //   ),
+                        // ),
+                      ],
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: HistoryList(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                        day: 'Yesterday',
-                        dayTotal: -36.50,
-                        items: {
-                          'Energy Bill': -78.5,
-                          'Week Bonus': 32,
-                          'Friends bet': 10,
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ],
     );

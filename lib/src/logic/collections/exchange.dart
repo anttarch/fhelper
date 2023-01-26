@@ -32,3 +32,56 @@ class Exchange {
   final String type; // Type (category)
   final double value; // Monetary value
 }
+
+Future<double> getSumValue(Isar isar, {int time = 0}) async {
+  final double today = await isar.exchanges
+      .where()
+      .filter()
+      .dateBetween(
+        DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+        ),
+        DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+          23,
+          59,
+          59,
+          999,
+          999,
+        ),
+      )
+      .valueProperty()
+      .sum();
+
+  final double week = await isar.exchanges
+      .where()
+      .filter()
+      .dateBetween(
+        DateTime.now().subtract(Duration(days: DateTime.now().weekday)),
+        DateTime.now(),
+      )
+      .valueProperty()
+      .sum();
+
+  final double month = await isar.exchanges
+      .where()
+      .filter()
+      .dateBetween(
+        DateTime.now().subtract(Duration(days: DateTime.now().day - 1)),
+        DateTime.now(),
+      )
+      .valueProperty()
+      .sum();
+
+  final Map<int, double> timeTable = {
+    0: today,
+    1: week,
+    2: month,
+  };
+
+  return timeTable[time]!;
+}

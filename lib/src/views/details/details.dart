@@ -1,11 +1,12 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/sheetchoice.dart';
 import 'package:flutter/material.dart';
 
 class DetailsView extends StatefulWidget {
-  const DetailsView({super.key, required this.item}) : assert(item.length == 1);
-  final Map<String, double> item;
+  const DetailsView({super.key, required this.item});
+  final Exchange item;
 
   @override
   State<DetailsView> createState() => _DetailsViewState();
@@ -49,26 +50,25 @@ class _DetailsViewState extends State<DetailsView> {
                             padding: const EdgeInsets.only(top: 8),
                             child: InputField(
                               label: 'Description',
-                              placeholder: widget.item.keys.single,
+                              placeholder: widget.item.description,
                               readOnly: true,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
-                              label: widget.item.values.single.isNegative
+                              label: widget.item.value.isNegative
                                   ? 'Price'
                                   : 'Amount',
-                              placeholder: widget.item.values.single.isNegative
-                                  ? widget.item.values.single
+                              placeholder: widget.item.value.isNegative
+                                  ? widget.item.value
                                       .toStringAsFixed(2)
                                       .replaceAll('-', r'-$')
                                   : r'+$' +
-                                      widget.item.values.single
-                                          .toStringAsFixed(2),
+                                      widget.item.value.toStringAsFixed(2),
                               readOnly: true,
                               textColor: Color(
-                                widget.item.values.single.isNegative
+                                widget.item.value.isNegative
                                     ? 0xffbd1c1c
                                     : 0xff199225,
                               ).harmonizeWith(
@@ -133,7 +133,7 @@ class _DetailsViewState extends State<DetailsView> {
                             ),
                           ),
                           Visibility(
-                            visible: widget.item.values.single.isNegative,
+                            visible: widget.item.value.isNegative,
                             child: Padding(
                               padding: const EdgeInsets.only(top: 20),
                               child: InputField(

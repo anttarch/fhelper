@@ -1,4 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class HistoryList extends StatelessWidget {
   final EdgeInsets contentPadding;
   final String day;
   final double dayTotal;
-  final Map<String, double> items;
+  final List<Exchange> items;
   final bool showTotal;
 
   @override
@@ -50,7 +51,7 @@ class HistoryList extends StatelessWidget {
           itemBuilder: (context, index) {
             Color valueColor = const Color(0xff199225)
                 .harmonizeWith(Theme.of(context).colorScheme.primary);
-            if (items.values.elementAt(index).isNegative) {
+            if (items[index].value.isNegative) {
               valueColor = const Color(0xffbd1c1c)
                   .harmonizeWith(Theme.of(context).colorScheme.primary);
             }
@@ -59,17 +60,16 @@ class HistoryList extends StatelessWidget {
                 ListTile(
                   contentPadding: contentPadding,
                   title: Text(
-                    items.keys.elementAt(index),
+                    items[index].description,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   subtitle: Text(
-                    items.values.elementAt(index).isNegative
-                        ? items.values
-                            .elementAt(index)
+                    items[index].value.isNegative
+                        ? items[index]
+                            .value
                             .toStringAsFixed(2)
                             .replaceAll('-', r'-$')
-                        : r'+$' +
-                            items.values.elementAt(index).toStringAsFixed(2),
+                        : r'+$' + items[index].value.toStringAsFixed(2),
                     style: TextStyle(color: valueColor),
                   ),
                   trailing: Icon(
@@ -80,7 +80,7 @@ class HistoryList extends StatelessWidget {
                     context,
                     MaterialPageRoute<DetailsView>(
                       builder: (context) => DetailsView(
-                        item: Map.fromEntries({items.entries.elementAt(index)}),
+                        item: items[index],
                       ),
                     ),
                   ),

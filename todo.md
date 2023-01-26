@@ -8,7 +8,7 @@
 - [ ] Customize View
 
 ## Widgets
-- [ ] Send id to HistoryList
+- [x] Send id to HistoryList
 - [ ] Migrate DatePicker to MD3 (as of 25/1/2023)
 - [ ] Create Graphic on Home Page
 - [ ] Mention Transfer View on Home Page
@@ -17,18 +17,27 @@
 
 ## App Logic
 - [ ] Implement Isar
+    - [x] Base Exchange write
+    - [x] Exchange read
+    - [ ] Card write and read
 - [ ] Implement internationalization
 - [ ] Implement Bloc
+- [ ] Add default accounts
+- [ ] Add default types
 
 ## Housekeeping
 - [ ] Review code
 - [ ] Unit testing?
 - [ ] Making every page it's own file
 
-### AddPage
-- [ ] Switch enums to real world enums
+### AddView
+- [x] Switch enums to real world enums
 - [ ] Add text formatting for date
 - [ ] Add intl DateFormat for displaying date
 
-### DetailsPage
+### DetailsView
 - [ ] Fix InputFields for selectable options
+- [ ] Fix Card display
+
+### HistoryPage
+- [ ] Fix displaying of dates before "yesterday"

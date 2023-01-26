@@ -156,9 +156,8 @@ class _AddViewState extends State<AddView> {
                                         context: context,
                                         initialDate: DateTime.now(),
                                         firstDate:
-                                            DateTime(DateTime.now().year),
-                                        lastDate:
-                                            DateTime(DateTime.now().year + 1),
+                                            DateTime(DateTime.now().month),
+                                        lastDate: DateTime.now(),
                                       );
                                       if (picked != null) {
                                         setState(
@@ -290,13 +289,17 @@ class _AddViewState extends State<AddView> {
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Column(
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 24),
-                                  child: InputField(label: 'Description'),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 20),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 24),
                                   child: InputField(
+                                    controller: textController[0],
+                                    label: 'Description',
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    controller: textController[1],
                                     label: 'Price',
                                     keyboardType: TextInputType.number,
                                   ),
@@ -313,9 +316,8 @@ class _AddViewState extends State<AddView> {
                                         context: context,
                                         initialDate: DateTime.now(),
                                         firstDate:
-                                            DateTime(DateTime.now().year),
-                                        lastDate:
-                                            DateTime(DateTime.now().year + 1),
+                                            DateTime(DateTime.now().month),
+                                        lastDate: DateTime.now(),
                                       );
                                       if (picked != null) {
                                         setState(() {
@@ -525,7 +527,9 @@ class _AddViewState extends State<AddView> {
                         final Exchange exchange = Exchange(
                           eType: _eType.single,
                           description: textController[0].text,
-                          value: double.parse(textController[1].text),
+                          value: _eType.single == EType.income
+                              ? double.parse(textController[1].text)
+                              : -double.parse(textController[1].text),
                           date: DateTime.parse(displayText[0]!),
                           type: displayText[1]!,
                           account: displayText[2]!,

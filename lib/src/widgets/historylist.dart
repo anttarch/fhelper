@@ -35,7 +35,9 @@ class HistoryList extends StatelessWidget {
                       ? dayTotal.toStringAsFixed(2).replaceAll('-', r'-$')
                       : r'+$' + dayTotal.toStringAsFixed(2),
                   style: Theme.of(context).textTheme.titleLarge!.apply(
-                        color: const Color(0xff199225).harmonizeWith(
+                        color: Color(
+                          dayTotal.isNegative ? 0xffbd1c1c : 0xff199225,
+                        ).harmonizeWith(
                           Theme.of(context).colorScheme.primary,
                         ),
                       ),

@@ -1,7 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
-import 'package:fhelper/src/widgets/sheetchoice.dart';
 import 'package:flutter/material.dart';
 
 class DetailsView extends StatefulWidget {
@@ -12,11 +11,7 @@ class DetailsView extends StatefulWidget {
   State<DetailsView> createState() => _DetailsViewState();
 }
 
-enum _IType { present, wage }
-
 class _DetailsViewState extends State<DetailsView> {
-  _IType _itype = _IType.present;
-
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
@@ -68,7 +63,7 @@ class _DetailsViewState extends State<DetailsView> {
                                       widget.item.value.toStringAsFixed(2),
                               readOnly: true,
                               textColor: Color(
-                                widget.item.value.isNegative
+                                widget.item.eType == EType.expense
                                     ? 0xffbd1c1c
                                     : 0xff199225,
                               ).harmonizeWith(
@@ -80,56 +75,16 @@ class _DetailsViewState extends State<DetailsView> {
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
                               label: 'Date',
+                              placeholder: widget.item.date.toString(),
                               readOnly: true,
-                              onTap: () {},
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
                               label: 'Type',
+                              placeholder: widget.item.type,
                               readOnly: true,
-                              onTap: () => showModalBottomSheet<void>(
-                                context: context,
-                                constraints: BoxConstraints(
-                                  maxHeight:
-                                      MediaQuery.of(context).size.height / 2.5,
-                                ),
-                                enableDrag: false,
-                                builder: (context) {
-                                  return StatefulBuilder(
-                                    builder: (context, setState) {
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(20),
-                                            child: Text(
-                                              'Select Type',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge,
-                                            ),
-                                          ),
-                                          SheetChoice<_IType>(
-                                            groupValue: _itype,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _itype = value!;
-                                              });
-                                            },
-                                            items: const {
-                                              'Present': _IType.present,
-                                              'Wage': _IType.wage
-                                            },
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
                             ),
                           ),
                           Visibility(
@@ -138,49 +93,8 @@ class _DetailsViewState extends State<DetailsView> {
                               padding: const EdgeInsets.only(top: 20),
                               child: InputField(
                                 label: 'Card',
+                                placeholder: widget.item.cardId.toString(),
                                 readOnly: true,
-                                onTap: () => showModalBottomSheet<void>(
-                                  context: context,
-                                  constraints: BoxConstraints(
-                                    maxHeight:
-                                        MediaQuery.of(context).size.height /
-                                            2.5,
-                                  ),
-                                  enableDrag: false,
-                                  builder: (context) {
-                                    return StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.all(20),
-                                              child: Text(
-                                                'Select Card',
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleLarge,
-                                              ),
-                                            ),
-                                            SheetChoice<_IType>(
-                                              groupValue: _itype,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _itype = value!;
-                                                });
-                                              },
-                                              items: const {
-                                                'Card 1': _IType.present,
-                                                'Card 2': _IType.wage
-                                              },
-                                            )
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
                               ),
                             ),
                           ),
@@ -188,48 +102,8 @@ class _DetailsViewState extends State<DetailsView> {
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
                               label: 'Account',
+                              placeholder: widget.item.account,
                               readOnly: true,
-                              onTap: () => showModalBottomSheet<void>(
-                                context: context,
-                                constraints: BoxConstraints(
-                                  maxHeight:
-                                      MediaQuery.of(context).size.height / 2.5,
-                                ),
-                                enableDrag: false,
-                                builder: (context) {
-                                  return StatefulBuilder(
-                                    builder: (context, setState) {
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(20),
-                                            child: Text(
-                                              'Select Account',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge,
-                                            ),
-                                          ),
-                                          SheetChoice<_IType>(
-                                            groupValue: _itype,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _itype = value!;
-                                              });
-                                            },
-                                            items: const {
-                                              'Wallet': _IType.present,
-                                              'Bank': _IType.wage
-                                            },
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
                             ),
                           ),
                         ],

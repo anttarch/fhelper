@@ -11,6 +11,7 @@ class Exchange {
     required this.account,
     this.cardId,
     required this.description,
+    required this.date,
     this.installments,
     this.installmentValue,
     required this.eType,
@@ -21,6 +22,7 @@ class Exchange {
   final Id id; // Isar id
   final String account; // Account linked
   final int? cardId; // Card linked
+  final DateTime date;
   final String description; // Name
   final int? installments; // Installments amount
   final double? installmentValue; // Value of each installment

@@ -27,34 +27,39 @@ const ExchangeSchema = CollectionSchema(
       name: r'cardId',
       type: IsarType.long,
     ),
-    r'description': PropertySchema(
+    r'date': PropertySchema(
       id: 2,
+      name: r'date',
+      type: IsarType.dateTime,
+    ),
+    r'description': PropertySchema(
+      id: 3,
       name: r'description',
       type: IsarType.string,
     ),
     r'eType': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'eType',
       type: IsarType.byte,
       enumMap: _ExchangeeTypeEnumValueMap,
     ),
     r'installmentValue': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'installmentValue',
       type: IsarType.double,
     ),
     r'installments': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'installments',
       type: IsarType.long,
     ),
     r'type': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'type',
       type: IsarType.string,
     ),
     r'value': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'value',
       type: IsarType.double,
     )
@@ -93,12 +98,13 @@ void _exchangeSerialize(
 ) {
   writer.writeString(offsets[0], object.account);
   writer.writeLong(offsets[1], object.cardId);
-  writer.writeString(offsets[2], object.description);
-  writer.writeByte(offsets[3], object.eType.index);
-  writer.writeDouble(offsets[4], object.installmentValue);
-  writer.writeLong(offsets[5], object.installments);
-  writer.writeString(offsets[6], object.type);
-  writer.writeDouble(offsets[7], object.value);
+  writer.writeDateTime(offsets[2], object.date);
+  writer.writeString(offsets[3], object.description);
+  writer.writeByte(offsets[4], object.eType.index);
+  writer.writeDouble(offsets[5], object.installmentValue);
+  writer.writeLong(offsets[6], object.installments);
+  writer.writeString(offsets[7], object.type);
+  writer.writeDouble(offsets[8], object.value);
 }
 
 Exchange _exchangeDeserialize(
@@ -110,14 +116,15 @@ Exchange _exchangeDeserialize(
   final object = Exchange(
     account: reader.readString(offsets[0]),
     cardId: reader.readLongOrNull(offsets[1]),
-    description: reader.readString(offsets[2]),
-    eType: _ExchangeeTypeValueEnumMap[reader.readByteOrNull(offsets[3])] ??
+    date: reader.readDateTime(offsets[2]),
+    description: reader.readString(offsets[3]),
+    eType: _ExchangeeTypeValueEnumMap[reader.readByteOrNull(offsets[4])] ??
         EType.income,
     id: id,
-    installmentValue: reader.readDoubleOrNull(offsets[4]),
-    installments: reader.readLongOrNull(offsets[5]),
-    type: reader.readString(offsets[6]),
-    value: reader.readDouble(offsets[7]),
+    installmentValue: reader.readDoubleOrNull(offsets[5]),
+    installments: reader.readLongOrNull(offsets[6]),
+    type: reader.readString(offsets[7]),
+    value: reader.readDouble(offsets[8]),
   );
   return object;
 }
@@ -134,17 +141,19 @@ P _exchangeDeserializeProp<P>(
     case 1:
       return (reader.readLongOrNull(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 3:
+      return (reader.readString(offset)) as P;
+    case 4:
       return (_ExchangeeTypeValueEnumMap[reader.readByteOrNull(offset)] ??
           EType.income) as P;
-    case 4:
-      return (reader.readDoubleOrNull(offset)) as P;
     case 5:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 6:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 7:
+      return (reader.readString(offset)) as P;
+    case 8:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -438,6 +447,59 @@ extension ExchangeQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'cardId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Exchange, Exchange, QAfterFilterCondition> dateEqualTo(
+      DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'date',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Exchange, Exchange, QAfterFilterCondition> dateGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'date',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Exchange, Exchange, QAfterFilterCondition> dateLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'date',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Exchange, Exchange, QAfterFilterCondition> dateBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'date',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -1062,6 +1124,18 @@ extension ExchangeQuerySortBy on QueryBuilder<Exchange, Exchange, QSortBy> {
     });
   }
 
+  QueryBuilder<Exchange, Exchange, QAfterSortBy> sortByDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'date', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Exchange, Exchange, QAfterSortBy> sortByDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'date', Sort.desc);
+    });
+  }
+
   QueryBuilder<Exchange, Exchange, QAfterSortBy> sortByDescription() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'description', Sort.asc);
@@ -1158,6 +1232,18 @@ extension ExchangeQuerySortThenBy
   QueryBuilder<Exchange, Exchange, QAfterSortBy> thenByCardIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'cardId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Exchange, Exchange, QAfterSortBy> thenByDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'date', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Exchange, Exchange, QAfterSortBy> thenByDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'date', Sort.desc);
     });
   }
 
@@ -1261,6 +1347,12 @@ extension ExchangeQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Exchange, Exchange, QDistinct> distinctByDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'date');
+    });
+  }
+
   QueryBuilder<Exchange, Exchange, QDistinct> distinctByDescription(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1317,6 +1409,12 @@ extension ExchangeQueryProperty
   QueryBuilder<Exchange, int?, QQueryOperations> cardIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'cardId');
+    });
+  }
+
+  QueryBuilder<Exchange, DateTime, QQueryOperations> dateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'date');
     });
   }
 

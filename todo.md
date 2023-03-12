@@ -44,4 +44,4 @@
 - [x] Add intl DateFormat for displaying date
 
 ### HistoryPage
-- [ ] Fix displaying of dates before "yesterday"
+- [x] Fix displaying of dates before "yesterday"

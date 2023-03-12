@@ -300,7 +300,13 @@ class _HistoryPageState extends State<HistoryPage> {
                                           : days.keys.toList()[index] ==
                                                   DateTime.now().day - 1
                                               ? 'Yesterday'
-                                              : 'Other day',
+                                              : DateFormat.EEEE().format(
+                                                  DateTime(
+                                                    DateTime.now().year,
+                                                    DateTime.now().month,
+                                                    days.keys.toList()[index],
+                                                  ),
+                                                ),
                                       dayTotal: days.values.toList()[index],
                                       items: exchangeLists[index],
                                     ),
@@ -449,7 +455,13 @@ class _HistoryPageState extends State<HistoryPage> {
                                           : days.keys.toList()[index] ==
                                                   DateTime.now().day - 1
                                               ? 'Yesterday'
-                                              : 'Other day',
+                                              : DateFormat('EEEE, dd').format(
+                                                  DateTime(
+                                                    DateTime.now().year,
+                                                    DateTime.now().month,
+                                                    days.keys.toList()[index],
+                                                  ),
+                                                ),
                                       dayTotal: days.values.toList()[index],
                                       items: exchangeLists[index],
                                     ),

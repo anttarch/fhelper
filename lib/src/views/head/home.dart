@@ -10,6 +10,9 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Exchange? exchange =
+        Isar.getInstance()!.exchanges.where().sortByDateDesc().findFirstSync();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: StreamBuilder(
@@ -17,78 +20,75 @@ class HomePage extends StatelessWidget {
         builder: (context, snapshot) {
           return Column(
             children: [
-              Card(
-                color: Theme.of(context).colorScheme.surface,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Latest:',
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.titleLarge!.apply(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              Isar.getInstance()!
-                                  .exchanges
-                                  .where()
-                                  .sortByDateDesc()
-                                  .findFirstSync()!
-                                  .description,
-                              textAlign: TextAlign.start,
-                              style:
-                                  Theme.of(context).textTheme.bodyLarge!.apply(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                      ),
-                            ),
-                            Text(
-                              Isar.getInstance()!
-                                  .exchanges
-                                  .where()
-                                  .sortByDateDesc()
-                                  .findFirstSync()!
-                                  .value
-                                  .toStringAsFixed(2),
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge!
-                                  .apply(
-                                    color:
-                                        const Color(0xffbd1c1c).harmonizeWith(
-                                      Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                            ),
-                          ],
+              Visibility(
+                visible: exchange != null,
+                child: Card(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Latest:',
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.titleLarge!.apply(
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                         ),
-                      ),
-                      OutlinedButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute<DetailsView>(
-                            builder: (context) => DetailsView(
-                              item: Isar.getInstance()!
-                                  .exchanges
-                                  .where()
-                                  .sortByDateDesc()
-                                  .findFirstSync()!,
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                exchange!.description,
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .apply(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                              ),
+                              Text(
+                                exchange.value.isNegative
+                                    ? exchange.value
+                                        .toStringAsFixed(2)
+                                        .replaceAll('-', r'-$')
+                                    : r'+$' + exchange.value.toStringAsFixed(2),
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .apply(
+                                      color: Color(
+                                        exchange.value.isNegative
+                                            ? 0xffbd1c1c
+                                            : 0xff199225,
+                                      ).harmonizeWith(
+                                        Theme.of(context).colorScheme.primary,
+                                      ),
+                                    ),
+                              ),
+                            ],
                           ),
                         ),
-                        child: const Text('Details'),
-                      )
-                    ],
+                        OutlinedButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute<DetailsView>(
+                              builder: (context) => DetailsView(
+                                item: exchange,
+                              ),
+                            ),
+                          ),
+                          child: const Text('Details'),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -130,8 +130,11 @@ class HomePage extends StatelessWidget {
                                       .textTheme
                                       .titleLarge!
                                       .apply(
-                                        color: const Color(0xff199225)
-                                            .harmonizeWith(
+                                        color: Color(
+                                          snapshot.data!.isNegative
+                                              ? 0xffbd1c1c
+                                              : 0xff199225,
+                                        ).harmonizeWith(
                                           Theme.of(context).colorScheme.primary,
                                         ),
                                       ),

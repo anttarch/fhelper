@@ -25,6 +25,9 @@
 - [ ] Add default accounts
 - [ ] Add default types
 
+## Nice Haves
+- [x] Set first day of week (default to local)
+
 ## Housekeeping
 - [ ] Review code
 - [ ] Unit testing?

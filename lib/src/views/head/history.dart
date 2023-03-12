@@ -143,7 +143,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           },
                         ),
                         FutureBuilder(
-                          future: getExchanges(isar),
+                          future: getExchanges(isar, context),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               return Padding(
@@ -238,7 +238,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           },
                         ),
                         FutureBuilder(
-                          future: getExchanges(isar, time: 1),
+                          future: getExchanges(isar, context, time: 1),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               // This function separates the raw result of `getExchanges()` into days,
@@ -387,7 +387,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           },
                         ),
                         FutureBuilder(
-                          future: getExchanges(isar, time: 2),
+                          future: getExchanges(isar, context, time: 2),
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               // This function separates the raw result of `getExchanges()` into days,

@@ -11,14 +11,17 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Exchange? exchange =
-        Isar.getInstance()!.exchanges.where().sortByDateDesc().findFirstSync();
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: StreamBuilder(
         stream: Isar.getInstance()!.exchanges.watchLazy(),
         builder: (context, snapshot) {
+          final Exchange? exchange = Isar.getInstance()!
+              .exchanges
+              .where()
+              .sortByDateDesc()
+              .findFirstSync();
+
           return Column(
             children: [
               Visibility(

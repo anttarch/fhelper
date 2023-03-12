@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DetailsView extends StatefulWidget {
   const DetailsView({super.key, required this.item});
@@ -12,6 +13,14 @@ class DetailsView extends StatefulWidget {
 }
 
 class _DetailsViewState extends State<DetailsView> {
+  String exchangeDate(DateTime date) {
+    final dateWithoutTime = DateTime(date.year, date.month, date.day);
+    if (date.isAtSameMomentAs(dateWithoutTime)) {
+      return DateFormat.yMd().format(date);
+    }
+    return DateFormat.yMd().add_jm().format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
@@ -75,7 +84,7 @@ class _DetailsViewState extends State<DetailsView> {
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
                               label: 'Date',
-                              placeholder: widget.item.date.toString(),
+                              placeholder: exchangeDate(widget.item.date),
                               readOnly: true,
                             ),
                           ),

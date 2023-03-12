@@ -3,6 +3,7 @@ import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/sheetchoice.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 class AddView extends StatefulWidget {
@@ -149,20 +150,44 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Date',
                                     readOnly: true,
-                                    placeholder: displayText[0],
+                                    placeholder: DateTime.now()
+                                                .difference(
+                                                  DateTime.parse(
+                                                    displayText[0]!,
+                                                  ),
+                                                )
+                                                .inHours <
+                                            24
+                                        ? DateFormat.yMd().add_jm().format(
+                                              DateTime.parse(displayText[0]!),
+                                            )
+                                        : DateFormat.yMd().format(
+                                            DateTime.parse(displayText[0]!),
+                                          ),
                                     onTap: () async {
                                       final DateTime? picked =
                                           await showDatePicker(
                                         context: context,
-                                        initialDate: DateTime.now(),
+                                        initialDate:
+                                            DateTime.parse(displayText[0]!),
                                         firstDate:
                                             DateTime(DateTime.now().month),
                                         lastDate: DateTime.now(),
                                       );
                                       if (picked != null) {
                                         setState(
-                                          () => displayText[0] =
-                                              picked.toString(),
+                                          () {
+                                            if (DateTime.now()
+                                                    .difference(picked)
+                                                    .inHours <
+                                                24) {
+                                              displayText[0] =
+                                                  DateTime.now().toString();
+                                            } else {
+                                              displayText[0] =
+                                                  picked.toString();
+                                            }
+                                          },
                                         );
                                       }
                                     },
@@ -309,20 +334,45 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: 'Date',
                                     readOnly: true,
-                                    placeholder: displayText[0],
+                                    placeholder: DateTime.now()
+                                                .difference(
+                                                  DateTime.parse(
+                                                    displayText[0]!,
+                                                  ),
+                                                )
+                                                .inHours <
+                                            24
+                                        ? DateFormat.yMd().add_jm().format(
+                                              DateTime.parse(displayText[0]!),
+                                            )
+                                        : DateFormat.yMd().format(
+                                            DateTime.parse(displayText[0]!),
+                                          ),
                                     onTap: () async {
                                       final DateTime? picked =
                                           await showDatePicker(
                                         context: context,
-                                        initialDate: DateTime.now(),
+                                        initialDate:
+                                            DateTime.parse(displayText[0]!),
                                         firstDate:
                                             DateTime(DateTime.now().month),
                                         lastDate: DateTime.now(),
                                       );
                                       if (picked != null) {
-                                        setState(() {
-                                          displayText[0] = picked.toString();
-                                        });
+                                        setState(
+                                          () {
+                                            if (DateTime.now()
+                                                    .difference(picked)
+                                                    .inHours <
+                                                24) {
+                                              displayText[0] =
+                                                  DateTime.now().toString();
+                                            } else {
+                                              displayText[0] =
+                                                  picked.toString();
+                                            }
+                                          },
+                                        );
                                       }
                                     },
                                   ),

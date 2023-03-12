@@ -32,6 +32,7 @@ dependencies:
   dynamic_color: ^1.5.4
   flutter:
     sdk: flutter
+  intl: ^0.18.0
   isar: ^3.0.5
   isar_flutter_libs: ^3.0.5
 

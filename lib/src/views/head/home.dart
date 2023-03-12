@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
       child: StreamBuilder(
         stream: Isar.getInstance()!.exchanges.watchLazy(),
         builder: (context, snapshot) {
-          final Exchange? exchange = Isar.getInstance()!
+          final exchange = Isar.getInstance()!
               .exchanges
               .where()
               .sortByDateDesc()
@@ -46,7 +46,9 @@ class HomePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                exchange!.description,
+                                exchange != null
+                                    ? exchange.description
+                                    : 'Placeholder',
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context)
                                     .textTheme
@@ -58,17 +60,20 @@ class HomePage extends StatelessWidget {
                                     ),
                               ),
                               Text(
-                                NumberFormat.simpleCurrency()
-                                    .format(exchange.value),
+                                NumberFormat.simpleCurrency().format(
+                                  exchange != null ? exchange.value : 0,
+                                ),
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge!
                                     .apply(
                                       color: Color(
-                                        exchange.value.isNegative
-                                            ? 0xffbd1c1c
-                                            : 0xff199225,
+                                        exchange != null
+                                            ? exchange.value.isNegative
+                                                ? 0xffbd1c1c
+                                                : 0xff199225
+                                            : 0xff000000,
                                       ).harmonizeWith(
                                         Theme.of(context).colorScheme.primary,
                                       ),
@@ -82,7 +87,7 @@ class HomePage extends StatelessWidget {
                             context,
                             MaterialPageRoute<DetailsView>(
                               builder: (context) => DetailsView(
-                                item: exchange,
+                                item: exchange!,
                               ),
                             ),
                           ),

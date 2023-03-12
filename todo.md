@@ -9,7 +9,7 @@
 
 ## Widgets
 - [x] Send id to HistoryList
-- [ ] Migrate DatePicker to MD3 (as of 25/1/2023)
+- [x] Migrate DatePicker to MD3 (as of 25/1/2023)
 - [ ] Create Graphic on Home Page
 - [ ] Mention Transfer View on Home Page
 - [ ] Internationalize Headline greetings

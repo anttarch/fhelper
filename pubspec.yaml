@@ -32,6 +32,8 @@ dependencies:
   dynamic_color: ^1.5.4
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   intl: ^0.18.0
   isar: ^3.0.5
   isar_flutter_libs: ^3.0.5
@@ -48,6 +50,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

@@ -64,12 +64,8 @@ class _DetailsViewState extends State<DetailsView> {
                               label: widget.item.value.isNegative
                                   ? 'Price'
                                   : 'Amount',
-                              placeholder: widget.item.value.isNegative
-                                  ? widget.item.value
-                                      .toStringAsFixed(2)
-                                      .replaceAll('-', r'-$')
-                                  : r'+$' +
-                                      widget.item.value.toStringAsFixed(2),
+                              placeholder: NumberFormat.simpleCurrency()
+                                  .format(widget.item.value),
                               readOnly: true,
                               textColor: Color(
                                 widget.item.eType == EType.expense

@@ -3,6 +3,7 @@ import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 class HomePage extends StatelessWidget {
@@ -54,11 +55,8 @@ class HomePage extends StatelessWidget {
                                     ),
                               ),
                               Text(
-                                exchange.value.isNegative
-                                    ? exchange.value
-                                        .toStringAsFixed(2)
-                                        .replaceAll('-', r'-$')
-                                    : r'+$' + exchange.value.toStringAsFixed(2),
+                                NumberFormat.simpleCurrency()
+                                    .format(exchange.value),
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context)
                                     .textTheme
@@ -119,12 +117,8 @@ class HomePage extends StatelessWidget {
                               ),
                               if (snapshot.hasData)
                                 Text(
-                                  snapshot.data!.isNegative
-                                      ? snapshot.data!
-                                          .toStringAsFixed(2)
-                                          .replaceAll('-', r'-$')
-                                      : r'+$' +
-                                          snapshot.data!.toStringAsFixed(2),
+                                  NumberFormat.simpleCurrency()
+                                      .format(snapshot.data),
                                   textAlign: TextAlign.start,
                                   style: Theme.of(context)
                                       .textTheme

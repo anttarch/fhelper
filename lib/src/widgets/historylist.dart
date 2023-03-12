@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HistoryList extends StatelessWidget {
   const HistoryList({
@@ -31,9 +32,7 @@ class HistoryList extends StatelessWidget {
               children: [
                 Text(day, style: Theme.of(context).textTheme.titleLarge),
                 Text(
-                  dayTotal.isNegative
-                      ? dayTotal.toStringAsFixed(2).replaceAll('-', r'-$')
-                      : r'+$' + dayTotal.toStringAsFixed(2),
+                  NumberFormat.simpleCurrency().format(dayTotal),
                   style: Theme.of(context).textTheme.titleLarge!.apply(
                         color: Color(
                           dayTotal.isNegative ? 0xffbd1c1c : 0xff199225,
@@ -51,12 +50,9 @@ class HistoryList extends StatelessWidget {
           itemCount: items.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            Color valueColor = const Color(0xff199225)
-                .harmonizeWith(Theme.of(context).colorScheme.primary);
-            if (items[index].value.isNegative) {
-              valueColor = const Color(0xffbd1c1c)
-                  .harmonizeWith(Theme.of(context).colorScheme.primary);
-            }
+            final Color valueColor =
+                Color(items[index].value.isNegative ? 0xffbd1c1c : 0xff199225)
+                    .harmonizeWith(Theme.of(context).colorScheme.primary);
             return Column(
               children: [
                 ListTile(
@@ -66,12 +62,7 @@ class HistoryList extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   subtitle: Text(
-                    items[index].value.isNegative
-                        ? items[index]
-                            .value
-                            .toStringAsFixed(2)
-                            .replaceAll('-', r'-$')
-                        : r'+$' + items[index].value.toStringAsFixed(2),
+                    NumberFormat.simpleCurrency().format(items[index].value),
                     style: TextStyle(color: valueColor),
                   ),
                   trailing: Icon(

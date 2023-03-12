@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/historylist.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 enum _Date { today, week, month }
@@ -113,15 +114,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                             ),
                                       ),
                                       Text(
-                                        snapshot.hasData
-                                            ? snapshot.data!.isNegative
-                                                ? snapshot.data!
-                                                    .toStringAsFixed(2)
-                                                    .replaceAll('-', r'-$')
-                                                : r'+$' +
-                                                    snapshot.data!
-                                                        .toStringAsFixed(2)
-                                            : r'$' + 0.toStringAsFixed(2),
+                                        NumberFormat.simpleCurrency().format(
+                                          snapshot.hasData ? snapshot.data : 0,
+                                        ),
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context)
                                             .textTheme
@@ -214,15 +209,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                             ),
                                       ),
                                       Text(
-                                        snapshot.hasData
-                                            ? snapshot.data!.isNegative
-                                                ? snapshot.data!
-                                                    .toStringAsFixed(2)
-                                                    .replaceAll('-', r'-$')
-                                                : r'+$' +
-                                                    snapshot.data!
-                                                        .toStringAsFixed(2)
-                                            : r'$' + 0.toStringAsFixed(2),
+                                        NumberFormat.simpleCurrency().format(
+                                          snapshot.hasData ? snapshot.data : 0,
+                                        ),
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context)
                                             .textTheme
@@ -265,7 +254,7 @@ class _HistoryPageState extends State<HistoryPage> {
                               // like weeks and months
                               // Also its (logicaly) limited to a max of `DateTime.now()`, so probably won't work on
                               // dates on the future  (not tested)
-                              // The overhead for processing multiple exchanges with multiple days is previewed
+                              // The overhead for processing multiple exchanges with multiple days is presumed
                               // to be high (not tested)
                               final Map<int, double> days = {};
                               final List<List<Exchange>> exchangeLists = [];
@@ -369,15 +358,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                             ),
                                       ),
                                       Text(
-                                        snapshot.hasData
-                                            ? snapshot.data!.isNegative
-                                                ? snapshot.data!
-                                                    .toStringAsFixed(2)
-                                                    .replaceAll('-', r'-$')
-                                                : r'+$' +
-                                                    snapshot.data!
-                                                        .toStringAsFixed(2)
-                                            : r'$' + 0.toStringAsFixed(2),
+                                        NumberFormat.simpleCurrency().format(
+                                          snapshot.hasData ? snapshot.data : 0,
+                                        ),
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context)
                                             .textTheme
@@ -420,7 +403,7 @@ class _HistoryPageState extends State<HistoryPage> {
                               // like weeks and months
                               // Also its (logicaly) limited to a max of `DateTime.now()`, so probably won't work on
                               // dates on the future  (not tested)
-                              // The overhead for processing multiple exchanges with multiple days is previewed
+                              // The overhead for processing multiple exchanges with multiple days is presumed
                               // to be high (not tested)
                               final Map<int, double> days = {};
                               final List<List<Exchange>> exchangeLists = [];

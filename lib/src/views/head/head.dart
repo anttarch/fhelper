@@ -2,6 +2,7 @@ import 'package:fhelper/src/views/head/history.dart';
 import 'package:fhelper/src/views/head/home.dart';
 import 'package:fhelper/src/views/head/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HeadView extends StatefulWidget {
   const HeadView({super.key});
@@ -12,10 +13,7 @@ class HeadView extends StatefulWidget {
 
 class _HeadViewState extends State<HeadView> {
   final PageController _pageCtrl = PageController();
-  //final List<String> _homeTitle = ['Good Morning!', 'Good Afternoon!'];
-  final List<String> _headline = [_getHomeString(), 'History', 'Settings'];
-
-  static String _getHomeString() {
+  static String _getHomeString(BuildContext context) {
     final int hour = TimeOfDay.now().hour;
     switch (hour) {
       case 5:
@@ -25,14 +23,14 @@ class _HeadViewState extends State<HeadView> {
       case 9:
       case 10:
       case 11:
-        return 'Good Morning!';
+        return AppLocalizations.of(context)!.goodMorning;
       case 12:
       case 13:
       case 14:
       case 15:
       case 16:
       case 17:
-        return 'Good Afternoon!';
+        return AppLocalizations.of(context)!.goodAfternoon;
       case 18:
       case 19:
       case 20:
@@ -44,9 +42,9 @@ class _HeadViewState extends State<HeadView> {
       case 2:
       case 3:
       case 4:
-        return 'Good Evening!';
+        return AppLocalizations.of(context)!.goodEvening;
       default:
-        return 'Home';
+        return AppLocalizations.of(context)!.home;
     }
   }
 
@@ -54,6 +52,12 @@ class _HeadViewState extends State<HeadView> {
 
   @override
   Widget build(BuildContext context) {
+    final List<String> headline = [
+      _getHomeString(context),
+      AppLocalizations.of(context)!.history,
+      AppLocalizations.of(context)!.settings,
+    ];
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: PreferredSize(
@@ -65,7 +69,7 @@ class _HeadViewState extends State<HeadView> {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                _headline[_pageIndex ?? 0],
+                headline[_pageIndex ?? 0],
                 textAlign: TextAlign.start,
                 style: Theme.of(context)
                     .textTheme
@@ -89,10 +93,19 @@ class _HeadViewState extends State<HeadView> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _pageIndex ?? 0,
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.history), label: 'History'),
-          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Icons.home),
+            label: AppLocalizations.of(context)!.home,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.history),
+            label: AppLocalizations.of(context)!.history,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.settings),
+            label: AppLocalizations.of(context)!.settings,
+          ),
         ],
         onDestinationSelected: (dest) {
           _pageCtrl.animateToPage(

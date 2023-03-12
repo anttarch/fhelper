@@ -12,7 +12,7 @@
 - [x] Migrate DatePicker to MD3 (as of 25/1/2023)
 - [ ] Create Graphic on Home Page
 - [ ] Mention Transfer View on Home Page
-- [ ] Internationalize Headline greetings
+- [x] Internationalize Headline greetings
 - [x] ~~Figure out~~ Implement display of read only text fields
 
 ## App Logic
@@ -21,6 +21,9 @@
     - [x] Exchange read
     - [ ] Card write and read
 - [ ] Implement internationalization (intl)
+    - [x] Base implementation
+    - [x] Currency and dates
+    - [ ] Options (Accounts, cards, ect)
 - [ ] Implement Bloc
 - [ ] Add default accounts
 - [ ] Add default types

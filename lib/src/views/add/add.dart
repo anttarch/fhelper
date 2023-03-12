@@ -3,6 +3,7 @@ import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/sheetchoice.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
@@ -77,7 +78,7 @@ class _AddViewState extends State<AddView> {
                     title: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
-                        'Add',
+                        AppLocalizations.of(context)!.add,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
@@ -87,14 +88,14 @@ class _AddViewState extends State<AddView> {
                       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                       color: Theme.of(context).colorScheme.background,
                       child: SegmentedButton(
-                        segments: const [
+                        segments: [
                           ButtonSegment(
                             value: EType.income,
-                            label: Text('Income'),
+                            label: Text(AppLocalizations.of(context)!.income),
                           ),
                           ButtonSegment(
                             value: EType.expense,
-                            label: Text('Expense'),
+                            label: Text(AppLocalizations.of(context)!.expense),
                           ),
                         ],
                         selected: _eType,
@@ -134,21 +135,22 @@ class _AddViewState extends State<AddView> {
                                   padding: const EdgeInsets.only(top: 24),
                                   child: InputField(
                                     controller: textController[0],
-                                    label: 'Description',
+                                    label: AppLocalizations.of(context)!
+                                        .description,
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
                                     controller: textController[1],
-                                    label: 'Amount',
+                                    label: AppLocalizations.of(context)!.amount,
                                     keyboardType: TextInputType.number,
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: 'Date',
+                                    label: AppLocalizations.of(context)!.date,
                                     readOnly: true,
                                     placeholder: DateTime.now()
                                                 .difference(
@@ -158,10 +160,16 @@ class _AddViewState extends State<AddView> {
                                                 )
                                                 .inHours <
                                             24
-                                        ? DateFormat.yMd().add_jm().format(
+                                        ? DateFormat.yMd(
+                                            Localizations.localeOf(context)
+                                                .languageCode,
+                                          ).add_jm().format(
                                               DateTime.parse(displayText[0]!),
                                             )
-                                        : DateFormat.yMd().format(
+                                        : DateFormat.yMd(
+                                            Localizations.localeOf(context)
+                                                .languageCode,
+                                          ).format(
                                             DateTime.parse(displayText[0]!),
                                           ),
                                     onTap: () async {
@@ -196,7 +204,8 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: 'Type',
+                                    label:
+                                        AppLocalizations.of(context)!.type(1),
                                     readOnly: true,
                                     placeholder: displayText[1],
                                     onTap: () => showModalBottomSheet<void>(
@@ -253,7 +262,8 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: 'Account',
+                                    label: AppLocalizations.of(context)!
+                                        .account(1),
                                     readOnly: true,
                                     placeholder: displayText[2],
                                     onTap: () => showModalBottomSheet<void>(
@@ -318,21 +328,22 @@ class _AddViewState extends State<AddView> {
                                   padding: const EdgeInsets.only(top: 24),
                                   child: InputField(
                                     controller: textController[0],
-                                    label: 'Description',
+                                    label: AppLocalizations.of(context)!
+                                        .description,
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
                                     controller: textController[1],
-                                    label: 'Price',
+                                    label: AppLocalizations.of(context)!.price,
                                     keyboardType: TextInputType.number,
                                   ),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: 'Date',
+                                    label: AppLocalizations.of(context)!.date,
                                     readOnly: true,
                                     placeholder: DateTime.now()
                                                 .difference(
@@ -342,10 +353,16 @@ class _AddViewState extends State<AddView> {
                                                 )
                                                 .inHours <
                                             24
-                                        ? DateFormat.yMd().add_jm().format(
+                                        ? DateFormat.yMd(
+                                            Localizations.localeOf(context)
+                                                .languageCode,
+                                          ).add_jm().format(
                                               DateTime.parse(displayText[0]!),
                                             )
-                                        : DateFormat.yMd().format(
+                                        : DateFormat.yMd(
+                                            Localizations.localeOf(context)
+                                                .languageCode,
+                                          ).format(
                                             DateTime.parse(displayText[0]!),
                                           ),
                                     onTap: () async {
@@ -380,7 +397,8 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: 'Type',
+                                    label:
+                                        AppLocalizations.of(context)!.type(1),
                                     readOnly: true,
                                     placeholder: displayText[1],
                                     onTap: () => showModalBottomSheet<void>(
@@ -437,7 +455,8 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: 'Card',
+                                    label:
+                                        AppLocalizations.of(context)!.card(1),
                                     readOnly: true,
                                     placeholder: displayText[3],
                                     onTap: () => showModalBottomSheet<void>(
@@ -494,7 +513,8 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: 'Account',
+                                    label: AppLocalizations.of(context)!
+                                        .account(1),
                                     readOnly: true,
                                     placeholder: displayText[2],
                                     onTap: () => showModalBottomSheet<void>(
@@ -566,7 +586,7 @@ class _AddViewState extends State<AddView> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
+                      child: Text(AppLocalizations.of(context)!.cancel),
                     ),
                   ),
                   const SizedBox(width: 20),
@@ -589,7 +609,7 @@ class _AddViewState extends State<AddView> {
                         }).then((_) => Navigator.pop(context));
                       },
                       icon: const Icon(Icons.add),
-                      label: const Text('Add'),
+                      label: Text(AppLocalizations.of(context)!.add),
                       style: ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll<Color>(
                           Color(

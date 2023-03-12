@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/historylist.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
@@ -32,7 +33,7 @@ class _HistoryPageState extends State<HistoryPage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
           child: Text(
-            'Show only:',
+            AppLocalizations.of(context)!.showOnly,
             textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.labelMedium!.apply(
                   color: Theme.of(context).colorScheme.onBackground,
@@ -42,18 +43,18 @@ class _HistoryPageState extends State<HistoryPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SegmentedButton(
-            segments: const [
+            segments: [
               ButtonSegment(
                 value: _Date.today,
-                label: Text('Today'),
+                label: Text(AppLocalizations.of(context)!.today),
               ),
               ButtonSegment(
                 value: _Date.week,
-                label: Text('Week'),
+                label: Text(AppLocalizations.of(context)!.week),
               ),
               ButtonSegment(
                 value: _Date.month,
-                label: Text('Month'),
+                label: Text(AppLocalizations.of(context)!.month),
               ),
             ],
             selected: _date,
@@ -102,7 +103,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Today',
+                                        AppLocalizations.of(context)!.today,
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context)
                                             .textTheme
@@ -114,7 +115,11 @@ class _HistoryPageState extends State<HistoryPage> {
                                             ),
                                       ),
                                       Text(
-                                        NumberFormat.simpleCurrency().format(
+                                        NumberFormat.simpleCurrency(
+                                          locale:
+                                              Localizations.localeOf(context)
+                                                  .languageCode,
+                                        ).format(
                                           snapshot.hasData ? snapshot.data : 0,
                                         ),
                                         textAlign: TextAlign.start,
@@ -197,7 +202,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'This Week',
+                                        AppLocalizations.of(context)!.thisWeek,
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context)
                                             .textTheme
@@ -209,7 +214,11 @@ class _HistoryPageState extends State<HistoryPage> {
                                             ),
                                       ),
                                       Text(
-                                        NumberFormat.simpleCurrency().format(
+                                        NumberFormat.simpleCurrency(
+                                          locale:
+                                              Localizations.localeOf(context)
+                                                  .languageCode,
+                                        ).format(
                                           snapshot.hasData ? snapshot.data : 0,
                                         ),
                                         textAlign: TextAlign.start,
@@ -296,11 +305,16 @@ class _HistoryPageState extends State<HistoryPage> {
                                       ),
                                       day: days.keys.toList()[index] ==
                                               DateTime.now().day
-                                          ? 'Today'
+                                          ? AppLocalizations.of(context)!.today
                                           : days.keys.toList()[index] ==
                                                   DateTime.now().day - 1
-                                              ? 'Yesterday'
-                                              : DateFormat.EEEE().format(
+                                              ? AppLocalizations.of(context)!
+                                                  .yesterday
+                                              : DateFormat.EEEE(
+                                                  Localizations.localeOf(
+                                                          context)
+                                                      .languageCode,
+                                                ).format(
                                                   DateTime(
                                                     DateTime.now().year,
                                                     DateTime.now().month,
@@ -352,7 +366,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'This Month',
+                                        AppLocalizations.of(context)!.thisMonth,
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context)
                                             .textTheme
@@ -364,7 +378,11 @@ class _HistoryPageState extends State<HistoryPage> {
                                             ),
                                       ),
                                       Text(
-                                        NumberFormat.simpleCurrency().format(
+                                        NumberFormat.simpleCurrency(
+                                          locale:
+                                              Localizations.localeOf(context)
+                                                  .languageCode,
+                                        ).format(
                                           snapshot.hasData ? snapshot.data : 0,
                                         ),
                                         textAlign: TextAlign.start,
@@ -451,11 +469,13 @@ class _HistoryPageState extends State<HistoryPage> {
                                       ),
                                       day: days.keys.toList()[index] ==
                                               DateTime.now().day
-                                          ? 'Today'
+                                          ? AppLocalizations.of(context)!.today
                                           : days.keys.toList()[index] ==
                                                   DateTime.now().day - 1
-                                              ? 'Yesterday'
-                                              : DateFormat('EEEE, dd').format(
+                                              ? AppLocalizations.of(context)!
+                                                  .yesterday
+                                              : AppLocalizations.of(context)!
+                                                  .historyListDayDate(
                                                   DateTime(
                                                     DateTime.now().year,
                                                     DateTime.now().month,

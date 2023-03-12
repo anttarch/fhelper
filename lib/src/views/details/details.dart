@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class DetailsView extends StatefulWidget {
@@ -16,9 +17,13 @@ class _DetailsViewState extends State<DetailsView> {
   String exchangeDate(DateTime date) {
     final dateWithoutTime = DateTime(date.year, date.month, date.day);
     if (date.isAtSameMomentAs(dateWithoutTime)) {
-      return DateFormat.yMd().format(date);
+      return DateFormat.yMd(
+        Localizations.localeOf(context).languageCode,
+      ).format(date);
     }
-    return DateFormat.yMd().add_jm().format(date);
+    return DateFormat.yMd(
+      Localizations.localeOf(context).languageCode,
+    ).add_jm().format(date);
   }
 
   @override
@@ -40,7 +45,7 @@ class _DetailsViewState extends State<DetailsView> {
                     title: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
-                        'Details',
+                        AppLocalizations.of(context)!.details,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
@@ -53,7 +58,7 @@ class _DetailsViewState extends State<DetailsView> {
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: InputField(
-                              label: 'Description',
+                              label: AppLocalizations.of(context)!.description,
                               placeholder: widget.item.description,
                               readOnly: true,
                             ),
@@ -62,10 +67,12 @@ class _DetailsViewState extends State<DetailsView> {
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
                               label: widget.item.value.isNegative
-                                  ? 'Price'
-                                  : 'Amount',
-                              placeholder: NumberFormat.simpleCurrency()
-                                  .format(widget.item.value),
+                                  ? AppLocalizations.of(context)!.price
+                                  : AppLocalizations.of(context)!.amount,
+                              placeholder: NumberFormat.simpleCurrency(
+                                locale: Localizations.localeOf(context)
+                                    .languageCode,
+                              ).format(widget.item.value),
                               readOnly: true,
                               textColor: Color(
                                 widget.item.eType == EType.expense
@@ -79,7 +86,7 @@ class _DetailsViewState extends State<DetailsView> {
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
-                              label: 'Date',
+                              label: AppLocalizations.of(context)!.date,
                               placeholder: exchangeDate(widget.item.date),
                               readOnly: true,
                             ),
@@ -87,7 +94,7 @@ class _DetailsViewState extends State<DetailsView> {
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
-                              label: 'Type',
+                              label: AppLocalizations.of(context)!.type(1),
                               placeholder: widget.item.type,
                               readOnly: true,
                             ),
@@ -97,7 +104,7 @@ class _DetailsViewState extends State<DetailsView> {
                             child: Padding(
                               padding: const EdgeInsets.only(top: 20),
                               child: InputField(
-                                label: 'Card',
+                                label: AppLocalizations.of(context)!.card(1),
                                 placeholder: widget.item.cardId.toString(),
                                 readOnly: true,
                               ),
@@ -106,7 +113,7 @@ class _DetailsViewState extends State<DetailsView> {
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
-                              label: 'Account',
+                              label: AppLocalizations.of(context)!.account(1),
                               placeholder: widget.item.account,
                               readOnly: true,
                             ),
@@ -123,7 +130,7 @@ class _DetailsViewState extends State<DetailsView> {
               child: FilledButton.tonalIcon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back),
-                label: const Text('Back'),
+                label: Text(AppLocalizations.of(context)!.back),
               ),
             ),
           ],

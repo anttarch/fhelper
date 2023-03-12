@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -6,12 +7,12 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> elements = [
-      'Accounts',
-      'Cards',
-      'Theme',
-      'Types',
-      'Privacy',
-      'Security',
+      AppLocalizations.of(context)!.account(-1),
+      AppLocalizations.of(context)!.card(-1),
+      AppLocalizations.of(context)!.theme,
+      AppLocalizations.of(context)!.type(-1),
+      AppLocalizations.of(context)!.privacy,
+      AppLocalizations.of(context)!.security,
     ];
     final List<VoidCallback> callbacks = [
       // Accounts

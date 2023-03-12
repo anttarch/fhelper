@@ -1,6 +1,64 @@
 {
-    "helloWorld": "Hello World!",
-    "@helloWorld": {
-      "description": "The conventional newborn programmer greeting"
-    }
-  }
+    "account": "{count, plural, =1{Account} other{Accounts}}",
+    "@account": {
+        "placeholders": {
+            "count": {
+                "type": "num"
+            }
+        }
+    },
+    "add": "Add",
+    "amount": "Amount",
+    "back": "Back",
+    "cancel": "Cancel",
+    "card": "{count, plural, =1{Card} other{Cards}}",
+    "@card": {
+        "placeholders": {
+            "count": {
+                "type": "num"
+            }
+        }
+    },
+    "date": "Date",
+    "description": "Description",
+    "details": "Details",
+    "expense": "Expense",
+    "goodMorning": "Good Morning!",
+    "goodAfternoon": "Good Afternoon!",
+    "goodEvening": "Good Evening!",
+    "history": "History",
+    "historyListDayDate": "{date}",
+    "@historyListDayDate": {
+        "description": "Text displayed for older dates",
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "EEEE, dd",
+                "isCustomDateFormat": "true"
+            }
+        }
+    },
+    "home": "Home",
+    "income": "Income",
+    "latest": "Latest:",
+    "month": "Month",
+    "price": "Price",
+    "privacy": "Privacy",
+    "security": "Security",
+    "settings": "Settings",
+    "showOnly": "Show only:",
+    "theme": "Theme",
+    "thisMonth": "This Month",
+    "thisWeek": "This Week",
+    "today": "Today",
+    "type": "{count, plural, =1{Type} other{Types}}",
+    "@type": {
+        "placeholders": {
+            "count": {
+                "type": "num"
+            }
+        }
+    },
+    "week": "Week",
+    "yesterday": "Yesterday"
+}

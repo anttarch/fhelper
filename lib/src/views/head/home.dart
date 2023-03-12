@@ -3,6 +3,7 @@ import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
@@ -21,7 +22,6 @@ class HomePage extends StatelessWidget {
               .where()
               .sortByDateDesc()
               .findFirstSync();
-
           return Column(
             children: [
               Visibility(
@@ -34,7 +34,7 @@ class HomePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          'Latest:',
+                          AppLocalizations.of(context)!.latest,
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.titleLarge!.apply(
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -60,7 +60,10 @@ class HomePage extends StatelessWidget {
                                     ),
                               ),
                               Text(
-                                NumberFormat.simpleCurrency().format(
+                                NumberFormat.simpleCurrency(
+                                  locale: Localizations.localeOf(context)
+                                      .languageCode,
+                                ).format(
                                   exchange != null ? exchange.value : 0,
                                 ),
                                 textAlign: TextAlign.start,
@@ -91,7 +94,7 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          child: const Text('Details'),
+                          child: Text(AppLocalizations.of(context)!.details),
                         )
                       ],
                     ),
@@ -112,7 +115,7 @@ class HomePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Today',
+                                AppLocalizations.of(context)!.today,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context)
                                     .textTheme
@@ -125,8 +128,10 @@ class HomePage extends StatelessWidget {
                               ),
                               if (snapshot.hasData)
                                 Text(
-                                  NumberFormat.simpleCurrency()
-                                      .format(snapshot.data),
+                                  NumberFormat.simpleCurrency(
+                                    locale: Localizations.localeOf(context)
+                                        .languageCode,
+                                  ).format(snapshot.data),
                                   textAlign: TextAlign.start,
                                   style: Theme.of(context)
                                       .textTheme
@@ -158,7 +163,7 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                             icon: const Icon(Icons.add),
-                            label: const Text('Add'),
+                            label: Text(AppLocalizations.of(context)!.add),
                           ),
                         ],
                       ),

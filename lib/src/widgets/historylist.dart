@@ -32,7 +32,9 @@ class HistoryList extends StatelessWidget {
               children: [
                 Text(day, style: Theme.of(context).textTheme.titleLarge),
                 Text(
-                  NumberFormat.simpleCurrency().format(dayTotal),
+                  NumberFormat.simpleCurrency(
+                    locale: Localizations.localeOf(context).languageCode,
+                  ).format(dayTotal),
                   style: Theme.of(context).textTheme.titleLarge!.apply(
                         color: Color(
                           dayTotal.isNegative ? 0xffbd1c1c : 0xff199225,
@@ -62,7 +64,9 @@ class HistoryList extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   subtitle: Text(
-                    NumberFormat.simpleCurrency().format(items[index].value),
+                    NumberFormat.simpleCurrency(
+                      locale: Localizations.localeOf(context).languageCode,
+                    ).format(items[index].value),
                     style: TextStyle(color: valueColor),
                   ),
                   trailing: Icon(

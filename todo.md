@@ -33,12 +33,12 @@
 ### AddView
 - [x] Switch enums to real world enums
 - [ ] Add text formatting for fields
-- [ ] Add intl DateFormat for displaying date
+- [x] Add intl DateFormat for displaying date
 
 ### DetailsView
 - [ ] Fix display text for selectable options
 - [ ] Fix Card display
-- [ ] Add intl DateFormat for displaying date
+- [x] Add intl DateFormat for displaying date
 
 ### HistoryPage
 - [ ] Fix displaying of dates before "yesterday"

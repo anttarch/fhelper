@@ -94,7 +94,7 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               FutureBuilder(
-                future: getSumValue(Isar.getInstance()!),
+                future: getSumValue(Isar.getInstance()!, context),
                 builder: (context, snapshot) {
                   return Card(
                     color: Theme.of(context).colorScheme.surfaceVariant,

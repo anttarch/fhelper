@@ -34,7 +34,59 @@ class Exchange {
   final double value; // Monetary value
 }
 
-Future<double> getSumValue(Isar isar, {int time = 0}) async {
+int _getWeekday(BuildContext context) {
+  final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+  final int firstDayOfWeek = localizations.firstDayOfWeekIndex;
+
+  // 0 = sunday ... 6 = saturday
+  final int weekday = DateTime.now().weekday;
+
+  // this switch convers the ISO8601 weekday format to local
+  switch (firstDayOfWeek) {
+    case 0:
+      {
+        final Map<int, int> iso8601toSunday = {
+          1: 2,
+          2: 3,
+          3: 4,
+          4: 5,
+          5: 6,
+          6: 7,
+          7: 1,
+        };
+        return iso8601toSunday.entries
+            .where((e) => e.key == weekday)
+            .single
+            .value;
+      }
+    case 6:
+      {
+        final Map<int, int> iso8601toSaturday = {
+          1: 3,
+          2: 4,
+          3: 5,
+          4: 6,
+          5: 7,
+          6: 1,
+          7: 2,
+        };
+        return iso8601toSaturday.entries
+            .where((e) => e.key == weekday)
+            .single
+            .value;
+      }
+    default:
+      return weekday;
+  }
+}
+
+Future<double> getSumValue(
+  Isar isar,
+  BuildContext context, {
+  int time = 0,
+}) async {
+  final int weekday = _getWeekday(context);
+
   final double today = await isar.exchanges
       .where()
       .filter()
@@ -53,7 +105,7 @@ Future<double> getSumValue(Isar isar, {int time = 0}) async {
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: DateTime.now().weekday)),
+        DateTime.now().subtract(Duration(days: weekday)),
         DateTime.now(),
       )
       .valueProperty()
@@ -83,48 +135,7 @@ Future<List<Exchange>> getExchanges(
   BuildContext context, {
   int time = 0,
 }) async {
-  final MaterialLocalizations localizations = MaterialLocalizations.of(context);
-  final int firstDayOfWeek =
-      localizations.firstDayOfWeekIndex; // 0 = sunday ... 6 = saturday
-  int weekday = DateTime.now().weekday;
-
-  // this switch convers the ISO8601 weekday format to local
-  switch (firstDayOfWeek) {
-    case 0:
-      {
-        final Map<int, int> iso8601toSunday = {
-          1: 2,
-          2: 3,
-          3: 4,
-          4: 5,
-          5: 6,
-          6: 7,
-          7: 1,
-        };
-        weekday =
-            iso8601toSunday.entries.where((e) => e.key == weekday).single.value;
-      }
-      break;
-    case 6:
-      {
-        final Map<int, int> iso8601toSaturday = {
-          1: 3,
-          2: 4,
-          3: 5,
-          4: 6,
-          5: 7,
-          6: 1,
-          7: 2,
-        };
-        weekday = iso8601toSaturday.entries
-            .where((e) => e.key == weekday)
-            .single
-            .value;
-      }
-      break;
-    default:
-      break;
-  }
+  final int weekday = _getWeekday(context);
 
   final List<Exchange> today = await isar.exchanges
       .where()

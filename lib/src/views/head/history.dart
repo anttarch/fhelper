@@ -81,7 +81,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Column(
                       children: [
                         FutureBuilder(
-                          future: getSumValue(isar),
+                          future: getSumValue(isar, context),
                           builder: (context, snapshot) {
                             return Padding(
                               padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
@@ -176,7 +176,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Column(
                       children: [
                         FutureBuilder(
-                          future: getSumValue(isar, time: 1),
+                          future: getSumValue(isar, context, time: 1),
                           builder: (context, snapshot) {
                             return Padding(
                               padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
@@ -331,7 +331,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Column(
                       children: [
                         FutureBuilder(
-                          future: getSumValue(isar, time: 2),
+                          future: getSumValue(isar, context, time: 2),
                           builder: (context, snapshot) {
                             return Padding(
                               padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),

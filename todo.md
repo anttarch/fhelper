@@ -20,7 +20,7 @@
     - [x] Base Exchange write
     - [x] Exchange read
     - [ ] Card write and read
-- [ ] Implement internationalization
+- [ ] Implement internationalization (intl)
 - [ ] Implement Bloc
 - [ ] Add default accounts
 - [ ] Add default types
@@ -32,12 +32,13 @@
 
 ### AddView
 - [x] Switch enums to real world enums
-- [ ] Add text formatting for date
+- [ ] Add text formatting for fields
 - [ ] Add intl DateFormat for displaying date
 
 ### DetailsView
-- [ ] Fix InputFields for selectable options
+- [ ] Fix display text for selectable options
 - [ ] Fix Card display
+- [ ] Add intl DateFormat for displaying date
 
 ### HistoryPage
 - [ ] Fix displaying of dates before "yesterday"

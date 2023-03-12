@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class InputField extends StatelessWidget {
   const InputField({
     super.key,
     this.controller,
+    this.inputFormatters,
     this.keyboardType = TextInputType.text,
     required this.label,
     this.onTap,
@@ -12,6 +15,7 @@ class InputField extends StatelessWidget {
     this.textColor,
   }) : assert(!(controller != null && placeholder != null));
   final TextEditingController? controller;
+  final List<TextInputFormatter>? inputFormatters;
   final TextInputType keyboardType;
   final String label;
   final VoidCallback? onTap;
@@ -49,9 +53,37 @@ class InputField extends StatelessWidget {
             style: TextStyle(
               color: textColor ?? Theme.of(context).colorScheme.onSurface,
             ),
+            inputFormatters: inputFormatters,
           ),
         ],
       ),
+    );
+  }
+}
+
+class CurrencyInputFormatter extends TextInputFormatter {
+  CurrencyInputFormatter({required this.locale});
+
+  final String locale;
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+
+    final String parsedValue = newValue.text.replaceAll(RegExp('[^0-9]'), '');
+    final double value = double.parse(parsedValue);
+
+    final formatter = NumberFormat.simpleCurrency(locale: locale);
+    final String newText = formatter.format(value / 100);
+
+    return newValue.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
     );
   }
 }

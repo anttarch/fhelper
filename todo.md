@@ -39,6 +39,8 @@
 ### AddView
 - [x] Switch enums to real world enums
 - [ ] Add text formatting for fields
+    - [x] Add currency formatting
+    - [ ] Add displayable options (account, type) names
 - [x] Add intl DateFormat for displaying date
 
 ### DetailsView

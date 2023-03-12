@@ -312,8 +312,8 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   .yesterday
                                               : DateFormat.EEEE(
                                                   Localizations.localeOf(
-                                                          context)
-                                                      .languageCode,
+                                                    context,
+                                                  ).languageCode,
                                                 ).format(
                                                   DateTime(
                                                     DateTime.now().year,

@@ -145,6 +145,12 @@ class _AddViewState extends State<AddView> {
                                     controller: textController[1],
                                     label: AppLocalizations.of(context)!.amount,
                                     keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      CurrencyInputFormatter(
+                                        locale: Localizations.localeOf(context)
+                                            .languageCode,
+                                      )
+                                    ],
                                   ),
                                 ),
                                 Padding(
@@ -338,6 +344,12 @@ class _AddViewState extends State<AddView> {
                                     controller: textController[1],
                                     label: AppLocalizations.of(context)!.price,
                                     keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      CurrencyInputFormatter(
+                                        locale: Localizations.localeOf(context)
+                                            .languageCode,
+                                      )
+                                    ],
                                   ),
                                 ),
                                 Padding(
@@ -593,13 +605,16 @@ class _AddViewState extends State<AddView> {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () async {
+                        final String value = textController[1]
+                            .text
+                            .replaceAll(RegExp('[^0-9]'), '');
                         final Isar isar = Isar.getInstance()!;
                         final Exchange exchange = Exchange(
                           eType: _eType.single,
                           description: textController[0].text,
                           value: _eType.single == EType.income
-                              ? double.parse(textController[1].text)
-                              : -double.parse(textController[1].text),
+                              ? double.parse(value) / 100
+                              : -double.parse(value) / 100,
                           date: DateTime.parse(displayText[0]!),
                           type: displayText[1]!,
                           account: displayText[2]!,

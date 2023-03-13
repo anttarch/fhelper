@@ -1,13 +1,14 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/head/head.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:isar/isar.dart';
+import 'package:isar/isar.dart' as isar;
 
 void main() async {
-  await Isar.open([ExchangeSchema]);
+  await isar.Isar.open([ExchangeSchema, AttributeSchema]);
   runApp(const MyApp());
 }
 

@@ -1,3 +1,4 @@
+import 'package:fhelper/src/views/managers/type_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -22,7 +23,12 @@ class SettingsPage extends StatelessWidget {
       // Theme
       () {},
       // Types
-      () {},
+      () => Navigator.push(
+            context,
+            MaterialPageRoute<TypeManager>(
+              builder: (context) => const TypeManager(),
+            ),
+          ),
       // Privacy
       () {},
       // Security

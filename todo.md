@@ -6,9 +6,9 @@
 - [x] Details View
 - [x] Settings Page
 - [ ] Customize Managers
-    - [ ] Accounts
+    - [x] Accounts
     - [ ] Cards
-    - [ ] Types
+    - [x] Types
 
 ## Widgets
 - [x] Send id to HistoryList

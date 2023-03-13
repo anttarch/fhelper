@@ -5,16 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:isar/isar.dart';
 
-class TypeManager extends StatefulWidget {
-  const TypeManager({super.key});
+class AccountManager extends StatefulWidget {
+  const AccountManager({super.key});
 
   @override
-  State<TypeManager> createState() => _TypeManagerState();
+  State<AccountManager> createState() => _AccountManagerState();
 }
 
-class _TypeManagerState extends State<TypeManager> {
-  Set<AttributeType> _attributeType = {AttributeType.incomeType};
-
+class _AccountManagerState extends State<AccountManager> {
   final List<TextEditingController> _controller = [
     TextEditingController(),
     TextEditingController(),
@@ -36,32 +34,8 @@ class _TypeManagerState extends State<TypeManager> {
                     title: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
-                        AppLocalizations.of(context)!.type(-1),
+                        AppLocalizations.of(context)!.account(-1),
                         style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Container(
-                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                      color: Theme.of(context).colorScheme.background,
-                      child: SegmentedButton(
-                        segments: [
-                          ButtonSegment(
-                            value: AttributeType.incomeType,
-                            label: Text(AppLocalizations.of(context)!.income),
-                          ),
-                          ButtonSegment(
-                            value: AttributeType.expenseType,
-                            label: Text(AppLocalizations.of(context)!.expense),
-                          ),
-                        ],
-                        selected: _attributeType,
-                        onSelectionChanged: (p0) {
-                          setState(() {
-                            _attributeType = p0;
-                          });
-                        },
                       ),
                     ),
                   ),
@@ -73,7 +47,7 @@ class _TypeManagerState extends State<TypeManager> {
                           return FutureBuilder(
                             future: getAttributes(
                               Isar.getInstance()!,
-                              _attributeType.single,
+                              AttributeType.account,
                             ),
                             builder: (context, snapshot) {
                               final List<Attribute> attributes = snapshot.hasData ? snapshot.data! : [];
@@ -247,7 +221,7 @@ class _TypeManagerState extends State<TypeManager> {
                                   final Isar isar = Isar.getInstance()!;
                                   final Attribute attribute = Attribute(
                                     name: _controller[0].text,
-                                    type: _attributeType.single,
+                                    type: AttributeType.account,
                                   );
                                   await isar.writeTxn(() async {
                                     await isar.attributes.put(attribute);

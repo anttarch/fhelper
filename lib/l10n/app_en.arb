@@ -20,8 +20,10 @@
         }
     },
     "date": "Date",
+    "delete": "Delete",
     "description": "Description",
     "details": "Details",
+    "edit": "Edit",
     "expense": "Expense",
     "goodMorning": "Good Morning!",
     "goodAfternoon": "Good Afternoon!",
@@ -44,6 +46,7 @@
     "month": "Month",
     "price": "Price",
     "privacy": "Privacy",
+    "save": "Save",
     "security": "Security",
     "settings": "Settings",
     "showOnly": "Show only:",

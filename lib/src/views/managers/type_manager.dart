@@ -55,91 +55,127 @@ class _TypeManagerState extends State<TypeManager> {
                                   color:
                                       Theme.of(context).colorScheme.onSurface,
                                 ),
-                                onTap: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    constraints: BoxConstraints(
-                                      maxHeight:
-                                          MediaQuery.of(context).size.height /
-                                              2.5,
-                                    ),
-                                    builder: (context) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(20),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Edit',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge,
+                                onTap: () => showModalBottomSheet<void>(
+                                  context: context,
+                                  constraints: BoxConstraints(
+                                    maxHeight:
+                                        MediaQuery.of(context).size.height /
+                                            3.2,
+                                  ),
+                                  builder: (context) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            'Wallet',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineMedium,
+                                          ),
+                                          const SizedBox(height: 15),
+                                          OutlinedButton.icon(
+                                            icon: const Icon(Icons.delete),
+                                            onPressed: () {},
+                                            label: Text(
+                                              AppLocalizations.of(context)!
+                                                  .delete,
                                             ),
-                                            const SizedBox(height: 10),
-                                            const InputField(
-                                              label: 'Type',
-                                              placeholder: 'Wallet',
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.stretch,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                    top: 20,
-                                                    bottom: 5,
+                                          ),
+                                          FilledButton.icon(
+                                            onPressed: () => showDialog<void>(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  title: Text(
+                                                    AppLocalizations.of(
+                                                      context,
+                                                    )!
+                                                        .edit,
                                                   ),
-                                                  child: OutlinedButton.icon(
-                                                    onPressed: () =>
-                                                        Navigator.pop(context),
-                                                    icon: const Icon(
-                                                        Icons.delete),
-                                                    label: Text('Delete'),
+                                                  icon: const Icon(Icons.edit),
+                                                  content: InputField(
+                                                    label: AppLocalizations.of(
+                                                      context,
+                                                    )!
+                                                        .type(1),
+                                                    placeholder: 'Wallet',
                                                   ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                    bottom: 20,
-                                                    top: 5,
-                                                  ),
-                                                  child: FilledButton.icon(
-                                                    onPressed: () =>
-                                                        Navigator.pop(context),
-                                                    icon:
-                                                        const Icon(Icons.done),
-                                                    label: Text('Done'),
-                                                    style: ButtonStyle(
-                                                      backgroundColor:
-                                                          MaterialStatePropertyAll<
-                                                              Color>(
-                                                        Theme.of(context)
-                                                            .colorScheme
-                                                            .primary,
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                        context,
                                                       ),
-                                                      foregroundColor:
-                                                          MaterialStatePropertyAll<
-                                                              Color>(
-                                                        Colors.white
-                                                            .harmonizeWith(
-                                                          Theme.of(context)
-                                                              .colorScheme
-                                                              .primary,
-                                                        ),
+                                                      child: Text(
+                                                        AppLocalizations.of(
+                                                          context,
+                                                        )!
+                                                            .cancel,
                                                       ),
                                                     ),
-                                                  ),
-                                                ),
-                                              ],
+                                                    FilledButton.tonalIcon(
+                                                      icon: const Icon(
+                                                        Icons.done,
+                                                      ),
+                                                      onPressed: () {},
+                                                      label: Text(
+                                                        AppLocalizations.of(
+                                                          context,
+                                                        )!
+                                                            .save,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
                                             ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  );
-                                },
+                                            icon: const Icon(Icons.edit),
+                                            label: Text(
+                                              AppLocalizations.of(context)!
+                                                  .edit,
+                                            ),
+                                            style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStatePropertyAll<
+                                                      Color>(
+                                                Theme.of(context)
+                                                    .colorScheme
+                                                    .primary,
+                                              ),
+                                              foregroundColor:
+                                                  MaterialStatePropertyAll<
+                                                      Color>(
+                                                Colors.white.harmonizeWith(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const Divider(
+                                            height: 24,
+                                            thickness: 2,
+                                          ),
+                                          FilledButton.tonalIcon(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            icon: const Icon(Icons.arrow_back),
+                                            label: Text(
+                                              AppLocalizations.of(context)!
+                                                  .back,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                               if (index == 2 - 1)
                                 Divider(

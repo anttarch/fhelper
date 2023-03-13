@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:isar/isar.dart';
 
@@ -121,6 +124,7 @@ class _TypeManagerState extends State<TypeManager> {
                                                                 }).then((_) {
                                                                   Navigator.pop(context);
                                                                   Navigator.pop(context);
+                                                                  _controller[1].clear();
                                                                 });
                                                               },
                                                               label: Text(AppLocalizations.of(context)!.save),
@@ -225,6 +229,7 @@ class _TypeManagerState extends State<TypeManager> {
                                   await isar.writeTxn(() async {
                                     await isar.attributes.put(attribute);
                                   }).then((_) => Navigator.pop(context));
+                                  _controller[0].clear();
                                 },
                                 label: Text(AppLocalizations.of(context)!.add),
                               ),

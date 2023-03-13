@@ -3,5 +3,15 @@
         "id": 0,
         "name": "Gift Card",
         "type": 1
+    },
+    {
+        "id": 2,
+        "name": "Wallet",
+        "type": 0
+    },
+    {
+        "id": 1,
+        "name": "Bill",
+        "type": 2
     }
 ]

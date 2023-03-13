@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:isar/isar.dart';
 
@@ -16,6 +13,8 @@ class TypeManager extends StatefulWidget {
 }
 
 class _TypeManagerState extends State<TypeManager> {
+  Set<AttributeType> _attributeType = {AttributeType.incomeType};
+
   final List<TextEditingController> _controller = [
     TextEditingController(),
     TextEditingController(),
@@ -43,6 +42,30 @@ class _TypeManagerState extends State<TypeManager> {
                     ),
                   ),
                   SliverToBoxAdapter(
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                      color: Theme.of(context).colorScheme.background,
+                      child: SegmentedButton(
+                        segments: [
+                          ButtonSegment(
+                            value: AttributeType.incomeType,
+                            label: Text(AppLocalizations.of(context)!.income),
+                          ),
+                          ButtonSegment(
+                            value: AttributeType.expenseType,
+                            label: Text(AppLocalizations.of(context)!.expense),
+                          ),
+                        ],
+                        selected: _attributeType,
+                        onSelectionChanged: (p0) {
+                          setState(() {
+                            _attributeType = p0;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
                     child: Material(
                       child: StreamBuilder(
                         stream: Isar.getInstance()!.attributes.watchLazy(),
@@ -50,7 +73,7 @@ class _TypeManagerState extends State<TypeManager> {
                           return FutureBuilder(
                             future: getAttributes(
                               Isar.getInstance()!,
-                              AttributeType.incomeType,
+                              _attributeType.single,
                             ),
                             builder: (context, snapshot) {
                               final List<Attribute> attributes = snapshot.hasData ? snapshot.data! : [];

@@ -48,10 +48,7 @@ class _AddViewState extends State<AddView> {
   double _getPageHeight() {
     // screen height - (appar + segmented btn + bottom row) height
     // - padding top and bottom
-    final double availableHeight = MediaQuery.of(context).size.height -
-        260 -
-        MediaQuery.of(context).padding.bottom -
-        MediaQuery.of(context).padding.top;
+    final double availableHeight = MediaQuery.of(context).size.height - 260 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top;
     final double treeHeight = _eType.single == EType.income ? 484 : 580;
     if (availableHeight > treeHeight) {
       return availableHeight;
@@ -68,10 +65,7 @@ class _AddViewState extends State<AddView> {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height -
-                  88 -
-                  MediaQuery.of(context).padding.bottom -
-                  MediaQuery.of(context).padding.top,
+              height: MediaQuery.of(context).size.height - 88 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top,
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar.medium(
@@ -109,9 +103,7 @@ class _AddViewState extends State<AddView> {
                             element.clear();
                           }
                           _pageCtrl.animateToPage(
-                            _indexMap.entries
-                                .firstWhere((e) => e.key == p0.single)
-                                .value,
+                            _indexMap.entries.firstWhere((e) => e.key == p0.single).value,
                             duration: const Duration(milliseconds: 200),
                             curve: Curves.easeInOut,
                           );
@@ -135,8 +127,7 @@ class _AddViewState extends State<AddView> {
                                   padding: const EdgeInsets.only(top: 24),
                                   child: InputField(
                                     controller: textController[0],
-                                    label: AppLocalizations.of(context)!
-                                        .description,
+                                    label: AppLocalizations.of(context)!.description,
                                   ),
                                 ),
                                 Padding(
@@ -147,8 +138,7 @@ class _AddViewState extends State<AddView> {
                                     keyboardType: TextInputType.number,
                                     inputFormatters: [
                                       CurrencyInputFormatter(
-                                        locale: Localizations.localeOf(context)
-                                            .languageCode,
+                                        locale: Localizations.localeOf(context).languageCode,
                                       )
                                     ],
                                   ),
@@ -158,48 +148,27 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: AppLocalizations.of(context)!.date,
                                     readOnly: true,
-                                    placeholder: DateTime.now()
-                                                .difference(
-                                                  DateTime.parse(
-                                                    displayText[0]!,
-                                                  ),
-                                                )
-                                                .inHours <
-                                            24
+                                    placeholder: DateTime.now().difference(DateTime.parse(displayText[0]!)).inHours < 24
                                         ? DateFormat.yMd(
-                                            Localizations.localeOf(context)
-                                                .languageCode,
-                                          ).add_jm().format(
-                                              DateTime.parse(displayText[0]!),
-                                            )
+                                            Localizations.localeOf(context).languageCode,
+                                          ).add_jm().format(DateTime.parse(displayText[0]!))
                                         : DateFormat.yMd(
-                                            Localizations.localeOf(context)
-                                                .languageCode,
-                                          ).format(
-                                            DateTime.parse(displayText[0]!),
-                                          ),
+                                            Localizations.localeOf(context).languageCode,
+                                          ).format(DateTime.parse(displayText[0]!)),
                                     onTap: () async {
-                                      final DateTime? picked =
-                                          await showDatePicker(
+                                      final DateTime? picked = await showDatePicker(
                                         context: context,
-                                        initialDate:
-                                            DateTime.parse(displayText[0]!),
-                                        firstDate:
-                                            DateTime(DateTime.now().month),
+                                        initialDate: DateTime.parse(displayText[0]!),
+                                        firstDate: DateTime(DateTime.now().month),
                                         lastDate: DateTime.now(),
                                       );
                                       if (picked != null) {
                                         setState(
                                           () {
-                                            if (DateTime.now()
-                                                    .difference(picked)
-                                                    .inHours <
-                                                24) {
-                                              displayText[0] =
-                                                  DateTime.now().toString();
+                                            if (DateTime.now().difference(picked).inHours < 24) {
+                                              displayText[0] = DateTime.now().toString();
                                             } else {
-                                              displayText[0] =
-                                                  picked.toString();
+                                              displayText[0] = picked.toString();
                                             }
                                           },
                                         );
@@ -210,33 +179,26 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label:
-                                        AppLocalizations.of(context)!.type(1),
+                                    label: AppLocalizations.of(context)!.type(1),
                                     readOnly: true,
                                     placeholder: displayText[1],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
-                                        maxHeight:
-                                            MediaQuery.of(context).size.height /
-                                                2.5,
+                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
                                       ),
                                       enableDrag: false,
                                       builder: (context) {
                                         return StatefulBuilder(
                                           builder: (context, setState) {
                                             return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(20),
+                                                  padding: const EdgeInsets.all(20),
                                                   child: Text(
                                                     'Select Type',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge,
+                                                    style: Theme.of(context).textTheme.titleLarge,
                                                   ),
                                                 ),
                                                 SheetChoice<_IType>(
@@ -247,10 +209,7 @@ class _AddViewState extends State<AddView> {
                                                     });
                                                     Navigator.pop(context);
                                                   },
-                                                  items: const {
-                                                    'Present': _IType.present,
-                                                    'Wage': _IType.wage
-                                                  },
+                                                  items: const {'Present': _IType.present, 'Wage': _IType.wage},
                                                 )
                                               ],
                                             );
@@ -259,8 +218,7 @@ class _AddViewState extends State<AddView> {
                                       },
                                     ).then(
                                       (_) => setState(
-                                        () =>
-                                            displayText[1] = _itype.toString(),
+                                        () => displayText[1] = _itype.toString(),
                                       ),
                                     ),
                                   ),
@@ -268,33 +226,26 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: AppLocalizations.of(context)!
-                                        .account(1),
+                                    label: AppLocalizations.of(context)!.account(1),
                                     readOnly: true,
                                     placeholder: displayText[2],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
-                                        maxHeight:
-                                            MediaQuery.of(context).size.height /
-                                                2.5,
+                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
                                       ),
                                       enableDrag: false,
                                       builder: (context) {
                                         return StatefulBuilder(
                                           builder: (context, setState) {
                                             return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(20),
+                                                  padding: const EdgeInsets.all(20),
                                                   child: Text(
                                                     'Select Account',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge,
+                                                    style: Theme.of(context).textTheme.titleLarge,
                                                   ),
                                                 ),
                                                 SheetChoice<_IType>(
@@ -305,10 +256,7 @@ class _AddViewState extends State<AddView> {
                                                     });
                                                     Navigator.pop(context);
                                                   },
-                                                  items: const {
-                                                    'Wallet': _IType.present,
-                                                    'Bank': _IType.wage
-                                                  },
+                                                  items: const {'Wallet': _IType.present, 'Bank': _IType.wage},
                                                 )
                                               ],
                                             );
@@ -317,8 +265,7 @@ class _AddViewState extends State<AddView> {
                                       },
                                     ).then(
                                       (_) => setState(
-                                        () =>
-                                            displayText[2] = _itype.toString(),
+                                        () => displayText[2] = _itype.toString(),
                                       ),
                                     ),
                                   ),
@@ -334,8 +281,7 @@ class _AddViewState extends State<AddView> {
                                   padding: const EdgeInsets.only(top: 24),
                                   child: InputField(
                                     controller: textController[0],
-                                    label: AppLocalizations.of(context)!
-                                        .description,
+                                    label: AppLocalizations.of(context)!.description,
                                   ),
                                 ),
                                 Padding(
@@ -346,8 +292,7 @@ class _AddViewState extends State<AddView> {
                                     keyboardType: TextInputType.number,
                                     inputFormatters: [
                                       CurrencyInputFormatter(
-                                        locale: Localizations.localeOf(context)
-                                            .languageCode,
+                                        locale: Localizations.localeOf(context).languageCode,
                                       )
                                     ],
                                   ),
@@ -366,39 +311,29 @@ class _AddViewState extends State<AddView> {
                                                 .inHours <
                                             24
                                         ? DateFormat.yMd(
-                                            Localizations.localeOf(context)
-                                                .languageCode,
+                                            Localizations.localeOf(context).languageCode,
                                           ).add_jm().format(
                                               DateTime.parse(displayText[0]!),
                                             )
                                         : DateFormat.yMd(
-                                            Localizations.localeOf(context)
-                                                .languageCode,
+                                            Localizations.localeOf(context).languageCode,
                                           ).format(
                                             DateTime.parse(displayText[0]!),
                                           ),
                                     onTap: () async {
-                                      final DateTime? picked =
-                                          await showDatePicker(
+                                      final DateTime? picked = await showDatePicker(
                                         context: context,
-                                        initialDate:
-                                            DateTime.parse(displayText[0]!),
-                                        firstDate:
-                                            DateTime(DateTime.now().month),
+                                        initialDate: DateTime.parse(displayText[0]!),
+                                        firstDate: DateTime(DateTime.now().month),
                                         lastDate: DateTime.now(),
                                       );
                                       if (picked != null) {
                                         setState(
                                           () {
-                                            if (DateTime.now()
-                                                    .difference(picked)
-                                                    .inHours <
-                                                24) {
-                                              displayText[0] =
-                                                  DateTime.now().toString();
+                                            if (DateTime.now().difference(picked).inHours < 24) {
+                                              displayText[0] = DateTime.now().toString();
                                             } else {
-                                              displayText[0] =
-                                                  picked.toString();
+                                              displayText[0] = picked.toString();
                                             }
                                           },
                                         );
@@ -409,33 +344,26 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label:
-                                        AppLocalizations.of(context)!.type(1),
+                                    label: AppLocalizations.of(context)!.type(1),
                                     readOnly: true,
                                     placeholder: displayText[1],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
-                                        maxHeight:
-                                            MediaQuery.of(context).size.height /
-                                                2.5,
+                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
                                       ),
                                       enableDrag: false,
                                       builder: (context) {
                                         return StatefulBuilder(
                                           builder: (context, setState) {
                                             return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(20),
+                                                  padding: const EdgeInsets.all(20),
                                                   child: Text(
                                                     'Select Type',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge,
+                                                    style: Theme.of(context).textTheme.titleLarge,
                                                   ),
                                                 ),
                                                 SheetChoice<_IType>(
@@ -446,10 +374,7 @@ class _AddViewState extends State<AddView> {
                                                     });
                                                     Navigator.pop(context);
                                                   },
-                                                  items: const {
-                                                    'Present': _IType.present,
-                                                    'Wage': _IType.wage
-                                                  },
+                                                  items: const {'Present': _IType.present, 'Wage': _IType.wage},
                                                 )
                                               ],
                                             );
@@ -458,8 +383,7 @@ class _AddViewState extends State<AddView> {
                                       },
                                     ).then(
                                       (_) => setState(
-                                        () =>
-                                            displayText[1] = _itype.toString(),
+                                        () => displayText[1] = _itype.toString(),
                                       ),
                                     ),
                                   ),
@@ -467,33 +391,26 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label:
-                                        AppLocalizations.of(context)!.card(1),
+                                    label: AppLocalizations.of(context)!.card(1),
                                     readOnly: true,
                                     placeholder: displayText[3],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
-                                        maxHeight:
-                                            MediaQuery.of(context).size.height /
-                                                2.5,
+                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
                                       ),
                                       enableDrag: false,
                                       builder: (context) {
                                         return StatefulBuilder(
                                           builder: (context, setState) {
                                             return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(20),
+                                                  padding: const EdgeInsets.all(20),
                                                   child: Text(
                                                     'Select Card',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge,
+                                                    style: Theme.of(context).textTheme.titleLarge,
                                                   ),
                                                 ),
                                                 SheetChoice<_IType>(
@@ -504,10 +421,7 @@ class _AddViewState extends State<AddView> {
                                                     });
                                                     Navigator.pop(context);
                                                   },
-                                                  items: const {
-                                                    'Card 1': _IType.present,
-                                                    'Card 2': _IType.wage
-                                                  },
+                                                  items: const {'Card 1': _IType.present, 'Card 2': _IType.wage},
                                                 )
                                               ],
                                             );
@@ -516,8 +430,7 @@ class _AddViewState extends State<AddView> {
                                       },
                                     ).then(
                                       (_) => setState(
-                                        () =>
-                                            displayText[3] = _itype.toString(),
+                                        () => displayText[3] = _itype.toString(),
                                       ),
                                     ),
                                   ),
@@ -525,33 +438,26 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: AppLocalizations.of(context)!
-                                        .account(1),
+                                    label: AppLocalizations.of(context)!.account(1),
                                     readOnly: true,
                                     placeholder: displayText[2],
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
-                                        maxHeight:
-                                            MediaQuery.of(context).size.height /
-                                                2.5,
+                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
                                       ),
                                       enableDrag: false,
                                       builder: (context) {
                                         return StatefulBuilder(
                                           builder: (context, setState) {
                                             return Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(20),
+                                                  padding: const EdgeInsets.all(20),
                                                   child: Text(
                                                     'Select Account',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge,
+                                                    style: Theme.of(context).textTheme.titleLarge,
                                                   ),
                                                 ),
                                                 SheetChoice<_IType>(
@@ -562,10 +468,7 @@ class _AddViewState extends State<AddView> {
                                                     });
                                                     Navigator.pop(context);
                                                   },
-                                                  items: const {
-                                                    'Wallet': _IType.present,
-                                                    'Bank': _IType.wage
-                                                  },
+                                                  items: const {'Wallet': _IType.present, 'Bank': _IType.wage},
                                                 )
                                               ],
                                             );
@@ -574,8 +477,7 @@ class _AddViewState extends State<AddView> {
                                       },
                                     ).then(
                                       (_) => setState(
-                                        () =>
-                                            displayText[2] = _itype.toString(),
+                                        () => displayText[2] = _itype.toString(),
                                       ),
                                     ),
                                   ),
@@ -605,16 +507,12 @@ class _AddViewState extends State<AddView> {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () async {
-                        final String value = textController[1]
-                            .text
-                            .replaceAll(RegExp('[^0-9]'), '');
+                        final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
                         final Isar isar = Isar.getInstance()!;
                         final Exchange exchange = Exchange(
                           eType: _eType.single,
                           description: textController[0].text,
-                          value: _eType.single == EType.income
-                              ? double.parse(value) / 100
-                              : -double.parse(value) / 100,
+                          value: _eType.single == EType.income ? double.parse(value) / 100 : -double.parse(value) / 100,
                           date: DateTime.parse(displayText[0]!),
                           type: displayText[1]!,
                           account: displayText[2]!,
@@ -628,9 +526,7 @@ class _AddViewState extends State<AddView> {
                       style: ButtonStyle(
                         backgroundColor: MaterialStatePropertyAll<Color>(
                           Color(
-                            _eType.single == EType.income
-                                ? 0xff199225
-                                : 0xffbd1c1c,
+                            _eType.single == EType.income ? 0xff199225 : 0xffbd1c1c,
                           ).harmonizeWith(
                             Theme.of(context).colorScheme.primary,
                           ),

@@ -5,7 +5,10 @@
 - [ ] Transfer View
 - [x] Details View
 - [x] Settings Page
-- [ ] Customize View
+- [ ] Customize Managers
+    - [ ] Accounts
+    - [ ] Cards
+    - [ ] Types
 
 ## Widgets
 - [x] Send id to HistoryList

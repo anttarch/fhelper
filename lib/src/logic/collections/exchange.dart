@@ -9,19 +9,19 @@ enum EType { income, expense }
 class Exchange {
   Exchange({
     this.id = Isar.autoIncrement,
-    required this.account,
+    required this.accountId,
     this.cardId,
     required this.description,
     required this.date,
     this.installments,
     this.installmentValue,
     required this.eType,
-    required this.type,
+    required this.typeId,
     required this.value,
   });
 
   final Id id; // Isar id
-  final String account; // Account linked
+  final int accountId; // Account (attribute) linked
   final int? cardId; // Card linked
   final DateTime date;
   final String description; // Name
@@ -30,7 +30,7 @@ class Exchange {
 
   @enumerated
   final EType eType; // Exchange type
-  final String type; // Type (category)
+  final int typeId; // Type (attribute) linked
   final double value; // Monetary value
 }
 
@@ -54,10 +54,7 @@ int _getWeekday(BuildContext context) {
           6: 7,
           7: 1,
         };
-        return iso8601toSunday.entries
-            .where((e) => e.key == weekday)
-            .single
-            .value;
+        return iso8601toSunday.entries.where((e) => e.key == weekday).single.value;
       }
     case 6:
       {
@@ -70,10 +67,7 @@ int _getWeekday(BuildContext context) {
           6: 1,
           7: 2,
         };
-        return iso8601toSaturday.entries
-            .where((e) => e.key == weekday)
-            .single
-            .value;
+        return iso8601toSaturday.entries.where((e) => e.key == weekday).single.value;
       }
     default:
       return weekday;

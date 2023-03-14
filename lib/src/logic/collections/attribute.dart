@@ -39,3 +39,8 @@ Future<List<Attribute>> getAttributes(Isar isar, AttributeType type) async {
   final List<Attribute> attributes = await isar.attributes.where().filter().typeEqualTo(type).findAll();
   return attributes;
 }
+
+Future<Attribute?> getAttributeFromId(Isar isar, int id) async {
+  final Attribute? attribute = await isar.attributes.get(id);
+  return attribute;
+}

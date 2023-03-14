@@ -1,9 +1,11 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:isar/isar.dart';
 
 class DetailsView extends StatefulWidget {
   const DetailsView({super.key, required this.item});
@@ -35,10 +37,7 @@ class _DetailsViewState extends State<DetailsView> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height -
-                  88 -
-                  MediaQuery.of(context).padding.bottom -
-                  MediaQuery.of(context).padding.top,
+              height: MediaQuery.of(context).size.height - 88 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top,
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar.medium(
@@ -66,18 +65,13 @@ class _DetailsViewState extends State<DetailsView> {
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
-                              label: widget.item.value.isNegative
-                                  ? AppLocalizations.of(context)!.price
-                                  : AppLocalizations.of(context)!.amount,
+                              label: widget.item.value.isNegative ? AppLocalizations.of(context)!.price : AppLocalizations.of(context)!.amount,
                               placeholder: NumberFormat.simpleCurrency(
-                                locale: Localizations.localeOf(context)
-                                    .languageCode,
+                                locale: Localizations.localeOf(context).languageCode,
                               ).format(widget.item.value),
                               readOnly: true,
                               textColor: Color(
-                                widget.item.eType == EType.expense
-                                    ? 0xffbd1c1c
-                                    : 0xff199225,
+                                widget.item.eType == EType.expense ? 0xffbd1c1c : 0xff199225,
                               ).harmonizeWith(
                                 Theme.of(context).colorScheme.primary,
                               ),
@@ -91,13 +85,18 @@ class _DetailsViewState extends State<DetailsView> {
                               readOnly: true,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: InputField(
-                              label: AppLocalizations.of(context)!.type(1),
-                              placeholder: widget.item.type,
-                              readOnly: true,
-                            ),
+                          FutureBuilder(
+                            future: getAttributeFromId(Isar.getInstance()!, widget.item.typeId),
+                            builder: (context, snapshot) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: InputField(
+                                  label: AppLocalizations.of(context)!.type(1),
+                                  placeholder: snapshot.hasData ? snapshot.data!.name : AppLocalizations.of(context)!.deleted,
+                                  readOnly: true,
+                                ),
+                              );
+                            },
                           ),
                           Visibility(
                             visible: widget.item.value.isNegative,
@@ -110,13 +109,18 @@ class _DetailsViewState extends State<DetailsView> {
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: InputField(
-                              label: AppLocalizations.of(context)!.account(1),
-                              placeholder: widget.item.account,
-                              readOnly: true,
-                            ),
+                          FutureBuilder(
+                            future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId),
+                            builder: (context, snapshot) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: InputField(
+                                  label: AppLocalizations.of(context)!.account(1),
+                                  placeholder: snapshot.hasData ? snapshot.data!.name : AppLocalizations.of(context)!.deleted,
+                                  readOnly: true,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

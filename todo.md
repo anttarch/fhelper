@@ -23,6 +23,7 @@
     - [x] Base Exchange write
     - [x] Exchange read
     - [ ] Card write and read
+    - [ ] Check for conflicts and dependencies on delete
 - [ ] Implement internationalization (intl)
     - [x] Base implementation
     - [x] Currency and dates

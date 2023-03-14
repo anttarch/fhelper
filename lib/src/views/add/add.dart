@@ -208,7 +208,7 @@ class _AddViewState extends State<AddView> {
                                                     Padding(
                                                       padding: const EdgeInsets.all(20),
                                                       child: Text(
-                                                        'Select Type',
+                                                        AppLocalizations.of(context)!.selectType,
                                                         style: Theme.of(context).textTheme.titleLarge,
                                                       ),
                                                     ),
@@ -265,7 +265,7 @@ class _AddViewState extends State<AddView> {
                                                     Padding(
                                                       padding: const EdgeInsets.all(20),
                                                       child: Text(
-                                                        'Select Account',
+                                                        AppLocalizations.of(context)!.selectAccount,
                                                         style: Theme.of(context).textTheme.titleLarge,
                                                       ),
                                                     ),
@@ -327,14 +327,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: AppLocalizations.of(context)!.date,
                                     readOnly: true,
-                                    placeholder: DateTime.now()
-                                                .difference(
-                                                  DateTime.parse(
-                                                    displayText[0]!,
-                                                  ),
-                                                )
-                                                .inHours <
-                                            24
+                                    placeholder: DateTime.now().difference(DateTime.parse(displayText[0]!)).inHours < 24
                                         ? DateFormat.yMd(
                                             Localizations.localeOf(context).languageCode,
                                           ).add_jm().format(
@@ -393,7 +386,7 @@ class _AddViewState extends State<AddView> {
                                                     Padding(
                                                       padding: const EdgeInsets.all(20),
                                                       child: Text(
-                                                        'Select Type',
+                                                        AppLocalizations.of(context)!.selectType,
                                                         style: Theme.of(context).textTheme.titleLarge,
                                                       ),
                                                     ),
@@ -497,7 +490,7 @@ class _AddViewState extends State<AddView> {
                                                     Padding(
                                                       padding: const EdgeInsets.all(20),
                                                       child: Text(
-                                                        'Select Account',
+                                                        AppLocalizations.of(context)!.selectAccount,
                                                         style: Theme.of(context).textTheme.titleLarge,
                                                       ),
                                                     ),
@@ -559,8 +552,8 @@ class _AddViewState extends State<AddView> {
                           description: textController[0].text,
                           value: _eType.single == EType.income ? double.parse(value) / 100 : -double.parse(value) / 100,
                           date: DateTime.parse(displayText[0]!),
-                          type: displayText[1]!,
-                          account: displayText[2]!,
+                          typeId: (await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType))[_typeId].id,
+                          accountId: (await getAttributes(isar, AttributeType.account))[_accountId].id,
                         );
                         await isar.writeTxn(() async {
                           await isar.exchanges.put(exchange);

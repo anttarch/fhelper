@@ -17,11 +17,7 @@ class HomePage extends StatelessWidget {
       child: StreamBuilder(
         stream: Isar.getInstance()!.exchanges.watchLazy(),
         builder: (context, snapshot) {
-          final exchange = Isar.getInstance()!
-              .exchanges
-              .where()
-              .sortByDateDesc()
-              .findFirstSync();
+          final exchange = Isar.getInstance()!.exchanges.where().sortByDateDesc().findFirstSync();
           return Column(
             children: [
               Visibility(
@@ -46,31 +42,20 @@ class HomePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                exchange != null
-                                    ? exchange.description
-                                    : 'Placeholder',
+                                exchange != null ? exchange.description : 'Placeholder',
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .apply(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
+                                style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                               ),
                               Text(
                                 NumberFormat.simpleCurrency(
-                                  locale: Localizations.localeOf(context)
-                                      .languageCode,
+                                  locale: Localizations.localeOf(context).languageCode,
                                 ).format(
                                   exchange != null ? exchange.value : 0,
                                 ),
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .apply(
+                                style: Theme.of(context).textTheme.bodyLarge!.apply(
                                       color: Color(
                                         exchange != null
                                             ? exchange.value.isNegative
@@ -117,39 +102,25 @@ class HomePage extends StatelessWidget {
                               Text(
                                 AppLocalizations.of(context)!.today,
                                 textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .apply(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
+                                style: Theme.of(context).textTheme.titleLarge!.apply(
+                                      color: Theme.of(context).colorScheme.onSurface,
                                     ),
                               ),
                               if (snapshot.hasData)
                                 Text(
                                   NumberFormat.simpleCurrency(
-                                    locale: Localizations.localeOf(context)
-                                        .languageCode,
+                                    locale: Localizations.localeOf(context).languageCode,
                                   ).format(snapshot.data),
                                   textAlign: TextAlign.start,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .apply(
+                                  style: Theme.of(context).textTheme.titleLarge!.apply(
                                         color: Color(
-                                          snapshot.data!.isNegative
-                                              ? 0xffbd1c1c
-                                              : 0xff199225,
+                                          snapshot.data!.isNegative ? 0xffbd1c1c : 0xff199225,
                                         ).harmonizeWith(
                                           Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
                                 )
-                              else if (snapshot.connectionState ==
-                                      ConnectionState.active ||
-                                  snapshot.connectionState ==
-                                      ConnectionState.waiting)
+                              else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting)
                                 const CircularProgressIndicator()
                               else
                                 const Text('OOPS')

@@ -23,11 +23,6 @@ class _AddViewState extends State<AddView> {
   _IType _itype = _IType.present;
   int _typeId = -1;
   int _accountId = -1;
-  final PageController _pageCtrl = PageController();
-  final Map<EType, int> _indexMap = {
-    EType.income: 0,
-    EType.expense: 1,
-  };
   final List<String?> displayText = [
     // Date
     DateTime.now().toString(),
@@ -43,25 +38,7 @@ class _AddViewState extends State<AddView> {
     TextEditingController(),
   ];
 
-  final _incomeForm = GlobalKey<FormState>();
-  final _expenseForm = GlobalKey<FormState>();
-  // `_getPageHeight()` is a hard coded function
-  // Some kind of hack to allow resizing of the view
-  // IT NEED TO BE UPDATED on every change of the widget tree
-  // `availableHeight` represents the screen size available for the pageview
-  // `treeHeight` represents the total height of widgets that need to be rendered
-
-  double _getPageHeight() {
-    // screen height - (appar + segmented btn + bottom row) height
-    // - padding top and bottom
-    final double availableHeight = MediaQuery.of(context).size.height - 260 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top;
-    final double treeHeight = _eType.single == EType.income ? 484 : 580;
-    if (availableHeight > treeHeight) {
-      return availableHeight;
-    } else {
-      return treeHeight;
-    }
-  }
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +77,7 @@ class _AddViewState extends State<AddView> {
                         ],
                         selected: _eType,
                         onSelectionChanged: (p0) {
+                          _formKey.currentState!.reset();
                           setState(() {
                             _eType = p0;
                             _typeId = -1;
@@ -110,491 +88,268 @@ class _AddViewState extends State<AddView> {
                           for (final element in textController) {
                             element.clear();
                           }
-                          _pageCtrl.animateToPage(
-                            _indexMap.entries.firstWhere((e) => e.key == p0.single).value,
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeInOut,
-                          );
                         },
                       ),
                     ),
                   ),
                   SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: _getPageHeight(),
-                      width: MediaQuery.of(context).size.width,
-                      child: PageView(
-                        controller: _pageCtrl,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Form(
-                              key: _incomeForm,
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 24),
-                                    child: InputField(
-                                      controller: textController[0],
-                                      label: AppLocalizations.of(context)!.description,
-                                      inputFormatters: [
-                                        LengthLimitingTextInputFormatter(20),
-                                      ],
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Cannot be empty';
-                                        } else if (value.length < 3) {
-                                          return 'At least 3 characters';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 20),
-                                    child: InputField(
-                                      controller: textController[1],
-                                      label: AppLocalizations.of(context)!.amount,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        CurrencyInputFormatter(
-                                          locale: Localizations.localeOf(context).languageCode,
-                                        )
-                                      ],
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Cannot be empty';
-                                        } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                          return 'Invalid value';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 20),
-                                    child: InputField(
-                                      label: AppLocalizations.of(context)!.date,
-                                      readOnly: true,
-                                      placeholder: DateTime.now().difference(DateTime.parse(displayText[0]!)).inHours < 24
-                                          ? DateFormat.yMd(
-                                              Localizations.localeOf(context).languageCode,
-                                            ).add_jm().format(DateTime.parse(displayText[0]!))
-                                          : DateFormat.yMd(
-                                              Localizations.localeOf(context).languageCode,
-                                            ).format(DateTime.parse(displayText[0]!)),
-                                      onTap: () async {
-                                        final DateTime? picked = await showDatePicker(
-                                          context: context,
-                                          initialDate: DateTime.parse(displayText[0]!),
-                                          firstDate: DateTime(DateTime.now().year, DateTime.now().month),
-                                          lastDate: DateTime.now(),
-                                        );
-                                        if (picked != null) {
-                                          setState(
-                                            () {
-                                              if (DateTime.now().difference(picked).inHours < 24) {
-                                                displayText[0] = DateTime.now().toString();
-                                              } else {
-                                                displayText[0] = picked.toString();
-                                              }
-                                            },
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  FutureBuilder(
-                                    future: getAttributes(
-                                      Isar.getInstance()!,
-                                      AttributeType.incomeType,
-                                    ),
-                                    builder: (context, snapshot) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 20),
-                                        child: InputField(
-                                          label: AppLocalizations.of(context)!.type(1),
-                                          readOnly: true,
-                                          placeholder: displayText[1],
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return 'Cannot be empty';
-                                            }
-                                            return null;
-                                          },
-                                          onTap: () => showModalBottomSheet<void>(
-                                            context: context,
-                                            constraints: BoxConstraints(
-                                              maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                            ),
-                                            enableDrag: false,
-                                            builder: (context) {
-                                              return StatefulBuilder(
-                                                builder: (context, setState) {
-                                                  return Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.all(20),
-                                                        child: Text(
-                                                          AppLocalizations.of(context)!.selectType,
-                                                          style: Theme.of(context).textTheme.titleLarge,
-                                                        ),
-                                                      ),
-                                                      AttributeChoice(
-                                                        groupValue: _typeId,
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _typeId = value!;
-                                                          });
-                                                          Navigator.pop(context);
-                                                        },
-                                                        items: snapshot.hasData ? snapshot.data! : [],
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ).then(
-                                            (_) => _typeId != -1
-                                                ? setState(
-                                                    () => displayText[1] = snapshot.hasData ? snapshot.data![_typeId].name : null,
-                                                  )
-                                                : null,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  FutureBuilder(
-                                    future: getAttributes(
-                                      Isar.getInstance()!,
-                                      AttributeType.account,
-                                    ),
-                                    builder: (context, snapshot) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 20),
-                                        child: InputField(
-                                          label: AppLocalizations.of(context)!.account(1),
-                                          readOnly: true,
-                                          placeholder: displayText[2],
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return 'Cannot be empty';
-                                            }
-                                            return null;
-                                          },
-                                          onTap: () => showModalBottomSheet<void>(
-                                            context: context,
-                                            constraints: BoxConstraints(
-                                              maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                            ),
-                                            enableDrag: false,
-                                            builder: (context) {
-                                              return StatefulBuilder(
-                                                builder: (context, setState) {
-                                                  return Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.all(20),
-                                                        child: Text(
-                                                          AppLocalizations.of(context)!.selectAccount,
-                                                          style: Theme.of(context).textTheme.titleLarge,
-                                                        ),
-                                                      ),
-                                                      AttributeChoice(
-                                                        groupValue: _accountId,
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _accountId = value!;
-                                                          });
-                                                          Navigator.pop(context);
-                                                        },
-                                                        items: snapshot.hasData ? snapshot.data! : [],
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ).then(
-                                            (_) => _accountId != -1
-                                                ? setState(
-                                                    () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
-                                                  )
-                                                : null,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 24),
+                              child: InputField(
+                                controller: textController[0],
+                                label: AppLocalizations.of(context)!.description,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(20),
                                 ],
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Cannot be empty';
+                                  } else if (value.length < 3) {
+                                    return 'At least 3 characters';
+                                  }
+                                  return null;
+                                },
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Form(
-                              key: _expenseForm,
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 24),
-                                    child: InputField(
-                                      controller: textController[0],
-                                      label: AppLocalizations.of(context)!.description,
-                                      inputFormatters: [
-                                        LengthLimitingTextInputFormatter(20),
-                                      ],
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Cannot be empty';
-                                        } else if (value.length < 3) {
-                                          return 'At least 3 characters';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 20),
-                                    child: InputField(
-                                      controller: textController[1],
-                                      label: AppLocalizations.of(context)!.price,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        CurrencyInputFormatter(
-                                          locale: Localizations.localeOf(context).languageCode,
-                                        )
-                                      ],
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return 'Cannot be empty';
-                                        } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                          return 'Invalid value';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 20),
-                                    child: InputField(
-                                      label: AppLocalizations.of(context)!.date,
-                                      readOnly: true,
-                                      placeholder: DateTime.now().difference(DateTime.parse(displayText[0]!)).inHours < 24
-                                          ? DateFormat.yMd(
-                                              Localizations.localeOf(context).languageCode,
-                                            ).add_jm().format(
-                                                DateTime.parse(displayText[0]!),
-                                              )
-                                          : DateFormat.yMd(
-                                              Localizations.localeOf(context).languageCode,
-                                            ).format(
-                                              DateTime.parse(displayText[0]!),
-                                            ),
-                                      onTap: () async {
-                                        final DateTime? picked = await showDatePicker(
-                                          context: context,
-                                          initialDate: DateTime.parse(displayText[0]!),
-                                          firstDate: DateTime(DateTime.now().month),
-                                          lastDate: DateTime.now(),
-                                        );
-                                        if (picked != null) {
-                                          setState(
-                                            () {
-                                              if (DateTime.now().difference(picked).inHours < 24) {
-                                                displayText[0] = DateTime.now().toString();
-                                              } else {
-                                                displayText[0] = picked.toString();
-                                              }
-                                            },
-                                          );
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: InputField(
+                                controller: textController[1],
+                                label: _eType.single == EType.income ? AppLocalizations.of(context)!.amount : AppLocalizations.of(context)!.price,
+                                keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                  CurrencyInputFormatter(
+                                    locale: Localizations.localeOf(context).languageCode,
+                                  )
+                                ],
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Cannot be empty';
+                                  } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
+                                    return 'Invalid value';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: InputField(
+                                label: AppLocalizations.of(context)!.date,
+                                readOnly: true,
+                                placeholder: DateTime.now().difference(DateTime.parse(displayText[0]!)).inHours < 24
+                                    ? DateFormat.yMd(
+                                        Localizations.localeOf(context).languageCode,
+                                      ).add_jm().format(DateTime.parse(displayText[0]!))
+                                    : DateFormat.yMd(
+                                        Localizations.localeOf(context).languageCode,
+                                      ).format(DateTime.parse(displayText[0]!)),
+                                onTap: () async {
+                                  final DateTime? picked = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.parse(displayText[0]!),
+                                    firstDate: DateTime(DateTime.now().year, DateTime.now().month),
+                                    lastDate: DateTime.now(),
+                                  );
+                                  if (picked != null) {
+                                    setState(
+                                      () {
+                                        if (DateTime.now().difference(picked).inHours < 24) {
+                                          displayText[0] = DateTime.now().toString();
+                                        } else {
+                                          displayText[0] = picked.toString();
                                         }
                                       },
-                                    ),
-                                  ),
-                                  FutureBuilder(
-                                    future: getAttributes(
-                                      Isar.getInstance()!,
-                                      AttributeType.expenseType,
-                                    ),
-                                    builder: (context, snapshot) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 20),
-                                        child: InputField(
-                                          label: AppLocalizations.of(context)!.type(1),
-                                          readOnly: true,
-                                          placeholder: displayText[1],
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return 'Cannot be empty';
-                                            }
-                                            return null;
-                                          },
-                                          onTap: () => showModalBottomSheet<void>(
-                                            context: context,
-                                            constraints: BoxConstraints(
-                                              maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                            ),
-                                            enableDrag: false,
-                                            builder: (context) {
-                                              return StatefulBuilder(
-                                                builder: (context, setState) {
-                                                  return Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.all(20),
-                                                        child: Text(
-                                                          AppLocalizations.of(context)!.selectType,
-                                                          style: Theme.of(context).textTheme.titleLarge,
-                                                        ),
-                                                      ),
-                                                      AttributeChoice(
-                                                        groupValue: _typeId,
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _typeId = value!;
-                                                          });
-                                                          Navigator.pop(context);
-                                                        },
-                                                        items: snapshot.hasData ? snapshot.data! : [],
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ).then(
-                                            (_) => _typeId != -1
-                                                ? setState(
-                                                    () => displayText[1] = snapshot.hasData ? snapshot.data![_typeId].name : null,
-                                                  )
-                                                : null,
-                                          ),
-                                        ),
-                                      );
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                            FutureBuilder(
+                              future: getAttributes(
+                                Isar.getInstance()!,
+                                _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType,
+                              ),
+                              builder: (context, snapshot) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: AppLocalizations.of(context)!.type(1),
+                                    readOnly: true,
+                                    placeholder: displayText[1],
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Cannot be empty';
+                                      }
+                                      return null;
                                     },
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 20),
-                                    child: InputField(
-                                      label: AppLocalizations.of(context)!.card(1),
-                                      readOnly: true,
-                                      placeholder: displayText[3],
-                                      onTap: () => showModalBottomSheet<void>(
-                                        context: context,
-                                        constraints: BoxConstraints(
-                                          maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                        ),
-                                        enableDrag: false,
-                                        builder: (context) {
-                                          return StatefulBuilder(
-                                            builder: (context, setState) {
-                                              return Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.all(20),
-                                                    child: Text(
-                                                      'Select Card',
-                                                      style: Theme.of(context).textTheme.titleLarge,
-                                                    ),
+                                    onTap: () => showModalBottomSheet<void>(
+                                      context: context,
+                                      constraints: BoxConstraints(
+                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                      ),
+                                      enableDrag: false,
+                                      builder: (context) {
+                                        return StatefulBuilder(
+                                          builder: (context, setState) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.all(20),
+                                                  child: Text(
+                                                    AppLocalizations.of(context)!.selectType,
+                                                    style: Theme.of(context).textTheme.titleLarge,
                                                   ),
-                                                  // AttributeChoice<_IType>(
-                                                  //   groupValue: _itype,
-                                                  //   onChanged: (value) {
-                                                  //     setState(() {
-                                                  //       _itype = value!;
-                                                  //     });
-                                                  //     Navigator.pop(context);
-                                                  //   },
-                                                  //   items: const {'Card 1': _IType.present, 'Card 2': _IType.wage},
-                                                  // )
-                                                ],
-                                              );
-                                            },
+                                                ),
+                                                AttributeChoice(
+                                                  groupValue: _typeId,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _typeId = value!;
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  items: snapshot.hasData ? snapshot.data! : [],
+                                                )
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ).then(
+                                      (_) => _typeId != -1
+                                          ? setState(
+                                              () => displayText[1] = snapshot.hasData ? snapshot.data![_typeId].name : null,
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            Visibility(
+                              visible: _eType.single == EType.expense,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: InputField(
+                                  label: AppLocalizations.of(context)!.card(1),
+                                  readOnly: true,
+                                  placeholder: displayText[3],
+                                  onTap: () => showModalBottomSheet<void>(
+                                    context: context,
+                                    constraints: BoxConstraints(
+                                      maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                    ),
+                                    enableDrag: false,
+                                    builder: (context) {
+                                      return StatefulBuilder(
+                                        builder: (context, setState) {
+                                          return Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.all(20),
+                                                child: Text(
+                                                  'Select Card',
+                                                  style: Theme.of(context).textTheme.titleLarge,
+                                                ),
+                                              ),
+                                              // AttributeChoice<_IType>(
+                                              //   groupValue: _itype,
+                                              //   onChanged: (value) {
+                                              //     setState(() {
+                                              //       _itype = value!;
+                                              //     });
+                                              //     Navigator.pop(context);
+                                              //   },
+                                              //   items: const {'Card 1': _IType.present, 'Card 2': _IType.wage},
+                                              // )
+                                            ],
                                           );
                                         },
-                                      ).then(
-                                        (_) => setState(
-                                          () => displayText[3] = _itype.toString(),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  FutureBuilder(
-                                    future: getAttributes(
-                                      Isar.getInstance()!,
-                                      AttributeType.account,
-                                    ),
-                                    builder: (context, snapshot) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 20),
-                                        child: InputField(
-                                          label: AppLocalizations.of(context)!.account(1),
-                                          readOnly: true,
-                                          placeholder: displayText[2],
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return 'Cannot be empty';
-                                            }
-                                            return null;
-                                          },
-                                          onTap: () => showModalBottomSheet<void>(
-                                            context: context,
-                                            constraints: BoxConstraints(
-                                              maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                            ),
-                                            enableDrag: false,
-                                            builder: (context) {
-                                              return StatefulBuilder(
-                                                builder: (context, setState) {
-                                                  return Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Padding(
-                                                        padding: const EdgeInsets.all(20),
-                                                        child: Text(
-                                                          AppLocalizations.of(context)!.selectAccount,
-                                                          style: Theme.of(context).textTheme.titleLarge,
-                                                        ),
-                                                      ),
-                                                      AttributeChoice(
-                                                        groupValue: _accountId,
-                                                        onChanged: (value) {
-                                                          setState(() {
-                                                            _accountId = value!;
-                                                          });
-                                                          Navigator.pop(context);
-                                                        },
-                                                        items: snapshot.hasData ? snapshot.data! : [],
-                                                      )
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                          ).then(
-                                            (_) => _accountId != -1
-                                                ? setState(
-                                                    () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
-                                                  )
-                                                : null,
-                                          ),
-                                        ),
                                       );
                                     },
+                                  ).then(
+                                    (_) => setState(
+                                      () => displayText[3] = _itype.toString(),
+                                    ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            FutureBuilder(
+                              future: getAttributes(
+                                Isar.getInstance()!,
+                                AttributeType.account,
+                              ),
+                              builder: (context, snapshot) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: AppLocalizations.of(context)!.account(1),
+                                    readOnly: true,
+                                    placeholder: displayText[2],
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Cannot be empty';
+                                      }
+                                      return null;
+                                    },
+                                    onTap: () => showModalBottomSheet<void>(
+                                      context: context,
+                                      constraints: BoxConstraints(
+                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                      ),
+                                      enableDrag: false,
+                                      builder: (context) {
+                                        return StatefulBuilder(
+                                          builder: (context, setState) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.all(20),
+                                                  child: Text(
+                                                    AppLocalizations.of(context)!.selectAccount,
+                                                    style: Theme.of(context).textTheme.titleLarge,
+                                                  ),
+                                                ),
+                                                AttributeChoice(
+                                                  groupValue: _accountId,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      _accountId = value!;
+                                                    });
+                                                    Navigator.pop(context);
+                                                  },
+                                                  items: snapshot.hasData ? snapshot.data! : [],
+                                                )
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ).then(
+                                      (_) => _accountId != -1
+                                          ? setState(
+                                              () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
+                                            )
+                                          : null,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -616,7 +371,7 @@ class _AddViewState extends State<AddView> {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () async {
-                        if ((_eType.single == EType.income ? _incomeForm : _expenseForm).currentState!.validate()) {
+                        if (_formKey.currentState!.validate()) {
                           final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
                           final Isar isar = Isar.getInstance()!;
                           final Exchange exchange = Exchange(

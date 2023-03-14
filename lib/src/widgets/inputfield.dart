@@ -13,6 +13,7 @@ class InputField extends StatelessWidget {
     this.placeholder,
     this.readOnly = false,
     this.textColor,
+    this.validator,
   }) : assert(!(controller != null && placeholder != null));
   final TextEditingController? controller;
   final List<TextInputFormatter>? inputFormatters;
@@ -22,6 +23,7 @@ class InputField extends StatelessWidget {
   final String? placeholder;
   final bool readOnly;
   final Color? textColor;
+  final String? Function(String? value)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +37,16 @@ class InputField extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 4),
             child: Text(
               label,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall!
-                  .apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              style: Theme.of(context).textTheme.bodySmall!.apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
             ),
           ),
-          TextField(
+          TextFormField(
             controller: controller ?? TextEditingController(text: placeholder),
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               contentPadding: EdgeInsets.all(16),
+              errorMaxLines: 1,
+              errorStyle: TextStyle(height: 1),
             ),
             keyboardType: keyboardType,
             textCapitalization: TextCapitalization.sentences,
@@ -56,6 +57,8 @@ class InputField extends StatelessWidget {
               color: textColor ?? Theme.of(context).colorScheme.onSurface,
             ),
             inputFormatters: inputFormatters,
+            validator: validator,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
           ),
         ],
       ),

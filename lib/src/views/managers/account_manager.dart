@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:isar/isar.dart';
 
@@ -98,13 +99,28 @@ class _AccountManagerState extends State<AccountManager> {
                                                     onPressed: () => showDialog<void>(
                                                       context: context,
                                                       builder: (context) {
+                                                        final formKey = GlobalKey<FormState>();
                                                         _controller[1].text = attributes[index].name;
                                                         return AlertDialog(
                                                           title: Text(AppLocalizations.of(context)!.edit),
                                                           icon: const Icon(Icons.edit),
-                                                          content: InputField(
-                                                            controller: _controller[1],
-                                                            label: AppLocalizations.of(context)!.name,
+                                                          content: Form(
+                                                            key: formKey,
+                                                            child: InputField(
+                                                              controller: _controller[1],
+                                                              label: AppLocalizations.of(context)!.name,
+                                                              inputFormatters: [
+                                                                LengthLimitingTextInputFormatter(15),
+                                                              ],
+                                                              validator: (value) {
+                                                                if (value!.isEmpty) {
+                                                                  return 'Cannot be empty';
+                                                                } else if (value.length < 3) {
+                                                                  return 'At least 3 characters';
+                                                                }
+                                                                return null;
+                                                              },
+                                                            ),
                                                           ),
                                                           actions: [
                                                             TextButton(
@@ -114,15 +130,17 @@ class _AccountManagerState extends State<AccountManager> {
                                                             FilledButton.tonalIcon(
                                                               icon: const Icon(Icons.done),
                                                               onPressed: () async {
-                                                                final Isar isar = Isar.getInstance()!;
-                                                                final Attribute attribute = attributes[index].copyWith(name: _controller[1].text);
-                                                                await isar.writeTxn(() async {
-                                                                  await isar.attributes.put(attribute);
-                                                                }).then((_) {
-                                                                  Navigator.pop(context);
-                                                                  Navigator.pop(context);
-                                                                  _controller[1].clear();
-                                                                });
+                                                                if (formKey.currentState!.validate()) {
+                                                                  final Isar isar = Isar.getInstance()!;
+                                                                  final Attribute attribute = attributes[index].copyWith(name: _controller[1].text);
+                                                                  await isar.writeTxn(() async {
+                                                                    await isar.attributes.put(attribute);
+                                                                  }).then((_) {
+                                                                    Navigator.pop(context);
+                                                                    Navigator.pop(context);
+                                                                    _controller[1].clear();
+                                                                  });
+                                                                }
                                                               },
                                                               label: Text(AppLocalizations.of(context)!.save),
                                                             ),
@@ -132,16 +150,6 @@ class _AccountManagerState extends State<AccountManager> {
                                                     ),
                                                     icon: const Icon(Icons.edit),
                                                     label: Text(AppLocalizations.of(context)!.edit),
-                                                    style: ButtonStyle(
-                                                      backgroundColor: MaterialStatePropertyAll<Color>(
-                                                        Theme.of(context).colorScheme.primary,
-                                                      ),
-                                                      foregroundColor: MaterialStatePropertyAll<Color>(
-                                                        Colors.white.harmonizeWith(
-                                                          Theme.of(context).colorScheme.primary,
-                                                        ),
-                                                      ),
-                                                    ),
                                                   ),
                                                   const Divider(
                                                     height: 24,
@@ -199,14 +207,29 @@ class _AccountManagerState extends State<AccountManager> {
                       onPressed: () => showDialog<void>(
                         context: context,
                         builder: (context) {
+                          final formKey = GlobalKey<FormState>();
                           return AlertDialog(
                             title: Text(
                               AppLocalizations.of(context)!.add,
                             ),
                             icon: const Icon(Icons.add),
-                            content: InputField(
-                              controller: _controller[0],
-                              label: AppLocalizations.of(context)!.name,
+                            content: Form(
+                              key: formKey,
+                              child: InputField(
+                                controller: _controller[0],
+                                label: AppLocalizations.of(context)!.name,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(15),
+                                ],
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Cannot be empty';
+                                  } else if (value.length < 3) {
+                                    return 'At least 3 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
                             ),
                             actions: [
                               TextButton(
@@ -218,15 +241,17 @@ class _AccountManagerState extends State<AccountManager> {
                               FilledButton.tonalIcon(
                                 icon: const Icon(Icons.add),
                                 onPressed: () async {
-                                  final Isar isar = Isar.getInstance()!;
-                                  final Attribute attribute = Attribute(
-                                    name: _controller[0].text,
-                                    type: AttributeType.account,
-                                  );
-                                  await isar.writeTxn(() async {
-                                    await isar.attributes.put(attribute);
-                                  }).then((_) => Navigator.pop(context));
-                                  _controller[0].clear();
+                                  if (formKey.currentState!.validate()) {
+                                    final Isar isar = Isar.getInstance()!;
+                                    final Attribute attribute = Attribute(
+                                      name: _controller[0].text,
+                                      type: AttributeType.account,
+                                    );
+                                    await isar.writeTxn(() async {
+                                      await isar.attributes.put(attribute);
+                                    }).then((_) => Navigator.pop(context));
+                                    _controller[0].clear();
+                                  }
                                 },
                                 label: Text(AppLocalizations.of(context)!.add),
                               ),
@@ -236,16 +261,6 @@ class _AccountManagerState extends State<AccountManager> {
                       ),
                       icon: const Icon(Icons.add),
                       label: Text(AppLocalizations.of(context)!.add),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll<Color>(
-                          Theme.of(context).colorScheme.primary,
-                        ),
-                        foregroundColor: MaterialStatePropertyAll<Color>(
-                          Colors.white.harmonizeWith(
-                            Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      ),
                     ),
                   )
                 ],

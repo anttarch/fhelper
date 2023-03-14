@@ -1,7 +1,8 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/widgets/attributechoice.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
-import 'package:fhelper/src/widgets/sheetchoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -19,6 +20,8 @@ enum _IType { present, wage }
 class _AddViewState extends State<AddView> {
   Set<EType> _eType = {EType.income};
   _IType _itype = _IType.present;
+  int _typeId = -1;
+  int _accountId = -1;
   final PageController _pageCtrl = PageController();
   final Map<EType, int> _indexMap = {
     EType.income: 0,
@@ -96,6 +99,8 @@ class _AddViewState extends State<AddView> {
                         onSelectionChanged: (p0) {
                           setState(() {
                             _eType = p0;
+                            _typeId = -1;
+                            _accountId = -1;
                             displayText[0] = DateTime.now().toString();
                           });
                           displayText.fillRange(1, 4, null);
@@ -176,99 +181,119 @@ class _AddViewState extends State<AddView> {
                                     },
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: InputField(
-                                    label: AppLocalizations.of(context)!.type(1),
-                                    readOnly: true,
-                                    placeholder: displayText[1],
-                                    onTap: () => showModalBottomSheet<void>(
-                                      context: context,
-                                      constraints: BoxConstraints(
-                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                      ),
-                                      enableDrag: false,
-                                      builder: (context) {
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(20),
-                                                  child: Text(
-                                                    'Select Type',
-                                                    style: Theme.of(context).textTheme.titleLarge,
-                                                  ),
-                                                ),
-                                                SheetChoice<_IType>(
-                                                  groupValue: _itype,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _itype = value!;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                  items: const {'Present': _IType.present, 'Wage': _IType.wage},
-                                                )
-                                              ],
+                                FutureBuilder(
+                                  future: getAttributes(
+                                    Isar.getInstance()!,
+                                    AttributeType.incomeType,
+                                  ),
+                                  builder: (context, snapshot) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: InputField(
+                                        label: AppLocalizations.of(context)!.type(1),
+                                        readOnly: true,
+                                        placeholder: displayText[1],
+                                        onTap: () => showModalBottomSheet<void>(
+                                          context: context,
+                                          constraints: BoxConstraints(
+                                            maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                          ),
+                                          enableDrag: false,
+                                          builder: (context) {
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(20),
+                                                      child: Text(
+                                                        'Select Type',
+                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                      ),
+                                                    ),
+                                                    AttributeChoice(
+                                                      groupValue: _typeId,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          _typeId = value!;
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                      items: snapshot.hasData ? snapshot.data! : [],
+                                                    )
+                                                  ],
+                                                );
+                                              },
                                             );
                                           },
-                                        );
-                                      },
-                                    ).then(
-                                      (_) => setState(
-                                        () => displayText[1] = _itype.toString(),
+                                        ).then(
+                                          (_) => _typeId != -1
+                                              ? setState(
+                                                  () => displayText[1] = snapshot.hasData ? snapshot.data![_typeId].name : null,
+                                                )
+                                              : null,
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: InputField(
-                                    label: AppLocalizations.of(context)!.account(1),
-                                    readOnly: true,
-                                    placeholder: displayText[2],
-                                    onTap: () => showModalBottomSheet<void>(
-                                      context: context,
-                                      constraints: BoxConstraints(
-                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                      ),
-                                      enableDrag: false,
-                                      builder: (context) {
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(20),
-                                                  child: Text(
-                                                    'Select Account',
-                                                    style: Theme.of(context).textTheme.titleLarge,
-                                                  ),
-                                                ),
-                                                SheetChoice<_IType>(
-                                                  groupValue: _itype,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _itype = value!;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                  items: const {'Wallet': _IType.present, 'Bank': _IType.wage},
-                                                )
-                                              ],
+                                FutureBuilder(
+                                  future: getAttributes(
+                                    Isar.getInstance()!,
+                                    AttributeType.account,
+                                  ),
+                                  builder: (context, snapshot) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: InputField(
+                                        label: AppLocalizations.of(context)!.account(1),
+                                        readOnly: true,
+                                        placeholder: displayText[2],
+                                        onTap: () => showModalBottomSheet<void>(
+                                          context: context,
+                                          constraints: BoxConstraints(
+                                            maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                          ),
+                                          enableDrag: false,
+                                          builder: (context) {
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(20),
+                                                      child: Text(
+                                                        'Select Account',
+                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                      ),
+                                                    ),
+                                                    AttributeChoice(
+                                                      groupValue: _accountId,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          _accountId = value!;
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                      items: snapshot.hasData ? snapshot.data! : [],
+                                                    )
+                                                  ],
+                                                );
+                                              },
                                             );
                                           },
-                                        );
-                                      },
-                                    ).then(
-                                      (_) => setState(
-                                        () => displayText[2] = _itype.toString(),
+                                        ).then(
+                                          (_) => _accountId != -1
+                                              ? setState(
+                                                  () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
+                                                )
+                                              : null,
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
@@ -341,52 +366,62 @@ class _AddViewState extends State<AddView> {
                                     },
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: InputField(
-                                    label: AppLocalizations.of(context)!.type(1),
-                                    readOnly: true,
-                                    placeholder: displayText[1],
-                                    onTap: () => showModalBottomSheet<void>(
-                                      context: context,
-                                      constraints: BoxConstraints(
-                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                      ),
-                                      enableDrag: false,
-                                      builder: (context) {
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(20),
-                                                  child: Text(
-                                                    'Select Type',
-                                                    style: Theme.of(context).textTheme.titleLarge,
-                                                  ),
-                                                ),
-                                                SheetChoice<_IType>(
-                                                  groupValue: _itype,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _itype = value!;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                  items: const {'Present': _IType.present, 'Wage': _IType.wage},
-                                                )
-                                              ],
+                                FutureBuilder(
+                                  future: getAttributes(
+                                    Isar.getInstance()!,
+                                    AttributeType.expenseType,
+                                  ),
+                                  builder: (context, snapshot) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: InputField(
+                                        label: AppLocalizations.of(context)!.type(1),
+                                        readOnly: true,
+                                        placeholder: displayText[1],
+                                        onTap: () => showModalBottomSheet<void>(
+                                          context: context,
+                                          constraints: BoxConstraints(
+                                            maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                          ),
+                                          enableDrag: false,
+                                          builder: (context) {
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(20),
+                                                      child: Text(
+                                                        'Select Type',
+                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                      ),
+                                                    ),
+                                                    AttributeChoice(
+                                                      groupValue: _typeId,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          _typeId = value!;
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                      items: snapshot.hasData ? snapshot.data! : [],
+                                                    )
+                                                  ],
+                                                );
+                                              },
                                             );
                                           },
-                                        );
-                                      },
-                                    ).then(
-                                      (_) => setState(
-                                        () => displayText[1] = _itype.toString(),
+                                        ).then(
+                                          (_) => _typeId != -1
+                                              ? setState(
+                                                  () => displayText[1] = snapshot.hasData ? snapshot.data![_typeId].name : null,
+                                                )
+                                              : null,
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
@@ -413,16 +448,16 @@ class _AddViewState extends State<AddView> {
                                                     style: Theme.of(context).textTheme.titleLarge,
                                                   ),
                                                 ),
-                                                SheetChoice<_IType>(
-                                                  groupValue: _itype,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _itype = value!;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                  items: const {'Card 1': _IType.present, 'Card 2': _IType.wage},
-                                                )
+                                                // AttributeChoice<_IType>(
+                                                //   groupValue: _itype,
+                                                //   onChanged: (value) {
+                                                //     setState(() {
+                                                //       _itype = value!;
+                                                //     });
+                                                //     Navigator.pop(context);
+                                                //   },
+                                                //   items: const {'Card 1': _IType.present, 'Card 2': _IType.wage},
+                                                // )
                                               ],
                                             );
                                           },
@@ -435,52 +470,62 @@ class _AddViewState extends State<AddView> {
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: InputField(
-                                    label: AppLocalizations.of(context)!.account(1),
-                                    readOnly: true,
-                                    placeholder: displayText[2],
-                                    onTap: () => showModalBottomSheet<void>(
-                                      context: context,
-                                      constraints: BoxConstraints(
-                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                      ),
-                                      enableDrag: false,
-                                      builder: (context) {
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.all(20),
-                                                  child: Text(
-                                                    'Select Account',
-                                                    style: Theme.of(context).textTheme.titleLarge,
-                                                  ),
-                                                ),
-                                                SheetChoice<_IType>(
-                                                  groupValue: _itype,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _itype = value!;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                  items: const {'Wallet': _IType.present, 'Bank': _IType.wage},
-                                                )
-                                              ],
+                                FutureBuilder(
+                                  future: getAttributes(
+                                    Isar.getInstance()!,
+                                    AttributeType.account,
+                                  ),
+                                  builder: (context, snapshot) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: InputField(
+                                        label: AppLocalizations.of(context)!.account(1),
+                                        readOnly: true,
+                                        placeholder: displayText[2],
+                                        onTap: () => showModalBottomSheet<void>(
+                                          context: context,
+                                          constraints: BoxConstraints(
+                                            maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                          ),
+                                          enableDrag: false,
+                                          builder: (context) {
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(20),
+                                                      child: Text(
+                                                        'Select Account',
+                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                      ),
+                                                    ),
+                                                    AttributeChoice(
+                                                      groupValue: _accountId,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          _accountId = value!;
+                                                        });
+                                                        Navigator.pop(context);
+                                                      },
+                                                      items: snapshot.hasData ? snapshot.data! : [],
+                                                    )
+                                                  ],
+                                                );
+                                              },
                                             );
                                           },
-                                        );
-                                      },
-                                    ).then(
-                                      (_) => setState(
-                                        () => displayText[2] = _itype.toString(),
+                                        ).then(
+                                          (_) => _accountId != -1
+                                              ? setState(
+                                                  () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
+                                                )
+                                              : null,
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),

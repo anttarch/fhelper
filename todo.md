@@ -43,7 +43,8 @@
 - [x] Switch enums to real world enums
 - [ ] Add text formatting for fields
     - [x] Add currency formatting
-    - [ ] Add displayable options (account, type) names
+    - [x] Add displayable options (account, type) names
+        - [ ] Cards
 - [x] Add intl DateFormat for displaying date
 
 ### DetailsView

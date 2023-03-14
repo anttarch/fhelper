@@ -1,15 +1,16 @@
+import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:flutter/material.dart';
 
-class SheetChoice<T> extends StatelessWidget {
-  const SheetChoice({
+class AttributeChoice extends StatelessWidget {
+  const AttributeChoice({
     super.key,
     required this.groupValue,
     required this.onChanged,
     required this.items,
   });
-  final Map<String, T> items;
-  final T groupValue;
-  final void Function(T? value)? onChanged;
+  final List<Attribute> items;
+  final int groupValue;
+  final void Function(int? value)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -19,15 +20,15 @@ class SheetChoice<T> extends StatelessWidget {
       itemBuilder: (context, index) {
         return Column(
           children: [
-            RadioListTile<T>(
-              value: items.values.elementAt(index),
+            RadioListTile<int>(
+              value: index,
               groupValue: groupValue,
               onChanged: onChanged,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 20,
               ),
               title: Text(
-                items.keys.elementAt(index),
+                items[index].name,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               controlAffinity: ListTileControlAffinity.trailing,

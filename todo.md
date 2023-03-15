@@ -1,57 +1,41 @@
 # TODO
 
-## Views/Pages
-- [x] Add View
+## Views
 - [ ] Transfer View
-- [x] Details View
-- [x] Settings Page
-- [ ] Customize Managers
-    - [x] Accounts
-    - [ ] Cards
-    - [x] Types
 
-## Widgets
-- [x] Send id to HistoryList
-- [x] Migrate DatePicker to MD3 (as of 25/1/2023)
-- [ ] Create Graphic on Home Page
-- [ ] Mention Transfer View on Home Page
-- [x] Internationalize Headline greetings
-- [x] ~~Figure out~~ Implement display of read only text fields
+- ### Add View
+    - [ ] Add Isar logic for selecting cards
+    - [ ] Add installments
 
-## App Logic
-- [ ] Implement Isar
-    - [x] Base Exchange write
-    - [x] Exchange read
-    - [ ] Card write and read
-    - [ ] Check for conflicts and dependencies on delete
-- [ ] Implement internationalization (intl)
-    - [x] Base implementation
-    - [x] Currency and dates
-    - [ ] Options (Accounts, cards, ect)
-- [ ] Implement Bloc
-- [ ] Add default accounts
-- [ ] Add default types
+- ### Details View
+    - [ ] Add Isar logic for displaying cards
+    - [ ] Add logic for card exchanges
 
-## Nice Haves
-- [x] Set first day of week (default to local)
+- ### Head View
 
-## Housekeeping
-- [ ] Review code
-- [ ] Unit testing?
-- [ ] Making every page it's own file
+    - #### Home Page
+        - [ ] Mention Transfer View
+        - [ ] Add graph to today summary (optional)
 
-### AddView
-- [x] Switch enums to real world enums
-- [ ] Add text formatting for fields
-    - [x] Add currency formatting
-    - [x] Add displayable options (account, type) names
-        - [ ] Cards
-- [x] Add intl DateFormat for displaying date
+    - #### Settings Page
+        - [ ] Add theme settings
+        - [ ] Add privacy settings
+        - [ ] Add security settings
 
-### DetailsView
-- [ ] Fix display text for selectable options
-- [ ] Fix Card display
-- [x] Add intl DateFormat for displaying date
+## Managers
 
-### HistoryPage
-- [x] Fix displaying of dates before "yesterday"
+- ### Account Manager
+    - [ ] Add information about values by account
+
+- ### Card Manager
+    - [ ] Add editing logic and ui
+    - [ ] Add information about bills and limits
+
+## Isar (database)
+- [ ] Add conflict verification for deletes (affects managers)
+
+## Internationalization (l10n)
+- [ ] Enable internationalization to default attributes
+
+## Other
+- [ ] Add default attributes

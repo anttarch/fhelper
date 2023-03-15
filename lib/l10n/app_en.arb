@@ -8,6 +8,7 @@
         }
     },
     "add": "Add",
+    "addCard": "Add card",
     "amount": "Amount",
     "back": "Back",
     "cancel": "Cancel",
@@ -20,11 +21,20 @@
         }
     },
     "date": "Date",
+    "dayOfMonth": "Day {dayAsNumber} of each month",
+    "@dayOfMonth": {
+        "placeholders": {
+            "dayAsNumber": {
+                "type": "int"
+            }
+        }
+    },
     "delete": "Delete",
     "deleted": "Deleted",
     "description": "Description",
     "details": "Details",
     "edit": "Edit",
+    "emptyField": "Cannot be empty",
     "expense": "Expense",
     "goodMorning": "Good Morning!",
     "goodAfternoon": "Good Afternoon!",
@@ -43,20 +53,26 @@
     },
     "home": "Home",
     "income": "Income",
+    "invalidValue": "Invalid Value",
     "latest": "Latest:",
+    "limit": "Limit",
     "month": "Month",
     "name": "Name",
+    "paymentDue": "Payment Due",
     "price": "Price",
     "privacy": "Privacy",
     "save": "Save",
     "security": "Security",
     "selectAccount": "Select Account",
+    "selectDay": "Select Day",
     "selectType": "Select Type",
     "settings": "Settings",
     "showOnly": "Show only:",
+    "statementClosing": "Statement Closing",
     "theme": "Theme",
     "thisMonth": "This Month",
     "thisWeek": "This Week",
+    "threeCharactersMinimum": "At least 3 characters",
     "today": "Today",
     "type": "{count, plural, =1{Type} other{Types}}",
     "@type": {

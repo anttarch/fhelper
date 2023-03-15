@@ -136,9 +136,9 @@ class _CardManagerState extends State<CardManager> {
                                                               ],
                                                               validator: (value) {
                                                                 if (value!.isEmpty) {
-                                                                  return 'Cannot be empty';
+                                                                  return AppLocalizations.of(context)!.emptyField;
                                                                 } else if (value.length < 3) {
-                                                                  return 'At least 3 characters';
+                                                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
                                                                 }
                                                                 return null;
                                                               },
@@ -236,7 +236,7 @@ class _CardManagerState extends State<CardManager> {
                                 child: Column(
                                   children: [
                                     AppBar(
-                                      title: Text('Add card'),
+                                      title: Text(AppLocalizations.of(context)!.addCard),
                                       leading: IconButton(
                                         onPressed: () {
                                           Navigator.pop(context);
@@ -283,9 +283,9 @@ class _CardManagerState extends State<CardManager> {
                                                 ],
                                                 validator: (value) {
                                                   if (value!.isEmpty) {
-                                                    return 'Cannot be empty';
+                                                    return AppLocalizations.of(context)!.emptyField;
                                                   } else if (value.length < 3) {
-                                                    return 'At least 3 characters';
+                                                    return AppLocalizations.of(context)!.threeCharactersMinimum;
                                                   }
                                                   return null;
                                                 },
@@ -294,14 +294,12 @@ class _CardManagerState extends State<CardManager> {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 15),
                                               child: InputField(
-                                                label: 'Statement Closing day',
+                                                label: AppLocalizations.of(context)!.statementClosing,
                                                 readOnly: true,
                                                 placeholder: displayText[0],
                                                 validator: (value) {
                                                   if (value!.isEmpty) {
-                                                    return 'Cannot be empty';
-                                                  } else if (value.length < 3) {
-                                                    return 'At least 3 characters';
+                                                    return AppLocalizations.of(context)!.emptyField;
                                                   }
                                                   return null;
                                                 },
@@ -320,7 +318,7 @@ class _CardManagerState extends State<CardManager> {
                                                             Padding(
                                                               padding: const EdgeInsets.all(20),
                                                               child: Text(
-                                                                'Select Day',
+                                                                AppLocalizations.of(context)!.selectDay,
                                                                 style: Theme.of(context).textTheme.titleLarge,
                                                               ),
                                                             ),
@@ -343,7 +341,7 @@ class _CardManagerState extends State<CardManager> {
                                                 ).then(
                                                   (_) => _stcDate != -1
                                                       ? setState(
-                                                          () => displayText[0] = 'Day ${_stcDate + 1} of each month',
+                                                          () => displayText[0] = AppLocalizations.of(context)!.dayOfMonth(_stcDate + 1),
                                                         )
                                                       : null,
                                                 ),
@@ -352,14 +350,12 @@ class _CardManagerState extends State<CardManager> {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 15),
                                               child: InputField(
-                                                label: 'Payment Due day',
+                                                label: AppLocalizations.of(context)!.paymentDue,
                                                 readOnly: true,
                                                 placeholder: displayText[1],
                                                 validator: (value) {
                                                   if (value!.isEmpty) {
-                                                    return 'Cannot be empty';
-                                                  } else if (value.length < 3) {
-                                                    return 'At least 3 characters';
+                                                    return AppLocalizations.of(context)!.emptyField;
                                                   }
                                                   return null;
                                                 },
@@ -378,7 +374,7 @@ class _CardManagerState extends State<CardManager> {
                                                             Padding(
                                                               padding: const EdgeInsets.all(20),
                                                               child: Text(
-                                                                'Select Day',
+                                                                AppLocalizations.of(context)!.selectDay,
                                                                 style: Theme.of(context).textTheme.titleLarge,
                                                               ),
                                                             ),
@@ -401,7 +397,7 @@ class _CardManagerState extends State<CardManager> {
                                                 ).then(
                                                   (_) => _pdDate != -1
                                                       ? setState(
-                                                          () => displayText[1] = 'Day ${_pdDate + 1} of each month',
+                                                          () => displayText[1] = AppLocalizations.of(context)!.dayOfMonth(_pdDate + 1),
                                                         )
                                                       : null,
                                                 ),
@@ -411,7 +407,7 @@ class _CardManagerState extends State<CardManager> {
                                               padding: const EdgeInsets.only(top: 15),
                                               child: InputField(
                                                 controller: _controller[1],
-                                                label: 'Limit',
+                                                label: AppLocalizations.of(context)!.limit,
                                                 keyboardType: TextInputType.number,
                                                 inputFormatters: [
                                                   CurrencyInputFormatter(
@@ -420,9 +416,9 @@ class _CardManagerState extends State<CardManager> {
                                                 ],
                                                 validator: (value) {
                                                   if (value!.isEmpty) {
-                                                    return 'Cannot be empty';
+                                                    return AppLocalizations.of(context)!.emptyField;
                                                   } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                                    return 'Invalid value';
+                                                    return AppLocalizations.of(context)!.invalidValue;
                                                   }
                                                   return null;
                                                 },
@@ -442,7 +438,7 @@ class _CardManagerState extends State<CardManager> {
                                                     placeholder: displayText[2],
                                                     validator: (value) {
                                                       if (value!.isEmpty) {
-                                                        return 'Cannot be empty';
+                                                        return AppLocalizations.of(context)!.emptyField;
                                                       }
                                                       return null;
                                                     },
@@ -497,31 +493,6 @@ class _CardManagerState extends State<CardManager> {
                                     ),
                                   ],
                                 ),
-                                // actions: [
-                                //   TextButton(
-                                //     onPressed: () => Navigator.pop(context),
-                                //     child: Text(
-                                //       AppLocalizations.of(context)!.cancel,
-                                //     ),
-                                //   ),
-                                //   FilledButton.tonalIcon(
-                                //     icon: const Icon(Icons.add),
-                                //     onPressed: () async {
-                                //       if (formKey.currentState!.validate()) {
-                                //         final Isar isar = Isar.getInstance()!;
-                                //         final Attribute attribute = Attribute(
-                                //           name: _controller[0].text,
-                                //           type: AttributeType.account,
-                                //         );
-                                //         // await isar.writeTxn(() async {
-                                //         //   await isar.attributes.put(attribute);
-                                //         // }).then((_) => Navigator.pop(context));
-                                //         // _controller[0].clear();
-                                //       }
-                                //     },
-                                //     label: Text(AppLocalizations.of(context)!.add),
-                                //   ),
-                                // ],
                               );
                             },
                           );

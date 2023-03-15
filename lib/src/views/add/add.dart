@@ -110,9 +110,9 @@ class _AddViewState extends State<AddView> {
                                 ],
                                 validator: (value) {
                                   if (value!.isEmpty) {
-                                    return 'Cannot be empty';
+                                    return AppLocalizations.of(context)!.emptyField;
                                   } else if (value.length < 3) {
-                                    return 'At least 3 characters';
+                                    return AppLocalizations.of(context)!.threeCharactersMinimum;
                                   }
                                   return null;
                                 },
@@ -131,9 +131,9 @@ class _AddViewState extends State<AddView> {
                                 ],
                                 validator: (value) {
                                   if (value!.isEmpty) {
-                                    return 'Cannot be empty';
+                                    return AppLocalizations.of(context)!.emptyField;
                                   } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                    return 'Invalid value';
+                                    return AppLocalizations.of(context)!.invalidValue;
                                   }
                                   return null;
                                 },
@@ -186,7 +186,7 @@ class _AddViewState extends State<AddView> {
                                     placeholder: displayText[1],
                                     validator: (value) {
                                       if (value!.isEmpty) {
-                                        return 'Cannot be empty';
+                                        return AppLocalizations.of(context)!.emptyField;
                                       }
                                       return null;
                                     },
@@ -299,7 +299,7 @@ class _AddViewState extends State<AddView> {
                                     placeholder: displayText[2],
                                     validator: (value) {
                                       if (value!.isEmpty) {
-                                        return 'Cannot be empty';
+                                        return AppLocalizations.of(context)!.emptyField;
                                       }
                                       return null;
                                     },

@@ -139,9 +139,9 @@ class _TypeManagerState extends State<TypeManager> {
                                                               ],
                                                               validator: (value) {
                                                                 if (value!.isEmpty) {
-                                                                  return 'Cannot be empty';
+                                                                  return AppLocalizations.of(context)!.emptyField;
                                                                 } else if (value.length < 3) {
-                                                                  return 'At least 3 characters';
+                                                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
                                                                 }
                                                                 return null;
                                                               },
@@ -248,9 +248,9 @@ class _TypeManagerState extends State<TypeManager> {
                                 ],
                                 validator: (value) {
                                   if (value!.isEmpty) {
-                                    return 'Cannot be empty';
+                                    return AppLocalizations.of(context)!.emptyField;
                                   } else if (value.length < 3) {
-                                    return 'At least 3 characters';
+                                    return AppLocalizations.of(context)!.threeCharactersMinimum;
                                   }
                                   return null;
                                 },

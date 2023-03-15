@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
+import 'package:fhelper/src/logic/collections/card.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/head/head.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:isar/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  await Isar.open([ExchangeSchema, AttributeSchema]);
+  await Isar.open([ExchangeSchema, AttributeSchema, CardSchema]);
   runApp(const MyApp());
 
   // Set default values for first launch

@@ -1,4 +1,5 @@
 import 'package:fhelper/src/views/managers/account_manager.dart';
+import 'package:fhelper/src/views/managers/card_manager.dart';
 import 'package:fhelper/src/views/managers/type_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -25,7 +26,12 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
       // Cards
-      () {},
+      () => Navigator.push(
+            context,
+            MaterialPageRoute<CardManager>(
+              builder: (context) => const CardManager(),
+            ),
+          ),
       // Theme
       () {},
       // Types

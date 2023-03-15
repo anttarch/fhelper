@@ -17,34 +17,29 @@ const CardSchema = CollectionSchema(
   name: r'Card',
   id: 2706062385186124215,
   properties: {
-    r'account': PropertySchema(
+    r'accountId': PropertySchema(
       id: 0,
-      name: r'account',
-      type: IsarType.string,
-    ),
-    r'billingCycle': PropertySchema(
-      id: 1,
-      name: r'billingCycle',
+      name: r'accountId',
       type: IsarType.long,
     ),
-    r'brand': PropertySchema(
-      id: 2,
-      name: r'brand',
-      type: IsarType.string,
-    ),
     r'limit': PropertySchema(
-      id: 3,
+      id: 1,
       name: r'limit',
       type: IsarType.double,
     ),
     r'name': PropertySchema(
-      id: 4,
+      id: 2,
       name: r'name',
       type: IsarType.string,
     ),
     r'paymentDue': PropertySchema(
-      id: 5,
+      id: 3,
       name: r'paymentDue',
+      type: IsarType.long,
+    ),
+    r'statementClosure': PropertySchema(
+      id: 4,
+      name: r'statementClosure',
       type: IsarType.long,
     )
   },
@@ -68,8 +63,6 @@ int _cardEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.account.length * 3;
-  bytesCount += 3 + object.brand.length * 3;
   bytesCount += 3 + object.name.length * 3;
   return bytesCount;
 }
@@ -80,12 +73,11 @@ void _cardSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.account);
-  writer.writeLong(offsets[1], object.billingCycle);
-  writer.writeString(offsets[2], object.brand);
-  writer.writeDouble(offsets[3], object.limit);
-  writer.writeString(offsets[4], object.name);
-  writer.writeLong(offsets[5], object.paymentDue);
+  writer.writeLong(offsets[0], object.accountId);
+  writer.writeDouble(offsets[1], object.limit);
+  writer.writeString(offsets[2], object.name);
+  writer.writeLong(offsets[3], object.paymentDue);
+  writer.writeLong(offsets[4], object.statementClosure);
 }
 
 Card _cardDeserialize(
@@ -95,13 +87,12 @@ Card _cardDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Card(
-    account: reader.readString(offsets[0]),
-    billingCycle: reader.readLong(offsets[1]),
-    brand: reader.readString(offsets[2]),
+    accountId: reader.readLong(offsets[0]),
     id: id,
-    limit: reader.readDouble(offsets[3]),
-    name: reader.readString(offsets[4]),
-    paymentDue: reader.readLong(offsets[5]),
+    limit: reader.readDouble(offsets[1]),
+    name: reader.readString(offsets[2]),
+    paymentDue: reader.readLong(offsets[3]),
+    statementClosure: reader.readLong(offsets[4]),
   );
   return object;
 }
@@ -114,16 +105,14 @@ P _cardDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
-    case 1:
       return (reader.readLong(offset)) as P;
+    case 1:
+      return (reader.readDouble(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
-    case 5:
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -216,171 +205,42 @@ extension CardQueryWhere on QueryBuilder<Card, Card, QWhereClause> {
 }
 
 extension CardQueryFilter on QueryBuilder<Card, Card, QFilterCondition> {
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Card, Card, QAfterFilterCondition> accountIdEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'account',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'account',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'account',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'account',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'account',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'account',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountContains(String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'account',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountMatches(String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'account',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'account',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> accountIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'account',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> billingCycleEqualTo(
-      int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'billingCycle',
+        property: r'accountId',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Card, Card, QAfterFilterCondition> billingCycleGreaterThan(
+  QueryBuilder<Card, Card, QAfterFilterCondition> accountIdGreaterThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'billingCycle',
+        property: r'accountId',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Card, Card, QAfterFilterCondition> billingCycleLessThan(
+  QueryBuilder<Card, Card, QAfterFilterCondition> accountIdLessThan(
     int value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'billingCycle',
+        property: r'accountId',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<Card, Card, QAfterFilterCondition> billingCycleBetween(
+  QueryBuilder<Card, Card, QAfterFilterCondition> accountIdBetween(
     int lower,
     int upper, {
     bool includeLower = true,
@@ -388,139 +248,11 @@ extension CardQueryFilter on QueryBuilder<Card, Card, QFilterCondition> {
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'billingCycle',
+        property: r'accountId',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'brand',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'brand',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'brand',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'brand',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'brand',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'brand',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandContains(String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'brand',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandMatches(String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'brand',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'brand',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterFilterCondition> brandIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'brand',
-        value: '',
       ));
     });
   }
@@ -818,6 +550,59 @@ extension CardQueryFilter on QueryBuilder<Card, Card, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Card, Card, QAfterFilterCondition> statementClosureEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'statementClosure',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Card, Card, QAfterFilterCondition> statementClosureGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'statementClosure',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Card, Card, QAfterFilterCondition> statementClosureLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'statementClosure',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Card, Card, QAfterFilterCondition> statementClosureBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'statementClosure',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension CardQueryObject on QueryBuilder<Card, Card, QFilterCondition> {}
@@ -825,39 +610,15 @@ extension CardQueryObject on QueryBuilder<Card, Card, QFilterCondition> {}
 extension CardQueryLinks on QueryBuilder<Card, Card, QFilterCondition> {}
 
 extension CardQuerySortBy on QueryBuilder<Card, Card, QSortBy> {
-  QueryBuilder<Card, Card, QAfterSortBy> sortByAccount() {
+  QueryBuilder<Card, Card, QAfterSortBy> sortByAccountId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'account', Sort.asc);
+      return query.addSortBy(r'accountId', Sort.asc);
     });
   }
 
-  QueryBuilder<Card, Card, QAfterSortBy> sortByAccountDesc() {
+  QueryBuilder<Card, Card, QAfterSortBy> sortByAccountIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'account', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterSortBy> sortByBillingCycle() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'billingCycle', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterSortBy> sortByBillingCycleDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'billingCycle', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterSortBy> sortByBrand() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'brand', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterSortBy> sortByBrandDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'brand', Sort.desc);
+      return query.addSortBy(r'accountId', Sort.desc);
     });
   }
 
@@ -896,42 +657,30 @@ extension CardQuerySortBy on QueryBuilder<Card, Card, QSortBy> {
       return query.addSortBy(r'paymentDue', Sort.desc);
     });
   }
+
+  QueryBuilder<Card, Card, QAfterSortBy> sortByStatementClosure() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'statementClosure', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Card, Card, QAfterSortBy> sortByStatementClosureDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'statementClosure', Sort.desc);
+    });
+  }
 }
 
 extension CardQuerySortThenBy on QueryBuilder<Card, Card, QSortThenBy> {
-  QueryBuilder<Card, Card, QAfterSortBy> thenByAccount() {
+  QueryBuilder<Card, Card, QAfterSortBy> thenByAccountId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'account', Sort.asc);
+      return query.addSortBy(r'accountId', Sort.asc);
     });
   }
 
-  QueryBuilder<Card, Card, QAfterSortBy> thenByAccountDesc() {
+  QueryBuilder<Card, Card, QAfterSortBy> thenByAccountIdDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'account', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterSortBy> thenByBillingCycle() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'billingCycle', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterSortBy> thenByBillingCycleDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'billingCycle', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterSortBy> thenByBrand() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'brand', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Card, Card, QAfterSortBy> thenByBrandDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'brand', Sort.desc);
+      return query.addSortBy(r'accountId', Sort.desc);
     });
   }
 
@@ -982,26 +731,24 @@ extension CardQuerySortThenBy on QueryBuilder<Card, Card, QSortThenBy> {
       return query.addSortBy(r'paymentDue', Sort.desc);
     });
   }
+
+  QueryBuilder<Card, Card, QAfterSortBy> thenByStatementClosure() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'statementClosure', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Card, Card, QAfterSortBy> thenByStatementClosureDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'statementClosure', Sort.desc);
+    });
+  }
 }
 
 extension CardQueryWhereDistinct on QueryBuilder<Card, Card, QDistinct> {
-  QueryBuilder<Card, Card, QDistinct> distinctByAccount(
-      {bool caseSensitive = true}) {
+  QueryBuilder<Card, Card, QDistinct> distinctByAccountId() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'account', caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<Card, Card, QDistinct> distinctByBillingCycle() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'billingCycle');
-    });
-  }
-
-  QueryBuilder<Card, Card, QDistinct> distinctByBrand(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'brand', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'accountId');
     });
   }
 
@@ -1023,6 +770,12 @@ extension CardQueryWhereDistinct on QueryBuilder<Card, Card, QDistinct> {
       return query.addDistinctBy(r'paymentDue');
     });
   }
+
+  QueryBuilder<Card, Card, QDistinct> distinctByStatementClosure() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'statementClosure');
+    });
+  }
 }
 
 extension CardQueryProperty on QueryBuilder<Card, Card, QQueryProperty> {
@@ -1032,21 +785,9 @@ extension CardQueryProperty on QueryBuilder<Card, Card, QQueryProperty> {
     });
   }
 
-  QueryBuilder<Card, String, QQueryOperations> accountProperty() {
+  QueryBuilder<Card, int, QQueryOperations> accountIdProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'account');
-    });
-  }
-
-  QueryBuilder<Card, int, QQueryOperations> billingCycleProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'billingCycle');
-    });
-  }
-
-  QueryBuilder<Card, String, QQueryOperations> brandProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'brand');
+      return query.addPropertyName(r'accountId');
     });
   }
 
@@ -1065,6 +806,12 @@ extension CardQueryProperty on QueryBuilder<Card, Card, QQueryProperty> {
   QueryBuilder<Card, int, QQueryOperations> paymentDueProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'paymentDue');
+    });
+  }
+
+  QueryBuilder<Card, int, QQueryOperations> statementClosureProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'statementClosure');
     });
   }
 }

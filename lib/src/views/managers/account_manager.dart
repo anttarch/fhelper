@@ -207,54 +207,63 @@ class _AccountManagerState extends State<AccountManager> {
                         context: context,
                         builder: (context) {
                           final formKey = GlobalKey<FormState>();
-                          return AlertDialog(
-                            title: Text(
-                              AppLocalizations.of(context)!.add,
-                            ),
-                            icon: const Icon(Icons.add),
-                            content: Form(
-                              key: formKey,
-                              child: InputField(
-                                controller: _controller[0],
-                                label: AppLocalizations.of(context)!.name,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(15),
-                                ],
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return AppLocalizations.of(context)!.emptyField;
-                                  } else if (value.length < 3) {
-                                    return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                  }
-                                  return null;
-                                },
+                          return WillPopScope(
+                            onWillPop: () {
+                              _controller[0].clear();
+                              return Future<bool>.value(true);
+                            },
+                            child: AlertDialog(
+                              title: Text(
+                                AppLocalizations.of(context)!.add,
                               ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text(
-                                  AppLocalizations.of(context)!.cancel,
+                              icon: const Icon(Icons.add),
+                              content: Form(
+                                key: formKey,
+                                child: InputField(
+                                  controller: _controller[0],
+                                  label: AppLocalizations.of(context)!.name,
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(15),
+                                  ],
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return AppLocalizations.of(context)!.emptyField;
+                                    } else if (value.length < 3) {
+                                      return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                    }
+                                    return null;
+                                  },
                                 ),
                               ),
-                              FilledButton.tonalIcon(
-                                icon: const Icon(Icons.add),
-                                onPressed: () async {
-                                  if (formKey.currentState!.validate()) {
-                                    final Isar isar = Isar.getInstance()!;
-                                    final Attribute attribute = Attribute(
-                                      name: _controller[0].text,
-                                      type: AttributeType.account,
-                                    );
-                                    await isar.writeTxn(() async {
-                                      await isar.attributes.put(attribute);
-                                    }).then((_) => Navigator.pop(context));
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
                                     _controller[0].clear();
-                                  }
-                                },
-                                label: Text(AppLocalizations.of(context)!.add),
-                              ),
-                            ],
+                                  },
+                                  child: Text(
+                                    AppLocalizations.of(context)!.cancel,
+                                  ),
+                                ),
+                                FilledButton.tonalIcon(
+                                  icon: const Icon(Icons.add),
+                                  onPressed: () async {
+                                    if (formKey.currentState!.validate()) {
+                                      final Isar isar = Isar.getInstance()!;
+                                      final Attribute attribute = Attribute(
+                                        name: _controller[0].text,
+                                        type: AttributeType.account,
+                                      );
+                                      await isar.writeTxn(() async {
+                                        await isar.attributes.put(attribute);
+                                      }).then((_) => Navigator.pop(context));
+                                      _controller[0].clear();
+                                    }
+                                  },
+                                  label: Text(AppLocalizations.of(context)!.add),
+                                ),
+                              ],
+                            ),
                           );
                         },
                       ),

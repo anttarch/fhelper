@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
+import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
@@ -98,16 +99,21 @@ class _DetailsViewState extends State<DetailsView> {
                               );
                             },
                           ),
-                          Visibility(
-                            visible: widget.item.value.isNegative,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: InputField(
-                                label: AppLocalizations.of(context)!.card(1),
-                                placeholder: widget.item.cardId.toString(),
-                                readOnly: true,
-                              ),
-                            ),
+                          FutureBuilder(
+                            future: fhelper.getCardFromId(Isar.getInstance()!, widget.item.cardId),
+                            builder: (context, snapshot) {
+                              return Visibility(
+                                visible: widget.item.value.isNegative && snapshot.hasData,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: AppLocalizations.of(context)!.card(1),
+                                    placeholder: snapshot.hasData ? snapshot.data!.name : '',
+                                    readOnly: true,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                           FutureBuilder(
                             future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId),

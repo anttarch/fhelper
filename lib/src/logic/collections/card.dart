@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:isar/isar.dart';
 
 part 'card.g.dart';
@@ -44,4 +43,12 @@ class Card {
 Future<List<Card>> getCards(Isar isar) async {
   final List<Card> cards = await isar.cards.where().findAll();
   return cards;
+}
+
+Future<Card?> getCardFromId(Isar isar, int? id) async {
+  if (id != null) {
+    final Card? card = await isar.cards.get(id);
+    return card;
+  }
+  return null;
 }

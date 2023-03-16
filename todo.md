@@ -9,8 +9,8 @@
     - [ ] Add installments
 
 - ### Details View
-    - [ ] Add Isar logic for displaying cards
-    - [ ] Add logic for card exchanges
+    - [x] Add Isar logic for displaying cards
+    - [ ] Add installments
 
 - ### Head View
 

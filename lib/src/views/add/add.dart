@@ -1,8 +1,9 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
+import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
-import 'package:fhelper/src/widgets/attributechoice.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
+import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -16,13 +17,11 @@ class AddView extends StatefulWidget {
   State<AddView> createState() => _AddViewState();
 }
 
-enum _IType { present, wage }
-
 class _AddViewState extends State<AddView> {
   Set<EType> _eType = {EType.income};
-  _IType _itype = _IType.present;
   int _typeId = -1;
   int _accountId = -1;
+  int _cardIndex = -1;
   final List<String?> displayText = [
     // Date
     DateTime.now().toString(),
@@ -209,7 +208,7 @@ class _AddViewState extends State<AddView> {
                                                     style: Theme.of(context).textTheme.titleLarge,
                                                   ),
                                                 ),
-                                                AttributeChoice(
+                                                ListChoice(
                                                   groupValue: _typeId,
                                                   onChanged: (value) {
                                                     setState(() {
@@ -217,7 +216,7 @@ class _AddViewState extends State<AddView> {
                                                     });
                                                     Navigator.pop(context);
                                                   },
-                                                  items: snapshot.hasData ? snapshot.data! : [],
+                                                  attributeList: snapshot.hasData ? snapshot.data! : null,
                                                 )
                                               ],
                                             );
@@ -237,52 +236,57 @@ class _AddViewState extends State<AddView> {
                             ),
                             Visibility(
                               visible: _eType.single == EType.expense,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: InputField(
-                                  label: AppLocalizations.of(context)!.card(1),
-                                  readOnly: true,
-                                  placeholder: displayText[3],
-                                  onTap: () => showModalBottomSheet<void>(
-                                    context: context,
-                                    constraints: BoxConstraints(
-                                      maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                    ),
-                                    enableDrag: false,
-                                    builder: (context) {
-                                      return StatefulBuilder(
-                                        builder: (context, setState) {
-                                          return Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.all(20),
-                                                child: Text(
-                                                  'Select Card',
-                                                  style: Theme.of(context).textTheme.titleLarge,
-                                                ),
-                                              ),
-                                              // AttributeChoice<_IType>(
-                                              //   groupValue: _itype,
-                                              //   onChanged: (value) {
-                                              //     setState(() {
-                                              //       _itype = value!;
-                                              //     });
-                                              //     Navigator.pop(context);
-                                              //   },
-                                              //   items: const {'Card 1': _IType.present, 'Card 2': _IType.wage},
-                                              // )
-                                            ],
+                              child: FutureBuilder(
+                                future: fhelper.getCards(Isar.getInstance()!),
+                                builder: (context, snapshot) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: InputField(
+                                      label: AppLocalizations.of(context)!.card(1),
+                                      readOnly: true,
+                                      placeholder: displayText[3],
+                                      onTap: () => showModalBottomSheet<void>(
+                                        context: context,
+                                        constraints: BoxConstraints(
+                                          maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                        ),
+                                        enableDrag: false,
+                                        builder: (context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(20),
+                                                    child: Text(
+                                                      AppLocalizations.of(context)!.selectCard,
+                                                      style: Theme.of(context).textTheme.titleLarge,
+                                                    ),
+                                                  ),
+                                                  ListChoice(
+                                                    groupValue: _cardIndex,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _cardIndex = value!;
+                                                      });
+                                                      Navigator.pop(context);
+                                                    },
+                                                    cardList: snapshot.hasData ? snapshot.data! : null,
+                                                  )
+                                                ],
+                                              );
+                                            },
                                           );
                                         },
-                                      );
-                                    },
-                                  ).then(
-                                    (_) => setState(
-                                      () => displayText[3] = _itype.toString(),
+                                      ).then(
+                                        (_) => setState(
+                                          () => displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
                             ),
                             FutureBuilder(
@@ -322,7 +326,7 @@ class _AddViewState extends State<AddView> {
                                                     style: Theme.of(context).textTheme.titleLarge,
                                                   ),
                                                 ),
-                                                AttributeChoice(
+                                                ListChoice(
                                                   groupValue: _accountId,
                                                   onChanged: (value) {
                                                     setState(() {
@@ -330,7 +334,7 @@ class _AddViewState extends State<AddView> {
                                                     });
                                                     Navigator.pop(context);
                                                   },
-                                                  items: snapshot.hasData ? snapshot.data! : [],
+                                                  attributeList: snapshot.hasData ? snapshot.data! : [],
                                                 )
                                               ],
                                             );
@@ -382,6 +386,7 @@ class _AddViewState extends State<AddView> {
                             typeId:
                                 (await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType))[_typeId].id,
                             accountId: (await getAttributes(isar, AttributeType.account))[_accountId].id,
+                            cardId: _eType.single == EType.expense && _cardIndex > -1 ? (await fhelper.getCards(isar))[_cardIndex].id : null,
                           );
                           await isar.writeTxn(() async {
                             await isar.exchanges.put(exchange);

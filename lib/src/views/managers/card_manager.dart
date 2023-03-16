@@ -1,7 +1,7 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
-import 'package:fhelper/src/widgets/attributechoice.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
+import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -183,7 +183,7 @@ class _CardManagerState extends State<CardManager> {
                                               style: Theme.of(context).textTheme.titleLarge,
                                             ),
                                           ),
-                                          AttributeChoice(
+                                          ListChoice(
                                             groupValue: _stcDate,
                                             onChanged: (value) {
                                               setState(() {
@@ -191,8 +191,7 @@ class _CardManagerState extends State<CardManager> {
                                               });
                                               Navigator.pop(context);
                                             },
-                                            items: const [],
-                                            lazyEnoughToMakeAnotherWidgetIntList: List.generate(31, (index) => index + 1),
+                                            intList: List.generate(31, (index) => index + 1),
                                           )
                                         ],
                                       );
@@ -239,7 +238,7 @@ class _CardManagerState extends State<CardManager> {
                                               style: Theme.of(context).textTheme.titleLarge,
                                             ),
                                           ),
-                                          AttributeChoice(
+                                          ListChoice(
                                             groupValue: _pdDate,
                                             onChanged: (value) {
                                               setState(() {
@@ -247,8 +246,7 @@ class _CardManagerState extends State<CardManager> {
                                               });
                                               Navigator.pop(context);
                                             },
-                                            items: const [],
-                                            lazyEnoughToMakeAnotherWidgetIntList: List.generate(31, (index) => index + 1),
+                                            intList: List.generate(31, (index) => index + 1),
                                           )
                                         ],
                                       );
@@ -323,7 +321,7 @@ class _CardManagerState extends State<CardManager> {
                                                   style: Theme.of(context).textTheme.titleLarge,
                                                 ),
                                               ),
-                                              AttributeChoice(
+                                              ListChoice(
                                                 groupValue: edit ? accountIndex : _accountId,
                                                 onChanged: (value) {
                                                   setState(() {
@@ -334,7 +332,7 @@ class _CardManagerState extends State<CardManager> {
                                                   });
                                                   Navigator.pop(context);
                                                 },
-                                                items: snapshot.hasData ? snapshot.data! : [],
+                                                attributeList: snapshot.hasData ? snapshot.data! : [],
                                               )
                                             ],
                                           );

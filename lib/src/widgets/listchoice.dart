@@ -1,28 +1,39 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
+import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:flutter/material.dart';
 
-class AttributeChoice extends StatelessWidget {
-  AttributeChoice({
+class ListChoice extends StatelessWidget {
+  const ListChoice({
     super.key,
     required this.groupValue,
     required this.onChanged,
-    required this.items,
-    this.lazyEnoughToMakeAnotherWidgetIntList,
-  }) : assert(
-          (lazyEnoughToMakeAnotherWidgetIntList != null && items.isEmpty) || (lazyEnoughToMakeAnotherWidgetIntList == null && items.isNotEmpty),
-          "I'm lazy, but that's too much",
-        );
-  final List<Attribute> items;
+    this.attributeList,
+    this.cardList,
+    this.intList,
+  })  : assert(
+          (intList != null && attributeList == null && cardList == null) ||
+              (intList == null && attributeList != null && cardList == null) ||
+              (intList == null && attributeList == null && cardList != null),
+          'Use only one list at a time',
+        ),
+        assert(!(intList == null && attributeList == null && cardList == null), 'Need a list');
+
+  final List<Attribute>? attributeList;
+  final List<fhelper.Card>? cardList;
   final int groupValue;
   final void Function(int? value)? onChanged;
-  final List<int>? lazyEnoughToMakeAnotherWidgetIntList;
+  final List<int>? intList;
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2.5 - 68),
       child: ListView.separated(
-        itemCount: items.isNotEmpty ? items.length : lazyEnoughToMakeAnotherWidgetIntList!.length,
+        itemCount: attributeList != null
+            ? attributeList!.length
+            : cardList != null
+                ? cardList!.length
+                : intList!.length,
         shrinkWrap: true,
         itemBuilder: (context, index) {
           return Column(
@@ -36,12 +47,22 @@ class AttributeChoice extends StatelessWidget {
                   horizontal: 20,
                 ),
                 title: Text(
-                  items.isNotEmpty ? items[index].name : lazyEnoughToMakeAnotherWidgetIntList![index].toString(),
+                  attributeList != null
+                      ? attributeList![index].name
+                      : cardList != null
+                          ? cardList![index].name
+                          : intList![index].toString(),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 controlAffinity: ListTileControlAffinity.trailing,
               ),
-              if (index == (items.isNotEmpty ? items.length : lazyEnoughToMakeAnotherWidgetIntList!.length) - 1)
+              if (index ==
+                  (attributeList != null
+                          ? attributeList!.length
+                          : cardList != null
+                              ? cardList!.length
+                              : intList!.length) -
+                      1)
                 Divider(
                   height: 1,
                   thickness: 1,

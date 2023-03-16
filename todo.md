@@ -39,3 +39,4 @@
 
 ## Other
 - [ ] Add default attributes
+- [ ] Make textfield open datepicker, bottom sheet, etc (maybe it's possible?)

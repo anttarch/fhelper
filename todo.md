@@ -28,7 +28,7 @@
     - [ ] Add information about values by account
 
 - ### Card Manager
-    - [ ] Add editing logic and ui
+    - [x] Add editing logic and ui
     - [ ] Add information about bills and limits
 
 ## Isar (database)

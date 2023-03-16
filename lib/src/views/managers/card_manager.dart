@@ -5,6 +5,7 @@ import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 class CardManager extends StatefulWidget {
@@ -32,6 +33,41 @@ class _CardManagerState extends State<CardManager> {
     null,
   ];
 
+  Future<void> _addCard() async {
+    final String value = _controller[1].text.replaceAll(RegExp('[^0-9]'), '');
+    final Isar isar = Isar.getInstance()!;
+    final fhelper.Card card = fhelper.Card(
+      name: _controller[0].text,
+      statementClosure: _stcDate + 1,
+      paymentDue: _pdDate + 1,
+      limit: double.parse(value) / 100,
+      accountId: (await getAttributes(isar, AttributeType.account))[_accountId].id,
+    );
+    await isar.writeTxn(() async {
+      await isar.cards.put(card);
+    }).then((_) => Navigator.pop(context));
+    cleanForm();
+  }
+
+  Future<void> _editCard(fhelper.Card originalCard) async {
+    final Isar isar = Isar.getInstance()!;
+    final String value = _controller[1].text.replaceAll(RegExp('[^0-9]'), '');
+    final fhelper.Card newCard = originalCard.copyWith(
+      name: _controller[0].text,
+      statementClosure: _stcDate + 1,
+      paymentDue: _pdDate + 1,
+      limit: double.parse(value) / 100,
+      accountId: _accountId == -1 ? null : (await getAttributes(isar, AttributeType.account))[_accountId].id,
+    );
+    await isar.writeTxn(() async {
+      await isar.cards.put(newCard);
+    }).then((_) {
+      Navigator.pop(context);
+      Navigator.pop(context);
+      cleanForm();
+    });
+  }
+
   void cleanForm() {
     setState(() {
       _accountId = -1;
@@ -42,6 +78,291 @@ class _CardManagerState extends State<CardManager> {
     for (final element in _controller) {
       element.clear();
     }
+  }
+
+  Future<void> _showFullscreenForm({bool edit = false, fhelper.Card? card, Attribute? cardAttribute}) {
+    if (card != null && edit) {
+      setState(() {
+        _stcDate = card.statementClosure - 1;
+        _pdDate = card.paymentDue - 1;
+        displayText[0] = AppLocalizations.of(context)!.dayOfMonth(card.statementClosure);
+        displayText[1] = AppLocalizations.of(context)!.dayOfMonth(card.paymentDue);
+        displayText[2] = cardAttribute!.name;
+        _controller[0].text = card.name;
+        _controller[1].text = NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(card.limit);
+      });
+    }
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        final formKey = GlobalKey<FormState>();
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog.fullscreen(
+              child: Column(
+                children: [
+                  AppBar(
+                    title: Text(edit ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.addCard),
+                    leading: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (edit) {
+                          Navigator.pop(context);
+                        }
+                        cleanForm();
+                      },
+                      icon: const Icon(Icons.close),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            if (edit) {
+                              await _editCard(card!);
+                            } else {
+                              await _addCard();
+                            }
+                          }
+                        },
+                        child: Text(edit ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 15),
+                            child: InputField(
+                              controller: _controller[0],
+                              label: AppLocalizations.of(context)!.name,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(15),
+                              ],
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return AppLocalizations.of(context)!.emptyField;
+                                } else if (value.length < 3) {
+                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 15),
+                            child: InputField(
+                              label: AppLocalizations.of(context)!.statementClosing,
+                              readOnly: true,
+                              placeholder: displayText[0],
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return AppLocalizations.of(context)!.emptyField;
+                                }
+                                return null;
+                              },
+                              onTap: () => showModalBottomSheet<void>(
+                                context: context,
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                ),
+                                enableDrag: false,
+                                builder: (context) {
+                                  return StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Text(
+                                              AppLocalizations.of(context)!.selectDay,
+                                              style: Theme.of(context).textTheme.titleLarge,
+                                            ),
+                                          ),
+                                          AttributeChoice(
+                                            groupValue: _stcDate,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _stcDate = value!;
+                                              });
+                                              Navigator.pop(context);
+                                            },
+                                            items: const [],
+                                            lazyEnoughToMakeAnotherWidgetIntList: List.generate(31, (index) => index + 1),
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ).then(
+                                (_) => _stcDate != -1
+                                    ? setState(
+                                        () => displayText[0] = AppLocalizations.of(context)!.dayOfMonth(_stcDate + 1),
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 15),
+                            child: InputField(
+                              label: AppLocalizations.of(context)!.paymentDue,
+                              readOnly: true,
+                              placeholder: displayText[1],
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return AppLocalizations.of(context)!.emptyField;
+                                }
+                                return null;
+                              },
+                              onTap: () => showModalBottomSheet<void>(
+                                context: context,
+                                constraints: BoxConstraints(
+                                  maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                ),
+                                enableDrag: false,
+                                builder: (context) {
+                                  return StatefulBuilder(
+                                    builder: (context, setState) {
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Text(
+                                              AppLocalizations.of(context)!.selectDay,
+                                              style: Theme.of(context).textTheme.titleLarge,
+                                            ),
+                                          ),
+                                          AttributeChoice(
+                                            groupValue: _pdDate,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                _pdDate = value!;
+                                              });
+                                              Navigator.pop(context);
+                                            },
+                                            items: const [],
+                                            lazyEnoughToMakeAnotherWidgetIntList: List.generate(31, (index) => index + 1),
+                                          )
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ).then(
+                                (_) => _pdDate != -1
+                                    ? setState(
+                                        () => displayText[1] = AppLocalizations.of(context)!.dayOfMonth(_pdDate + 1),
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 15),
+                            child: InputField(
+                              controller: _controller[1],
+                              label: AppLocalizations.of(context)!.limit,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                CurrencyInputFormatter(
+                                  locale: Localizations.localeOf(context).languageCode,
+                                )
+                              ],
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return AppLocalizations.of(context)!.emptyField;
+                                } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
+                                  return AppLocalizations.of(context)!.invalidValue;
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          FutureBuilder(
+                            future: getAttributes(
+                              Isar.getInstance()!,
+                              AttributeType.account,
+                            ),
+                            builder: (context, snapshot) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: InputField(
+                                  label: AppLocalizations.of(context)!.account(1),
+                                  readOnly: true,
+                                  placeholder: displayText[2],
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return AppLocalizations.of(context)!.emptyField;
+                                    }
+                                    return null;
+                                  },
+                                  onTap: () => showModalBottomSheet<void>(
+                                    context: context,
+                                    constraints: BoxConstraints(
+                                      maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                    ),
+                                    enableDrag: false,
+                                    builder: (context) {
+                                      int accountIndex = edit && snapshot.hasData ? snapshot.data!.indexOf(cardAttribute!) : -1;
+                                      return StatefulBuilder(
+                                        builder: (context, setState) {
+                                          return Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.all(20),
+                                                child: Text(
+                                                  AppLocalizations.of(context)!.selectAccount,
+                                                  style: Theme.of(context).textTheme.titleLarge,
+                                                ),
+                                              ),
+                                              AttributeChoice(
+                                                groupValue: edit ? accountIndex : _accountId,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    if (edit) {
+                                                      accountIndex = value!;
+                                                    }
+                                                    _accountId = value!;
+                                                  });
+                                                  Navigator.pop(context);
+                                                },
+                                                items: snapshot.hasData ? snapshot.data! : [],
+                                              )
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ).then(
+                                    (_) => _accountId != -1
+                                        ? setState(
+                                            () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -118,58 +439,10 @@ class _CardManagerState extends State<CardManager> {
                                                     label: Text(AppLocalizations.of(context)!.delete),
                                                   ),
                                                   FilledButton.icon(
-                                                    onPressed: () => showDialog<void>(
-                                                      context: context,
-                                                      builder: (context) {
-                                                        final formKey = GlobalKey<FormState>();
-                                                        _controller[1].text = cards[index].name;
-                                                        return AlertDialog(
-                                                          title: Text(AppLocalizations.of(context)!.edit),
-                                                          icon: const Icon(Icons.edit),
-                                                          content: Form(
-                                                            key: formKey,
-                                                            child: InputField(
-                                                              controller: _controller[1],
-                                                              label: AppLocalizations.of(context)!.name,
-                                                              inputFormatters: [
-                                                                LengthLimitingTextInputFormatter(15),
-                                                              ],
-                                                              validator: (value) {
-                                                                if (value!.isEmpty) {
-                                                                  return AppLocalizations.of(context)!.emptyField;
-                                                                } else if (value.length < 3) {
-                                                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                                                }
-                                                                return null;
-                                                              },
-                                                            ),
-                                                          ),
-                                                          actions: [
-                                                            TextButton(
-                                                              onPressed: () => Navigator.pop(context),
-                                                              child: Text(AppLocalizations.of(context)!.cancel),
-                                                            ),
-                                                            FilledButton.tonalIcon(
-                                                              icon: const Icon(Icons.done),
-                                                              onPressed: () async {
-                                                                if (formKey.currentState!.validate()) {
-                                                                  final Isar isar = Isar.getInstance()!;
-                                                                  final fhelper.Card card = cards[index].copyWith(name: _controller[1].text);
-                                                                  await isar.writeTxn(() async {
-                                                                    await isar.cards.put(card);
-                                                                  }).then((_) {
-                                                                    Navigator.pop(context);
-                                                                    Navigator.pop(context);
-                                                                    _controller[1].clear();
-                                                                  });
-                                                                }
-                                                              },
-                                                              label: Text(AppLocalizations.of(context)!.save),
-                                                            ),
-                                                          ],
-                                                        );
-                                                      },
-                                                    ),
+                                                    onPressed: () async {
+                                                      final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[index].accountId);
+                                                      await _showFullscreenForm(edit: true, card: cards[index], cardAttribute: attribute);
+                                                    },
                                                     icon: const Icon(Icons.edit),
                                                     label: Text(AppLocalizations.of(context)!.edit),
                                                   ),
@@ -226,278 +499,7 @@ class _CardManagerState extends State<CardManager> {
                   const SizedBox(width: 20),
                   Expanded(
                     child: FilledButton.icon(
-                      onPressed: () => showDialog<void>(
-                        context: context,
-                        builder: (context) {
-                          final formKey = GlobalKey<FormState>();
-                          return StatefulBuilder(
-                            builder: (context, setState) {
-                              return Dialog.fullscreen(
-                                child: Column(
-                                  children: [
-                                    AppBar(
-                                      title: Text(AppLocalizations.of(context)!.addCard),
-                                      leading: IconButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          cleanForm();
-                                        },
-                                        icon: const Icon(Icons.close),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () async {
-                                            if (formKey.currentState!.validate()) {
-                                              final String value = _controller[1].text.replaceAll(RegExp('[^0-9]'), '');
-                                              final Isar isar = Isar.getInstance()!;
-                                              final fhelper.Card card = fhelper.Card(
-                                                name: _controller[0].text,
-                                                statementClosure: _stcDate + 1,
-                                                paymentDue: _pdDate + 1,
-                                                limit: double.parse(value) / 100,
-                                                accountId: (await getAttributes(isar, AttributeType.account))[_accountId].id,
-                                              );
-                                              await isar.writeTxn(() async {
-                                                await isar.cards.put(card);
-                                              }).then((_) => Navigator.pop(context));
-                                              cleanForm();
-                                            }
-                                          },
-                                          child: Text(AppLocalizations.of(context)!.add),
-                                        ),
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                                      child: Form(
-                                        key: formKey,
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 15),
-                                              child: InputField(
-                                                controller: _controller[0],
-                                                label: AppLocalizations.of(context)!.name,
-                                                inputFormatters: [
-                                                  LengthLimitingTextInputFormatter(15),
-                                                ],
-                                                validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return AppLocalizations.of(context)!.emptyField;
-                                                  } else if (value.length < 3) {
-                                                    return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 15),
-                                              child: InputField(
-                                                label: AppLocalizations.of(context)!.statementClosing,
-                                                readOnly: true,
-                                                placeholder: displayText[0],
-                                                validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return AppLocalizations.of(context)!.emptyField;
-                                                  }
-                                                  return null;
-                                                },
-                                                onTap: () => showModalBottomSheet<void>(
-                                                  context: context,
-                                                  constraints: BoxConstraints(
-                                                    maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                                  ),
-                                                  enableDrag: false,
-                                                  builder: (context) {
-                                                    return StatefulBuilder(
-                                                      builder: (context, setState) {
-                                                        return Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Padding(
-                                                              padding: const EdgeInsets.all(20),
-                                                              child: Text(
-                                                                AppLocalizations.of(context)!.selectDay,
-                                                                style: Theme.of(context).textTheme.titleLarge,
-                                                              ),
-                                                            ),
-                                                            AttributeChoice(
-                                                              groupValue: _stcDate,
-                                                              onChanged: (value) {
-                                                                setState(() {
-                                                                  _stcDate = value!;
-                                                                });
-                                                                Navigator.pop(context);
-                                                              },
-                                                              items: const [],
-                                                              lazyEnoughToMakeAnotherWidgetIntList: List.generate(31, (index) => index + 1),
-                                                            )
-                                                          ],
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                ).then(
-                                                  (_) => _stcDate != -1
-                                                      ? setState(
-                                                          () => displayText[0] = AppLocalizations.of(context)!.dayOfMonth(_stcDate + 1),
-                                                        )
-                                                      : null,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 15),
-                                              child: InputField(
-                                                label: AppLocalizations.of(context)!.paymentDue,
-                                                readOnly: true,
-                                                placeholder: displayText[1],
-                                                validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return AppLocalizations.of(context)!.emptyField;
-                                                  }
-                                                  return null;
-                                                },
-                                                onTap: () => showModalBottomSheet<void>(
-                                                  context: context,
-                                                  constraints: BoxConstraints(
-                                                    maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                                  ),
-                                                  enableDrag: false,
-                                                  builder: (context) {
-                                                    return StatefulBuilder(
-                                                      builder: (context, setState) {
-                                                        return Column(
-                                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                                          children: [
-                                                            Padding(
-                                                              padding: const EdgeInsets.all(20),
-                                                              child: Text(
-                                                                AppLocalizations.of(context)!.selectDay,
-                                                                style: Theme.of(context).textTheme.titleLarge,
-                                                              ),
-                                                            ),
-                                                            AttributeChoice(
-                                                              groupValue: _pdDate,
-                                                              onChanged: (value) {
-                                                                setState(() {
-                                                                  _pdDate = value!;
-                                                                });
-                                                                Navigator.pop(context);
-                                                              },
-                                                              items: const [],
-                                                              lazyEnoughToMakeAnotherWidgetIntList: List.generate(31, (index) => index + 1),
-                                                            )
-                                                          ],
-                                                        );
-                                                      },
-                                                    );
-                                                  },
-                                                ).then(
-                                                  (_) => _pdDate != -1
-                                                      ? setState(
-                                                          () => displayText[1] = AppLocalizations.of(context)!.dayOfMonth(_pdDate + 1),
-                                                        )
-                                                      : null,
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 15),
-                                              child: InputField(
-                                                controller: _controller[1],
-                                                label: AppLocalizations.of(context)!.limit,
-                                                keyboardType: TextInputType.number,
-                                                inputFormatters: [
-                                                  CurrencyInputFormatter(
-                                                    locale: Localizations.localeOf(context).languageCode,
-                                                  )
-                                                ],
-                                                validator: (value) {
-                                                  if (value!.isEmpty) {
-                                                    return AppLocalizations.of(context)!.emptyField;
-                                                  } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                                    return AppLocalizations.of(context)!.invalidValue;
-                                                  }
-                                                  return null;
-                                                },
-                                              ),
-                                            ),
-                                            FutureBuilder(
-                                              future: getAttributes(
-                                                Isar.getInstance()!,
-                                                AttributeType.account,
-                                              ),
-                                              builder: (context, snapshot) {
-                                                return Padding(
-                                                  padding: const EdgeInsets.only(top: 15),
-                                                  child: InputField(
-                                                    label: AppLocalizations.of(context)!.account(1),
-                                                    readOnly: true,
-                                                    placeholder: displayText[2],
-                                                    validator: (value) {
-                                                      if (value!.isEmpty) {
-                                                        return AppLocalizations.of(context)!.emptyField;
-                                                      }
-                                                      return null;
-                                                    },
-                                                    onTap: () => showModalBottomSheet<void>(
-                                                      context: context,
-                                                      constraints: BoxConstraints(
-                                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                                      ),
-                                                      enableDrag: false,
-                                                      builder: (context) {
-                                                        return StatefulBuilder(
-                                                          builder: (context, setState) {
-                                                            return Column(
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: [
-                                                                Padding(
-                                                                  padding: const EdgeInsets.all(20),
-                                                                  child: Text(
-                                                                    AppLocalizations.of(context)!.selectAccount,
-                                                                    style: Theme.of(context).textTheme.titleLarge,
-                                                                  ),
-                                                                ),
-                                                                AttributeChoice(
-                                                                  groupValue: _accountId,
-                                                                  onChanged: (value) {
-                                                                    setState(() {
-                                                                      _accountId = value!;
-                                                                    });
-                                                                    Navigator.pop(context);
-                                                                  },
-                                                                  items: snapshot.hasData ? snapshot.data! : [],
-                                                                )
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                                    ).then(
-                                                      (_) => _accountId != -1
-                                                          ? setState(
-                                                              () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
-                                                            )
-                                                          : null,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                      onPressed: _showFullscreenForm,
                       icon: const Icon(Icons.add),
                       label: Text(AppLocalizations.of(context)!.add),
                     ),

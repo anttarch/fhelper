@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 
 part 'attribute.g.dart';
@@ -9,9 +9,10 @@ enum AttributeType {
   expenseType,
 }
 
+@immutable
 @Collection()
 class Attribute {
-  Attribute({
+  const Attribute({
     this.id = Isar.autoIncrement,
     required this.name,
     required this.type,
@@ -33,6 +34,18 @@ class Attribute {
       type: type ?? this.type,
     );
   }
+
+  @override
+  bool operator ==(covariant Attribute other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other.id == id && other.name == name && other.type == type;
+  }
+
+  @override
+  int get hashCode => id.hashCode ^ name.hashCode ^ type.hashCode;
 }
 
 Future<List<Attribute>> getAttributes(Isar isar, AttributeType type) async {

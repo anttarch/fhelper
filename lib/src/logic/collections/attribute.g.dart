@@ -17,13 +17,18 @@ const AttributeSchema = CollectionSchema(
   name: r'Attribute',
   id: 7545206588480797890,
   properties: {
-    r'name': PropertySchema(
+    r'hashCode': PropertySchema(
       id: 0,
+      name: r'hashCode',
+      type: IsarType.long,
+    ),
+    r'name': PropertySchema(
+      id: 1,
       name: r'name',
       type: IsarType.string,
     ),
     r'type': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'type',
       type: IsarType.byte,
       enumMap: _AttributetypeEnumValueMap,
@@ -59,8 +64,9 @@ void _attributeSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.name);
-  writer.writeByte(offsets[1], object.type.index);
+  writer.writeLong(offsets[0], object.hashCode);
+  writer.writeString(offsets[1], object.name);
+  writer.writeByte(offsets[2], object.type.index);
 }
 
 Attribute _attributeDeserialize(
@@ -71,8 +77,8 @@ Attribute _attributeDeserialize(
 ) {
   final object = Attribute(
     id: id,
-    name: reader.readString(offsets[0]),
-    type: _AttributetypeValueEnumMap[reader.readByteOrNull(offsets[1])] ??
+    name: reader.readString(offsets[1]),
+    type: _AttributetypeValueEnumMap[reader.readByteOrNull(offsets[2])] ??
         AttributeType.account,
   );
   return object;
@@ -86,8 +92,10 @@ P _attributeDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
+      return (reader.readString(offset)) as P;
+    case 2:
       return (_AttributetypeValueEnumMap[reader.readByteOrNull(offset)] ??
           AttributeType.account) as P;
     default:
@@ -195,6 +203,59 @@ extension AttributeQueryWhere
 
 extension AttributeQueryFilter
     on QueryBuilder<Attribute, Attribute, QFilterCondition> {
+  QueryBuilder<Attribute, Attribute, QAfterFilterCondition> hashCodeEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'hashCode',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attribute, Attribute, QAfterFilterCondition> hashCodeGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'hashCode',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attribute, Attribute, QAfterFilterCondition> hashCodeLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'hashCode',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Attribute, Attribute, QAfterFilterCondition> hashCodeBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'hashCode',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Attribute, Attribute, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -439,6 +500,18 @@ extension AttributeQueryLinks
     on QueryBuilder<Attribute, Attribute, QFilterCondition> {}
 
 extension AttributeQuerySortBy on QueryBuilder<Attribute, Attribute, QSortBy> {
+  QueryBuilder<Attribute, Attribute, QAfterSortBy> sortByHashCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hashCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attribute, Attribute, QAfterSortBy> sortByHashCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hashCode', Sort.desc);
+    });
+  }
+
   QueryBuilder<Attribute, Attribute, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -466,6 +539,18 @@ extension AttributeQuerySortBy on QueryBuilder<Attribute, Attribute, QSortBy> {
 
 extension AttributeQuerySortThenBy
     on QueryBuilder<Attribute, Attribute, QSortThenBy> {
+  QueryBuilder<Attribute, Attribute, QAfterSortBy> thenByHashCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hashCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Attribute, Attribute, QAfterSortBy> thenByHashCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hashCode', Sort.desc);
+    });
+  }
+
   QueryBuilder<Attribute, Attribute, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -505,6 +590,12 @@ extension AttributeQuerySortThenBy
 
 extension AttributeQueryWhereDistinct
     on QueryBuilder<Attribute, Attribute, QDistinct> {
+  QueryBuilder<Attribute, Attribute, QDistinct> distinctByHashCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'hashCode');
+    });
+  }
+
   QueryBuilder<Attribute, Attribute, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -524,6 +615,12 @@ extension AttributeQueryProperty
   QueryBuilder<Attribute, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Attribute, int, QQueryOperations> hashCodeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'hashCode');
     });
   }
 

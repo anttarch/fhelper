@@ -2,7 +2,7 @@
 
 ## Views
 - [ ] Transfer View
-- [ ] Investigate overflowing in some views/pages/dialogs
+- [x] ~~Investigate~~ Fixed overflowing in some views/pages/dialogs 
 
 - ### Add View
     - [x] Add Isar logic for selecting cards

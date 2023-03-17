@@ -7,7 +7,7 @@ A new Flutter project.
 This project intents to implement a finance companion built in [Flutter](flutter.dev).
 
 It utilizes the new [Material Design 3 (Material You)](m3.material.io).
-Since Flutter support for MD3 is not complete (as of 12/3/2023), **it needs Flutter Beta** (tested with 3.8.0-10.1.pre). 
+Since Flutter support for MD3 is not complete (as of 12/3/2023), **it needs Flutter Beta** (tested with 3.9.0-1.0.pre.2). 
 
 ### Dart 3
 

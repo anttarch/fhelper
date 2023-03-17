@@ -27,14 +27,14 @@
 
 - ### Account Manager
     - [ ] Add information about values by account
-    - [ ] Refactor for single TextController use
+    - [x] Refactor for single TextController use
 
 - ### Card Manager
     - [x] Add editing logic and ui
     - [ ] Add information about bills and limits
 
 - ### Type Manager
-    - [ ] Refactor for single TextController use
+    - [x] Refactor for single TextController use
 
 ## Isar (database)
 - [ ] Add conflict verification for deletes (affects managers)

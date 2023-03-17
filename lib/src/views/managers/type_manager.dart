@@ -15,10 +15,7 @@ class TypeManager extends StatefulWidget {
 class _TypeManagerState extends State<TypeManager> {
   Set<AttributeType> _attributeType = {AttributeType.incomeType};
 
-  final List<TextEditingController> _controller = [
-    TextEditingController(),
-    TextEditingController(),
-  ];
+  final TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -125,14 +122,14 @@ class _TypeManagerState extends State<TypeManager> {
                                                       context: context,
                                                       builder: (context) {
                                                         final formKey = GlobalKey<FormState>();
-                                                        _controller[1].text = attributes[index].name;
+                                                        _controller.text = attributes[index].name;
                                                         return AlertDialog(
                                                           title: Text(AppLocalizations.of(context)!.edit),
                                                           icon: const Icon(Icons.edit),
                                                           content: Form(
                                                             key: formKey,
                                                             child: InputField(
-                                                              controller: _controller[1],
+                                                              controller: _controller,
                                                               label: AppLocalizations.of(context)!.name,
                                                               inputFormatters: [
                                                                 LengthLimitingTextInputFormatter(15),
@@ -157,13 +154,12 @@ class _TypeManagerState extends State<TypeManager> {
                                                               onPressed: () async {
                                                                 if (formKey.currentState!.validate()) {
                                                                   final Isar isar = Isar.getInstance()!;
-                                                                  final Attribute attribute = attributes[index].copyWith(name: _controller[1].text);
+                                                                  final Attribute attribute = attributes[index].copyWith(name: _controller.text);
                                                                   await isar.writeTxn(() async {
                                                                     await isar.attributes.put(attribute);
                                                                   }).then((_) {
                                                                     Navigator.pop(context);
                                                                     Navigator.pop(context);
-                                                                    _controller[1].clear();
                                                                   });
                                                                 }
                                                               },
@@ -172,7 +168,7 @@ class _TypeManagerState extends State<TypeManager> {
                                                           ],
                                                         );
                                                       },
-                                                    ),
+                                                    ).then((_) => _controller.clear()),
                                                     icon: const Icon(Icons.edit),
                                                     label: Text(AppLocalizations.of(context)!.edit),
                                                   ),
@@ -233,63 +229,56 @@ class _TypeManagerState extends State<TypeManager> {
                         context: context,
                         builder: (context) {
                           final formKey = GlobalKey<FormState>();
-                          return WillPopScope(
-                            onWillPop: () {
-                              _controller[0].clear();
-                              return Future<bool>.value(true);
-                            },
-                            child: AlertDialog(
-                              title: Text(
-                                AppLocalizations.of(context)!.add,
-                              ),
-                              icon: const Icon(Icons.add),
-                              content: Form(
-                                key: formKey,
-                                child: InputField(
-                                  controller: _controller[0],
-                                  label: AppLocalizations.of(context)!.name,
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(15),
-                                  ],
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return AppLocalizations.of(context)!.emptyField;
-                                    } else if (value.length < 3) {
-                                      return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    AppLocalizations.of(context)!.cancel,
-                                  ),
-                                ),
-                                FilledButton.tonalIcon(
-                                  icon: const Icon(Icons.add),
-                                  onPressed: () async {
-                                    if (formKey.currentState!.validate()) {
-                                      final Isar isar = Isar.getInstance()!;
-                                      final Attribute attribute = Attribute(
-                                        name: _controller[0].text,
-                                        type: _attributeType.single,
-                                      );
-                                      await isar.writeTxn(() async {
-                                        await isar.attributes.put(attribute);
-                                      }).then((_) => Navigator.pop(context));
-                                      _controller[0].clear();
-                                    }
-                                  },
-                                  label: Text(AppLocalizations.of(context)!.add),
-                                ),
-                              ],
+                          return AlertDialog(
+                            title: Text(
+                              AppLocalizations.of(context)!.add,
                             ),
+                            icon: const Icon(Icons.add),
+                            content: Form(
+                              key: formKey,
+                              child: InputField(
+                                controller: _controller,
+                                label: AppLocalizations.of(context)!.name,
+                                inputFormatters: [
+                                  LengthLimitingTextInputFormatter(15),
+                                ],
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return AppLocalizations.of(context)!.emptyField;
+                                  } else if (value.length < 3) {
+                                    return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(
+                                  AppLocalizations.of(context)!.cancel,
+                                ),
+                              ),
+                              FilledButton.tonalIcon(
+                                icon: const Icon(Icons.add),
+                                onPressed: () async {
+                                  if (formKey.currentState!.validate()) {
+                                    final Isar isar = Isar.getInstance()!;
+                                    final Attribute attribute = Attribute(
+                                      name: _controller.text,
+                                      type: _attributeType.single,
+                                    );
+                                    await isar.writeTxn(() async {
+                                      await isar.attributes.put(attribute);
+                                    }).then((_) => Navigator.pop(context));
+                                  }
+                                },
+                                label: Text(AppLocalizations.of(context)!.add),
+                              ),
+                            ],
                           );
                         },
-                      ),
+                      ).then((_) => _controller.clear()),
                       icon: const Icon(Icons.add),
                       label: Text(AppLocalizations.of(context)!.add),
                     ),

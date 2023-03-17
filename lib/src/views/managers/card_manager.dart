@@ -86,66 +86,59 @@ class _CardManagerState extends State<CardManager> {
       context: context,
       builder: (context) {
         final formKey = GlobalKey<FormState>();
-        return WillPopScope(
-          onWillPop: () {
-            controller.clear();
-            return Future<bool>.value(true);
-          },
-          child: AlertDialog(
-            title: Text(
-              AppLocalizations.of(context)!.add,
-            ),
-            icon: const Icon(Icons.add),
-            content: Form(
-              key: formKey,
-              child: InputField(
-                controller: controller,
-                label: AppLocalizations.of(context)!.name,
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(15),
-                ],
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.emptyField;
-                  } else if (value.length < 3) {
-                    return AppLocalizations.of(context)!.threeCharactersMinimum;
-                  }
-                  return null;
-                },
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  AppLocalizations.of(context)!.cancel,
-                ),
-              ),
-              FilledButton.tonalIcon(
-                icon: const Icon(Icons.add),
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    final Isar isar = Isar.getInstance()!;
-                    final Attribute attribute = Attribute(
-                      name: controller.text,
-                      type: AttributeType.account,
-                    );
-                    await isar.writeTxn(() async {
-                      await isar.attributes.put(attribute);
-                    }).then((_) {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    });
-                    controller.clear();
-                  }
-                },
-                label: Text(AppLocalizations.of(context)!.add),
-              ),
-            ],
+        return AlertDialog(
+          title: Text(
+            AppLocalizations.of(context)!.add,
           ),
+          icon: const Icon(Icons.add),
+          content: Form(
+            key: formKey,
+            child: InputField(
+              controller: controller,
+              label: AppLocalizations.of(context)!.name,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(15),
+              ],
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return AppLocalizations.of(context)!.emptyField;
+                } else if (value.length < 3) {
+                  return AppLocalizations.of(context)!.threeCharactersMinimum;
+                }
+                return null;
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                AppLocalizations.of(context)!.cancel,
+              ),
+            ),
+            FilledButton.tonalIcon(
+              icon: const Icon(Icons.add),
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final Isar isar = Isar.getInstance()!;
+                  final Attribute attribute = Attribute(
+                    name: controller.text,
+                    type: AttributeType.account,
+                  );
+                  await isar.writeTxn(() async {
+                    await isar.attributes.put(attribute);
+                  }).then((_) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  });
+                }
+              },
+              label: Text(AppLocalizations.of(context)!.add),
+            ),
+          ],
         );
       },
-    );
+    ).then((_) => controller.clear());
   }
 
   Future<void> _showFullscreenForm({bool edit = false, fhelper.Card? card, Attribute? cardAttribute}) {

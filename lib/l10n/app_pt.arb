@@ -6,6 +6,7 @@
     "back": "Voltar",
     "cancel": "Cancelar",
     "card": "{count, plural, =1{Cartão} other{Cartões}}",
+    "clear": "Limpar",
     "date": "Data",
     "dayOfMonth": "Dia {dayAsNumber} de cada mês",
     "delete": "Excluir",

@@ -9,6 +9,7 @@ class InputField extends StatelessWidget {
     this.inputFormatters,
     this.keyboardType = TextInputType.text,
     required this.label,
+    this.locked = false,
     this.onTap,
     this.placeholder,
     this.readOnly = false,
@@ -19,6 +20,7 @@ class InputField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType keyboardType;
   final String label;
+  final bool locked;
   final VoidCallback? onTap;
   final String? placeholder;
   final bool readOnly;
@@ -42,16 +44,17 @@ class InputField extends StatelessWidget {
           ),
           TextFormField(
             controller: controller ?? TextEditingController(text: placeholder),
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.all(16),
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              contentPadding: const EdgeInsets.all(16),
               errorMaxLines: 1,
-              errorStyle: TextStyle(height: 1),
+              errorStyle: const TextStyle(height: 1),
+              suffixIcon: locked ? const Icon(Icons.lock) : null,
             ),
             keyboardType: keyboardType,
             textCapitalization: TextCapitalization.sentences,
             textInputAction: TextInputAction.next,
-            onTap: onTap,
+            onTap: locked ? () {} : onTap,
             readOnly: readOnly,
             style: TextStyle(
               color: textColor ?? Theme.of(context).colorScheme.onSurface,

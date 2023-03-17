@@ -20,6 +20,7 @@
             }
         }
     },
+    "clear": "Clear",
     "date": "Date",
     "dayOfMonth": "Day {dayAsNumber} of each month",
     "@dayOfMonth": {

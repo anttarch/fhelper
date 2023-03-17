@@ -22,6 +22,7 @@ class _AddViewState extends State<AddView> {
   int _typeId = -1;
   int _accountId = -1;
   int _cardIndex = -1;
+  bool _accountFieldLock = false;
   final List<String?> displayText = [
     // Date
     DateTime.now().toString(),
@@ -81,6 +82,7 @@ class _AddViewState extends State<AddView> {
                             _eType = p0;
                             _typeId = -1;
                             _accountId = -1;
+                            _cardIndex = -1;
                             displayText[0] = DateTime.now().toString();
                           });
                           displayText.fillRange(1, 4, null);
@@ -259,9 +261,24 @@ class _AddViewState extends State<AddView> {
                                                 children: [
                                                   Padding(
                                                     padding: const EdgeInsets.all(20),
-                                                    child: Text(
-                                                      AppLocalizations.of(context)!.selectCard,
-                                                      style: Theme.of(context).textTheme.titleLarge,
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          AppLocalizations.of(context)!.selectCard,
+                                                          style: Theme.of(context).textTheme.titleLarge,
+                                                        ),
+                                                        if (_cardIndex != -1)
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                _cardIndex = -1;
+                                                              });
+                                                              Navigator.pop(context);
+                                                            },
+                                                            child: Text(AppLocalizations.of(context)!.clear),
+                                                          ),
+                                                      ],
                                                     ),
                                                   ),
                                                   ListChoice(
@@ -280,9 +297,26 @@ class _AddViewState extends State<AddView> {
                                           );
                                         },
                                       ).then(
-                                        (_) => setState(
-                                          () => displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null,
-                                        ),
+                                        (_) async {
+                                          if (_cardIndex != -1) {
+                                            final Attribute? account = await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId);
+                                            setState(
+                                              () {
+                                                displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null;
+                                                if (snapshot.hasData) {
+                                                  displayText[2] = account!.name;
+                                                  _accountFieldLock = true;
+                                                }
+                                              },
+                                            );
+                                          } else if (_accountFieldLock == true) {
+                                            setState(() {
+                                              _accountFieldLock = false;
+                                              displayText[2] = null;
+                                              displayText[3] = null;
+                                            });
+                                          }
+                                        },
                                       ),
                                     ),
                                   );
@@ -299,6 +333,7 @@ class _AddViewState extends State<AddView> {
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
                                     label: AppLocalizations.of(context)!.account(1),
+                                    locked: _accountFieldLock,
                                     readOnly: true,
                                     placeholder: displayText[2],
                                     validator: (value) {
@@ -385,7 +420,9 @@ class _AddViewState extends State<AddView> {
                             date: DateTime.parse(displayText[0]!),
                             typeId:
                                 (await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType))[_typeId].id,
-                            accountId: (await getAttributes(isar, AttributeType.account))[_accountId].id,
+                            accountId: _cardIndex > -1
+                                ? (await fhelper.getCards(isar))[_cardIndex].accountId
+                                : (await getAttributes(isar, AttributeType.account))[_accountId].id,
                             cardId: _eType.single == EType.expense && _cardIndex > -1 ? (await fhelper.getCards(isar))[_cardIndex].id : null,
                           );
                           await isar.writeTxn(() async {

@@ -16,7 +16,7 @@
 
     - #### Home Page
         - [x] Mention Transfer View
-        - [ ] Block transfer when isar is empty or when only one account is active
+        - [x] Block transfer when isar is empty or when only one account is active
         - [ ] Add graph to today summary (optional)
 
     - #### Settings Page

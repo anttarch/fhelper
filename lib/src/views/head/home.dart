@@ -1,4 +1,5 @@
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/details/details.dart';
@@ -17,7 +18,7 @@ class HomePage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: StreamBuilder(
         stream: Isar.getInstance()!.exchanges.watchLazy(),
-        builder: (context, snapshot) {
+        builder: (context, _) {
           final exchange = Isar.getInstance()!.exchanges.where().sortByDateDesc().findFirstSync();
           return Column(
             children: [
@@ -163,15 +164,40 @@ class HomePage extends StatelessWidget {
                               color: Theme.of(context).colorScheme.onSurface,
                             ),
                       ),
-                      FilledButton.tonalIcon(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute<TransferView>(
-                            builder: (context) => const TransferView(),
-                          ),
-                        ),
-                        icon: const Icon(Icons.swap_horiz),
-                        label: Text(AppLocalizations.of(context)!.transfer),
+                      FutureBuilder(
+                        future: getAttributes(Isar.getInstance()!, AttributeType.account),
+                        builder: (context, snapshot) {
+                          return Visibility(
+                            visible: Isar.getInstance()!.exchanges.countSync() == 0 || snapshot.hasData && snapshot.data!.length == 1,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Text(
+                                snapshot.hasData && snapshot.data!.length == 1
+                                    ? AppLocalizations.of(context)!.transferAccountRequirement
+                                    : AppLocalizations.of(context)!.transferExchangeRequirement,
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.bodyLarge!.apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      FutureBuilder(
+                        future: getAttributes(Isar.getInstance()!, AttributeType.account),
+                        builder: (context, snapshot) {
+                          return FilledButton.tonalIcon(
+                            onPressed: Isar.getInstance()!.exchanges.countSync() > 0 && snapshot.hasData && snapshot.data!.length > 1
+                                ? () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute<TransferView>(
+                                        builder: (context) => const TransferView(),
+                                      ),
+                                    )
+                                : null,
+                            icon: const Icon(Icons.swap_horiz),
+                            label: Text(AppLocalizations.of(context)!.transfer),
+                          );
+                        },
                       ),
                     ],
                   ),

@@ -48,7 +48,9 @@
     "to": "Para:",
     "today": "Hoje",
     "transfer": "Transferir",
+    "transferAccountRequirement": "São necessárias 2 contas ou mais",
     "transferDescription": "{from} para {to}",
+    "transferExchangeRequirement": "É necessário uma transação",
     "type": "{count, plural, =1{Categoria} other{Categorias}}",
     "week": "Semana",
     "yesterday": "Ontem"

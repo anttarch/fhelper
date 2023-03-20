@@ -79,6 +79,7 @@
     "to": "To:",
     "today": "Today",
     "transfer": "Transfer",
+    "transferAccountRequirement": "At least 2 accounts are needed",
     "transferDescription": "{from} to {to}",
     "@transferDescription": {
         "placeholders": {
@@ -90,6 +91,7 @@
             }
         }
     },
+    "transferExchangeRequirement": "A transaction is needed",
     "type": "{count, plural, =1{Type} other{Types}}",
     "@type": {
         "placeholders": {

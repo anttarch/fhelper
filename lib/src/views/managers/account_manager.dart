@@ -1,8 +1,11 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
+import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 class AccountManager extends StatefulWidget {
@@ -77,9 +80,32 @@ class _AccountManagerState extends State<AccountManager> {
                                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                                   mainAxisAlignment: MainAxisAlignment.end,
                                                   children: [
-                                                    Text(
-                                                      attributes[index].name,
-                                                      style: Theme.of(context).textTheme.headlineMedium,
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          attributes[index].name,
+                                                          style: Theme.of(context).textTheme.headlineMedium,
+                                                        ),
+                                                        FutureBuilder(
+                                                          future: getSumValueByAttribute(Isar.getInstance()!, attributes[index].id, AttributeType.account),
+                                                          builder: (context, snapshot) {
+                                                            return Text(
+                                                              snapshot.hasData
+                                                                  ? NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
+                                                                      .format(snapshot.data)
+                                                                  : '',
+                                                              style: Theme.of(context).textTheme.headlineMedium!.apply(
+                                                                    color: Color(
+                                                                      snapshot.hasData && snapshot.data! < 0 ? 0xffbd1c1c : 0xff199225,
+                                                                    ).harmonizeWith(
+                                                                      Theme.of(context).colorScheme.primary,
+                                                                    ),
+                                                                  ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
                                                     const SizedBox(height: 15),
                                                     OutlinedButton.icon(

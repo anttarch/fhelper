@@ -30,7 +30,7 @@
 ## Managers
 
 - ### Account Manager
-    - [ ] Add information about values by account
+    - [x] Add information about values by account
     - [x] Refactor for single TextController use
 
 - ### Card Manager

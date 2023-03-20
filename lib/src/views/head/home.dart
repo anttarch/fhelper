@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/details/details.dart';
+import 'package:fhelper/src/views/transfer/transfer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -21,9 +22,15 @@ class HomePage extends StatelessWidget {
           return Column(
             children: [
               Visibility(
-                visible: exchange != null,
+                visible: exchange != null || exchange != null && exchange.eType == EType.transfer,
                 child: Card(
-                  color: Theme.of(context).colorScheme.surface,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -90,6 +97,7 @@ class HomePage extends StatelessWidget {
                 future: getSumValue(Isar.getInstance()!, context),
                 builder: (context, snapshot) {
                   return Card(
+                    elevation: 0,
                     color: Theme.of(context).colorScheme.surfaceVariant,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -141,7 +149,34 @@ class HomePage extends StatelessWidget {
                     ),
                   );
                 },
-              )
+              ),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.transfer,
+                        textAlign: TextAlign.start,
+                        style: Theme.of(context).textTheme.titleLarge!.apply(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                      ),
+                      FilledButton.tonalIcon(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute<TransferView>(
+                            builder: (context) => const TransferView(),
+                          ),
+                        ),
+                        icon: const Icon(Icons.swap_horiz),
+                        label: Text(AppLocalizations.of(context)!.transfer),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           );
         },

@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class HistoryList extends StatelessWidget {
@@ -52,15 +53,15 @@ class HistoryList extends StatelessWidget {
           itemCount: items.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            final Color valueColor =
-                Color(items[index].value.isNegative ? 0xffbd1c1c : 0xff199225)
-                    .harmonizeWith(Theme.of(context).colorScheme.primary);
+            final Color valueColor = Color(items[index].value.isNegative ? 0xffbd1c1c : 0xff199225).harmonizeWith(Theme.of(context).colorScheme.primary);
             return Column(
               children: [
                 ListTile(
                   contentPadding: contentPadding,
                   title: Text(
-                    items[index].description,
+                    items[index].eType != EType.transfer
+                        ? items[index].description
+                        : AppLocalizations.of(context)!.transferDescription(items[index].description.split(' ')[0], items[index].description.split(' ')[1]),
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   subtitle: Text(

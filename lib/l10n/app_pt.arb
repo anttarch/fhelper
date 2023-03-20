@@ -16,6 +16,7 @@
     "edit": "Editar",
     "emptyField": "Campo é obrigatório",
     "expense": "Despesa",
+    "from": "De:",
     "goodMorning": "Bom Dia!",
     "goodAfternoon": "Boa Tarde!",
     "goodEvening": "Boa Noite!",
@@ -44,7 +45,10 @@
     "thisMonth": "Esse Mês",
     "thisWeek": "Essa Semana",
     "threeCharactersMinimum": "Mínimo de 3 caracteres",
+    "to": "Para:",
     "today": "Hoje",
+    "transfer": "Transferir",
+    "transferDescription": "{from} para {to}",
     "type": "{count, plural, =1{Categoria} other{Categorias}}",
     "week": "Semana",
     "yesterday": "Ontem"

@@ -3,42 +3,44 @@ import 'package:isar/isar.dart';
 
 part 'exchange.g.dart';
 
-enum EType { income, expense }
+enum EType { income, expense, transfer }
 
 @Collection()
 class Exchange {
   Exchange({
     this.id = Isar.autoIncrement,
     required this.accountId,
+    this.accountIdEnd,
     this.cardId,
     required this.description,
     required this.date,
+    required this.eType,
     this.installments,
     this.installmentValue,
-    required this.eType,
     required this.typeId,
     required this.value,
-  });
+  }) : assert(eType == EType.transfer ? accountIdEnd != null : accountIdEnd == null);
 
   final Id id; // Isar id
   final int accountId; // Account (attribute) linked
+  final int? accountIdEnd; // Destination account linked (Transfer only)
   final int? cardId; // Card linked
   final DateTime date;
   final String description; // Name
-  final int? installments; // Installments amount
-  final double? installmentValue; // Value of each installment
-
   @enumerated
   final EType eType; // Exchange type
+  final int? installments; // Installments amount
+  final double? installmentValue; // Value of each installment
   final int typeId; // Type (attribute) linked
   final double value; // Monetary value
 }
 
 int _getWeekday(BuildContext context) {
   final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+  // 0 = sunday ... 6 = saturday
   final int firstDayOfWeek = localizations.firstDayOfWeekIndex;
 
-  // 0 = sunday ... 6 = saturday
+  // 1 = monday ... 7 = sunday
   final int weekday = DateTime.now().weekday;
 
   // this switch convers the ISO8601 weekday format to local
@@ -92,6 +94,9 @@ Future<double> getSumValue(
         ),
         DateTime.now(),
       )
+      .and()
+      .not()
+      .eTypeEqualTo(EType.transfer)
       .valueProperty()
       .sum();
 
@@ -102,6 +107,8 @@ Future<double> getSumValue(
         DateTime.now().subtract(Duration(days: weekday)),
         DateTime.now(),
       )
+      .not()
+      .eTypeEqualTo(EType.transfer)
       .valueProperty()
       .sum();
 
@@ -112,6 +119,8 @@ Future<double> getSumValue(
         DateTime(DateTime.now().year, DateTime.now().month),
         DateTime.now(),
       )
+      .not()
+      .eTypeEqualTo(EType.transfer)
       .valueProperty()
       .sum();
 

@@ -59,7 +59,10 @@ class _DetailsViewState extends State<DetailsView> {
                             padding: const EdgeInsets.only(top: 8),
                             child: InputField(
                               label: AppLocalizations.of(context)!.description,
-                              placeholder: widget.item.description,
+                              placeholder: widget.item.eType != EType.transfer
+                                  ? widget.item.description
+                                  : AppLocalizations.of(context)!
+                                      .transferDescription(widget.item.description.split(' ')[0], widget.item.description.split(' ')[1]),
                               readOnly: true,
                             ),
                           ),
@@ -86,18 +89,21 @@ class _DetailsViewState extends State<DetailsView> {
                               readOnly: true,
                             ),
                           ),
-                          FutureBuilder(
-                            future: getAttributeFromId(Isar.getInstance()!, widget.item.typeId),
-                            builder: (context, snapshot) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: InputField(
-                                  label: AppLocalizations.of(context)!.type(1),
-                                  placeholder: snapshot.hasData ? snapshot.data!.name : AppLocalizations.of(context)!.deleted,
-                                  readOnly: true,
-                                ),
-                              );
-                            },
+                          Visibility(
+                            visible: widget.item.eType != EType.transfer,
+                            child: FutureBuilder(
+                              future: getAttributeFromId(Isar.getInstance()!, widget.item.typeId),
+                              builder: (context, snapshot) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: AppLocalizations.of(context)!.type(1),
+                                    placeholder: snapshot.hasData ? snapshot.data!.name : AppLocalizations.of(context)!.deleted,
+                                    readOnly: true,
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                           FutureBuilder(
                             future: fhelper.getCardFromId(Isar.getInstance()!, widget.item.cardId),
@@ -121,13 +127,27 @@ class _DetailsViewState extends State<DetailsView> {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20),
                                 child: InputField(
-                                  label: AppLocalizations.of(context)!.account(1),
+                                  label: widget.item.eType != EType.transfer ? AppLocalizations.of(context)!.account(1) : AppLocalizations.of(context)!.from,
                                   placeholder: snapshot.hasData ? snapshot.data!.name : AppLocalizations.of(context)!.deleted,
                                   readOnly: true,
                                 ),
                               );
                             },
                           ),
+                          if (widget.item.eType == EType.transfer)
+                            FutureBuilder(
+                              future: getAttributeFromId(Isar.getInstance()!, widget.item.accountIdEnd!),
+                              builder: (context, snapshot) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: AppLocalizations.of(context)!.to,
+                                    placeholder: snapshot.hasData ? snapshot.data!.name : AppLocalizations.of(context)!.deleted,
+                                    readOnly: true,
+                                  ),
+                                );
+                              },
+                            ),
                         ],
                       ),
                     ),

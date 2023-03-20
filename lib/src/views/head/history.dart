@@ -20,11 +20,7 @@ class _HistoryPageState extends State<HistoryPage> {
   final PageController _pageCtrl = PageController();
   Isar isar = Isar.getInstance()!;
 
-  final Map<_Date, int> _indexMap = {
-    _Date.today: 0,
-    _Date.week: 1,
-    _Date.month: 2
-  };
+  final Map<_Date, int> _indexMap = {_Date.today: 0, _Date.week: 1, _Date.month: 2};
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -92,41 +88,29 @@ class _HistoryPageState extends State<HistoryPage> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
+                                    color: Theme.of(context).colorScheme.outline,
                                   ),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         AppLocalizations.of(context)!.today,
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .apply(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
+                                        style: Theme.of(context).textTheme.titleLarge!.apply(
+                                              color: Theme.of(context).colorScheme.onSurface,
                                             ),
                                       ),
                                       Text(
                                         NumberFormat.simpleCurrency(
-                                          locale:
-                                              Localizations.localeOf(context)
-                                                  .languageCode,
+                                          locale: Localizations.localeOf(context).languageCode,
                                         ).format(
                                           snapshot.hasData ? snapshot.data : 0,
                                         ),
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .apply(
+                                        style: Theme.of(context).textTheme.titleLarge!.apply(
                                               color: Color(
                                                 snapshot.hasData
                                                     ? snapshot.data!.isNegative
@@ -134,9 +118,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                         : 0xff199225
                                                     : 0xff000000,
                                               ).harmonizeWith(
-                                                Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                Theme.of(context).colorScheme.primary,
                                               ),
                                             ),
                                       ),
@@ -164,10 +146,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 ),
                               );
                             } else {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.active ||
-                                  snapshot.connectionState ==
-                                      ConnectionState.waiting) {
+                              if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
                                 return const CircularProgressIndicator();
                               }
                               return const Text('OOPS');
@@ -191,41 +170,29 @@ class _HistoryPageState extends State<HistoryPage> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
+                                    color: Theme.of(context).colorScheme.outline,
                                   ),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         AppLocalizations.of(context)!.thisWeek,
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .apply(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
+                                        style: Theme.of(context).textTheme.titleLarge!.apply(
+                                              color: Theme.of(context).colorScheme.onSurface,
                                             ),
                                       ),
                                       Text(
                                         NumberFormat.simpleCurrency(
-                                          locale:
-                                              Localizations.localeOf(context)
-                                                  .languageCode,
+                                          locale: Localizations.localeOf(context).languageCode,
                                         ).format(
                                           snapshot.hasData ? snapshot.data : 0,
                                         ),
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .apply(
+                                        style: Theme.of(context).textTheme.titleLarge!.apply(
                                               color: Color(
                                                 snapshot.hasData
                                                     ? snapshot.data!.isNegative
@@ -233,9 +200,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                         : 0xff199225
                                                     : 0xff000000,
                                               ).harmonizeWith(
-                                                Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                Theme.of(context).colorScheme.primary,
                                               ),
                                             ),
                                       ),
@@ -275,18 +240,17 @@ class _HistoryPageState extends State<HistoryPage> {
                               for (final day in days.keys) {
                                 for (final element in snapshot.data!) {
                                   if (element.date.day == day) {
-                                    if (exchangeLists.length >
-                                        days.keys.toList().indexOf(day)) {
-                                      exchangeLists[
-                                              days.keys.toList().indexOf(day)]
-                                          .add(element);
+                                    if (exchangeLists.length > days.keys.toList().indexOf(day)) {
+                                      exchangeLists[days.keys.toList().indexOf(day)].add(element);
                                     } else {
                                       exchangeLists.add([element]);
                                     }
-                                    days.update(
-                                      day,
-                                      (value) => value += element.value,
-                                    );
+                                    if (element.eType != EType.transfer) {
+                                      days.update(
+                                        day,
+                                        (value) => value += element.value,
+                                      );
+                                    }
                                   }
                                 }
                               }
@@ -299,17 +263,13 @@ class _HistoryPageState extends State<HistoryPage> {
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 20),
                                     child: HistoryList(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
+                                      contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 20,
                                       ),
-                                      day: days.keys.toList()[index] ==
-                                              DateTime.now().day
+                                      day: days.keys.toList()[index] == DateTime.now().day
                                           ? AppLocalizations.of(context)!.today
-                                          : days.keys.toList()[index] ==
-                                                  DateTime.now().day - 1
-                                              ? AppLocalizations.of(context)!
-                                                  .yesterday
+                                          : days.keys.toList()[index] == DateTime.now().day - 1
+                                              ? AppLocalizations.of(context)!.yesterday
                                               : DateFormat.EEEE(
                                                   Localizations.localeOf(
                                                     context,
@@ -328,10 +288,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 },
                               );
                             } else {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.active ||
-                                  snapshot.connectionState ==
-                                      ConnectionState.waiting) {
+                              if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
                                 return const CircularProgressIndicator();
                               }
                               return const Text('OOPS');
@@ -355,41 +312,29 @@ class _HistoryPageState extends State<HistoryPage> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.outline,
+                                    color: Theme.of(context).colorScheme.outline,
                                   ),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         AppLocalizations.of(context)!.thisMonth,
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .apply(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface,
+                                        style: Theme.of(context).textTheme.titleLarge!.apply(
+                                              color: Theme.of(context).colorScheme.onSurface,
                                             ),
                                       ),
                                       Text(
                                         NumberFormat.simpleCurrency(
-                                          locale:
-                                              Localizations.localeOf(context)
-                                                  .languageCode,
+                                          locale: Localizations.localeOf(context).languageCode,
                                         ).format(
                                           snapshot.hasData ? snapshot.data : 0,
                                         ),
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .apply(
+                                        style: Theme.of(context).textTheme.titleLarge!.apply(
                                               color: Color(
                                                 snapshot.hasData
                                                     ? snapshot.data!.isNegative
@@ -397,9 +342,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                         : 0xff199225
                                                     : 0xff000000,
                                               ).harmonizeWith(
-                                                Theme.of(context)
-                                                    .colorScheme
-                                                    .primary,
+                                                Theme.of(context).colorScheme.primary,
                                               ),
                                             ),
                                       ),
@@ -439,18 +382,17 @@ class _HistoryPageState extends State<HistoryPage> {
                               for (final day in days.keys) {
                                 for (final element in snapshot.data!) {
                                   if (element.date.day == day) {
-                                    if (exchangeLists.length >
-                                        days.keys.toList().indexOf(day)) {
-                                      exchangeLists[
-                                              days.keys.toList().indexOf(day)]
-                                          .add(element);
+                                    if (exchangeLists.length > days.keys.toList().indexOf(day)) {
+                                      exchangeLists[days.keys.toList().indexOf(day)].add(element);
                                     } else {
                                       exchangeLists.add([element]);
                                     }
-                                    days.update(
-                                      day,
-                                      (value) => value += element.value,
-                                    );
+                                    if (element.eType != EType.transfer) {
+                                      days.update(
+                                        day,
+                                        (value) => value += element.value,
+                                      );
+                                    }
                                   }
                                 }
                               }
@@ -463,19 +405,14 @@ class _HistoryPageState extends State<HistoryPage> {
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 20),
                                     child: HistoryList(
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
+                                      contentPadding: const EdgeInsets.symmetric(
                                         horizontal: 20,
                                       ),
-                                      day: days.keys.toList()[index] ==
-                                              DateTime.now().day
+                                      day: days.keys.toList()[index] == DateTime.now().day
                                           ? AppLocalizations.of(context)!.today
-                                          : days.keys.toList()[index] ==
-                                                  DateTime.now().day - 1
-                                              ? AppLocalizations.of(context)!
-                                                  .yesterday
-                                              : AppLocalizations.of(context)!
-                                                  .historyListDayDate(
+                                          : days.keys.toList()[index] == DateTime.now().day - 1
+                                              ? AppLocalizations.of(context)!.yesterday
+                                              : AppLocalizations.of(context)!.historyListDayDate(
                                                   DateTime(
                                                     DateTime.now().year,
                                                     DateTime.now().month,
@@ -489,10 +426,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 },
                               );
                             } else {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.active ||
-                                  snapshot.connectionState ==
-                                      ConnectionState.waiting) {
+                              if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
                                 return const CircularProgressIndicator();
                               }
                               return const Text('OOPS');

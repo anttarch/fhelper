@@ -37,6 +37,7 @@
     "edit": "Edit",
     "emptyField": "Cannot be empty",
     "expense": "Expense",
+    "from": "From:",
     "goodMorning": "Good Morning!",
     "goodAfternoon": "Good Afternoon!",
     "goodEvening": "Good Evening!",
@@ -75,7 +76,20 @@
     "thisMonth": "This Month",
     "thisWeek": "This Week",
     "threeCharactersMinimum": "At least 3 characters",
+    "to": "To:",
     "today": "Today",
+    "transfer": "Transfer",
+    "transferDescription": "{from} to {to}",
+    "@transferDescription": {
+        "placeholders": {
+            "from": {
+                "type": "String"
+            },
+            "to": {
+                "type": "String"
+            }
+        }
+    },
     "type": "{count, plural, =1{Type} other{Types}}",
     "@type": {
         "placeholders": {

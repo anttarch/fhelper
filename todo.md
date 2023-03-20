@@ -1,7 +1,7 @@
 # TODO
 
 ## Views
-- [ ] Transfer View
+- [x] Transfer View
 - [x] ~~Investigate~~ Fixed overflowing in some views/pages/dialogs 
 
 - ### Add View
@@ -15,13 +15,17 @@
 - ### Head View
 
     - #### Home Page
-        - [ ] Mention Transfer View
+        - [x] Mention Transfer View
+        - [ ] Block transfer when isar is empty or when only one account is active
         - [ ] Add graph to today summary (optional)
 
     - #### Settings Page
         - [ ] Add theme settings
         - [ ] Add privacy settings
         - [ ] Add security settings
+        
+- ### Transfer View
+    - [ ] Add validation for transfered value
 
 ## Managers
 

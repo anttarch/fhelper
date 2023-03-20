@@ -55,6 +55,7 @@
     },
     "home": "Home",
     "income": "Income",
+    "insufficientFunds": "Insufficient funds",
     "invalidValue": "Invalid Value",
     "latest": "Latest:",
     "limit": "Limit",

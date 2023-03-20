@@ -26,6 +26,8 @@
         
 - ### Transfer View
     - [ ] Add validation for transfered value
+        - [ ] Block transfers to the same account
+        - [x] Block transfers greater than the funds available
 
 ## Managers
 

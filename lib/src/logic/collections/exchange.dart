@@ -137,12 +137,16 @@ Future<double> getSumValue(
 Future<double> getSumValueByAttribute(Isar isar, int attributeId, AttributeType attributeType) async {
   double value = 0;
 
-  switch (attributeType) {
-    case AttributeType.account:
-      value = await isar.exchanges.where().filter().accountIdEqualTo(attributeId).valueProperty().sum();
-      return value;
-    default:
-      return value;
+  if (attributeId == -1) {
+    return value;
+  } else {
+    switch (attributeType) {
+      case AttributeType.account:
+        value = await isar.exchanges.where().filter().accountIdEqualTo(attributeId).valueProperty().sum();
+        return value;
+      default:
+        return value;
+    }
   }
 }
 

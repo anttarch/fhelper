@@ -13,6 +13,8 @@ class InputField extends StatelessWidget {
     this.onTap,
     this.placeholder,
     this.readOnly = false,
+    this.suffix,
+    this.suffixStyle,
     this.textColor,
     this.validator,
   }) : assert(!(controller != null && placeholder != null));
@@ -24,13 +26,14 @@ class InputField extends StatelessWidget {
   final VoidCallback? onTap;
   final String? placeholder;
   final bool readOnly;
+  final String? suffix;
+  final TextStyle? suffixStyle;
   final Color? textColor;
   final String? Function(String? value)? validator;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -50,6 +53,8 @@ class InputField extends StatelessWidget {
               errorMaxLines: 1,
               errorStyle: const TextStyle(height: 1),
               suffixIcon: locked ? const Icon(Icons.lock) : null,
+              suffixText: suffix,
+              suffixStyle: suffixStyle,
             ),
             keyboardType: keyboardType,
             textCapitalization: TextCapitalization.sentences,

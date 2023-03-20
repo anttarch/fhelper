@@ -24,6 +24,7 @@
     "historyListDayDate": "{date}",
     "home": "Início",
     "income": "Receita",
+    "insufficientFunds": "Saldo insuficiente",
     "invalidValue": "Valor inválido",
     "latest": "Recente:",
     "limit": "Limite",

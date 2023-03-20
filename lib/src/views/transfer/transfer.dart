@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
@@ -5,6 +6,7 @@ import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 class TransferView extends StatefulWidget {
@@ -17,6 +19,7 @@ class TransferView extends StatefulWidget {
 class _TransferViewState extends State<TransferView> {
   int _accountId = -1;
   int _accountIdEnd = -1;
+  double _accountFromValue = 0;
   final List<String?> displayText = [
     // Origin
     null,
@@ -131,67 +134,93 @@ class _TransferViewState extends State<TransferView> {
                               builder: (context, snapshot) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),
-                                  child: InputField(
-                                    label: AppLocalizations.of(context)!.from,
-                                    readOnly: true,
-                                    placeholder: displayText[0],
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return AppLocalizations.of(context)!.emptyField;
-                                      }
-                                      return null;
-                                    },
-                                    onTap: () => showModalBottomSheet<void>(
-                                      context: context,
-                                      constraints: BoxConstraints(
-                                        maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                      ),
-                                      enableDrag: false,
-                                      builder: (context) {
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        AppLocalizations.of(context)!.selectAccount,
-                                                        style: Theme.of(context).textTheme.titleLarge,
+                                  child: FutureBuilder(
+                                    future: getSumValueByAttribute(
+                                      Isar.getInstance()!,
+                                      _accountId != -1 ? snapshot.data![_accountId].id : -1,
+                                      AttributeType.account,
+                                    ),
+                                    builder: (context, sum) {
+                                      return InputField(
+                                        label: AppLocalizations.of(context)!.from,
+                                        readOnly: true,
+                                        placeholder: displayText[0],
+                                        suffix: NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(sum.data ?? 0),
+                                        suffixStyle: TextStyle(
+                                          color: Color(
+                                            sum.hasData && sum.data! < 0 ? 0xffbd1c1c : 0xff199225,
+                                          ).harmonizeWith(
+                                            Theme.of(context).colorScheme.primary,
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return AppLocalizations.of(context)!.emptyField;
+                                          }
+                                          return null;
+                                        },
+                                        onTap: () => showModalBottomSheet<void>(
+                                          context: context,
+                                          constraints: BoxConstraints(
+                                            maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                          ),
+                                          enableDrag: false,
+                                          builder: (context) {
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                return Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                                      child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text(
+                                                            AppLocalizations.of(context)!.selectAccount,
+                                                            style: Theme.of(context).textTheme.titleLarge,
+                                                          ),
+                                                          TextButton.icon(
+                                                            onPressed: () => _addDialog(AttributeType.account),
+                                                            icon: const Icon(Icons.add),
+                                                            label: Text(AppLocalizations.of(context)!.add),
+                                                          ),
+                                                        ],
                                                       ),
-                                                      TextButton.icon(
-                                                        onPressed: () => _addDialog(AttributeType.account),
-                                                        icon: const Icon(Icons.add),
-                                                        label: Text(AppLocalizations.of(context)!.add),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                ListChoice(
-                                                  groupValue: _accountId,
-                                                  onChanged: (value) {
-                                                    setState(() {
-                                                      _accountId = value!;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  },
-                                                  attributeList: snapshot.hasData ? snapshot.data! : [],
-                                                ),
-                                              ],
+                                                    ),
+                                                    ListChoice(
+                                                      groupValue: _accountId,
+                                                      onChanged: (value) async {
+                                                        setState(() {
+                                                          _accountId = value!;
+                                                        });
+                                                        await getSumValueByAttribute(
+                                                          Isar.getInstance()!,
+                                                          _accountId != -1 ? snapshot.data![_accountId].id : -1,
+                                                          AttributeType.account,
+                                                        ).then((value) {
+                                                          setState(() {
+                                                            _accountFromValue = value;
+                                                          });
+                                                          Navigator.pop(context);
+                                                        });
+                                                      },
+                                                      attributeList: snapshot.hasData ? snapshot.data! : [],
+                                                    ),
+                                                  ],
+                                                );
+                                              },
                                             );
                                           },
-                                        );
-                                      },
-                                    ).then(
-                                      (_) => _accountId != -1
-                                          ? setState(
-                                              () => displayText[0] = snapshot.hasData ? snapshot.data![_accountId].name : null,
-                                            )
-                                          : null,
-                                    ),
+                                        ).then(
+                                          (_) => _accountId != -1
+                                              ? setState(
+                                                  () => displayText[0] = snapshot.hasData ? snapshot.data![_accountId].name : null,
+                                                )
+                                              : null,
+                                        ),
+                                      );
+                                    },
                                   ),
                                 );
                               },
@@ -286,10 +315,15 @@ class _TransferViewState extends State<TransferView> {
                                   )
                                 ],
                                 validator: (value) {
-                                  if (value!.isEmpty) {
+                                  final String numberValue = value!.replaceAll(RegExp('[^0-9]'), '');
+                                  if (value.isEmpty) {
                                     return AppLocalizations.of(context)!.emptyField;
-                                  } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
+                                  } else if (numberValue == '000') {
                                     return AppLocalizations.of(context)!.invalidValue;
+                                  }
+
+                                  if ((double.parse(numberValue) / 100) > _accountFromValue) {
+                                    return AppLocalizations.of(context)!.insufficientFunds;
                                   }
                                   return null;
                                 },

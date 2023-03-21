@@ -1,4 +1,5 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
+import 'package:fhelper/src/logic/collections/card.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
@@ -153,6 +154,32 @@ Future<double> getSumValueByAttribute(Isar isar, int attributeId, AttributeType 
       default:
         return value;
     }
+  }
+}
+
+Future<int> checkForAttributeDependencies(Isar isar, int propertyId, AttributeType? attributeType) async {
+  int dependenciesCount = 0;
+
+  if (propertyId == -1) {
+    return dependenciesCount;
+  } else {
+    if (attributeType != null) {
+      switch (attributeType) {
+        case AttributeType.account:
+          dependenciesCount = await isar.exchanges.filter().accountIdEqualTo(propertyId).or().accountIdEndEqualTo(propertyId).count();
+          dependenciesCount += await isar.cards.filter().accountIdEqualTo(propertyId).count();
+          return dependenciesCount;
+        case AttributeType.incomeType:
+        case AttributeType.expenseType:
+          dependenciesCount = await isar.exchanges.filter().typeIdEqualTo(propertyId).count();
+          return dependenciesCount;
+        default:
+          return dependenciesCount;
+      }
+    } else {
+      dependenciesCount = await isar.exchanges.filter().cardIdEqualTo(propertyId).count();
+    }
+    return dependenciesCount;
   }
 }
 

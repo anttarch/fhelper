@@ -1,5 +1,6 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
+import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
@@ -505,15 +506,49 @@ class _CardManagerState extends State<CardManager> {
                                                     style: Theme.of(context).textTheme.headlineMedium,
                                                   ),
                                                   const SizedBox(height: 15),
-                                                  OutlinedButton.icon(
-                                                    icon: const Icon(Icons.delete),
-                                                    onPressed: () async {
-                                                      final Isar isar = Isar.getInstance()!;
-                                                      await isar.writeTxn(() async {
-                                                        await isar.cards.delete(cards[index].id);
-                                                      }).then((_) => Navigator.pop(context));
+                                                  FutureBuilder(
+                                                    future: checkForAttributeDependencies(Isar.getInstance()!, cards[index].id, null),
+                                                    builder: (context, snapshot) {
+                                                      return OutlinedButton.icon(
+                                                        icon: const Icon(Icons.delete),
+                                                        onPressed: () async {
+                                                          final Isar isar = Isar.getInstance()!;
+                                                          if (snapshot.data != null && snapshot.data! > 0) {
+                                                            await showDialog<void>(
+                                                              context: context,
+                                                              builder: (context) {
+                                                                return AlertDialog(
+                                                                  title: Text(AppLocalizations.of(context)!.proceedQuestion),
+                                                                  icon: const Icon(Icons.warning),
+                                                                  content: Text(AppLocalizations.of(context)!.dependencyPhrase(snapshot.data!)),
+                                                                  actions: [
+                                                                    TextButton(
+                                                                      onPressed: () => Navigator.pop(context),
+                                                                      child: Text(
+                                                                        AppLocalizations.of(context)!.cancel,
+                                                                      ),
+                                                                    ),
+                                                                    FilledButton.tonal(
+                                                                      onPressed: () async {
+                                                                        await isar.writeTxn(() async {
+                                                                          await isar.cards.delete(cards[index].id);
+                                                                        }).then((_) => Navigator.pop(context));
+                                                                      },
+                                                                      child: Text(AppLocalizations.of(context)!.proceed),
+                                                                    )
+                                                                  ],
+                                                                );
+                                                              },
+                                                            );
+                                                          } else {
+                                                            await isar.writeTxn(() async {
+                                                              await isar.cards.delete(cards[index].id);
+                                                            }).then((_) => Navigator.pop(context));
+                                                          }
+                                                        },
+                                                        label: Text(AppLocalizations.of(context)!.delete),
+                                                      );
                                                     },
-                                                    label: Text(AppLocalizations.of(context)!.delete),
                                                   ),
                                                   FilledButton.icon(
                                                     onPressed: () async {

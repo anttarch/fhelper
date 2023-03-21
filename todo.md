@@ -6,6 +6,7 @@
 
 - ### Add View
     - [x] Add Isar logic for selecting cards
+    - [ ] Add validation for cards limits
     - [ ] Add installments
 
 - ### Details View
@@ -44,6 +45,9 @@
 
 ## Isar (database)
 - [ ] Add conflict verification for deletes (affects managers)
+    - [x] Add confirmation for deletion
+    - [ ] Handle transfers
+    - [ ] Add migration for types and accounts
 
 ## Internationalization (l10n)
 - [ ] Enable internationalization to default attributes

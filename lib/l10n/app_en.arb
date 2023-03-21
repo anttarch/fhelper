@@ -32,6 +32,14 @@
     },
     "delete": "Delete",
     "deleted": "Deleted",
+    "dependencyPhrase": "{count, plural, =1{1 dependency was} other{{count} dependencies were}} found",
+    "@dependencyPhrase": {
+        "placeholders": {
+            "count": {
+                "type": "num"
+            }
+        }
+    },
     "description": "Description",
     "details": "Details",
     "edit": "Edit",
@@ -64,6 +72,8 @@
     "paymentDue": "Payment Due",
     "price": "Price",
     "privacy": "Privacy",
+    "proceed": "Proceed",
+    "proceedQuestion": "Proceed?",
     "save": "Save",
     "security": "Security",
     "selectAccount": "Select Account",

@@ -109,6 +109,14 @@ class _AddViewState extends State<AddView> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void dispose() {
+    for (final element in textController) {
+      element.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ColoredBox(
       color: Theme.of(context).colorScheme.background,

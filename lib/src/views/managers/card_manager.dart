@@ -141,6 +141,14 @@ class _CardManagerState extends State<CardManager> {
     ).then((_) => controller.clear());
   }
 
+  @override
+  void dispose() {
+    for (final element in _controller) {
+      element.dispose();
+    }
+    super.dispose();
+  }
+
   Future<void> _showFullscreenForm({bool edit = false, fhelper.Card? card, Attribute? cardAttribute}) {
     if (card != null && edit) {
       setState(() {

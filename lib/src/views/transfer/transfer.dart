@@ -99,6 +99,12 @@ class _TransferViewState extends State<TransferView> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ColoredBox(
       color: Theme.of(context).colorScheme.background,

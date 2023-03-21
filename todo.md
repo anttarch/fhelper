@@ -25,8 +25,8 @@
         - [ ] Add security settings
         
 - ### Transfer View
-    - [ ] Add validation for transfered value
-        - [ ] Block transfers to the same account
+    - [x] Add validation for transfered value
+        - [x] Block transfers to the same account
         - [x] Block transfers greater than the funds available
 
 ## Managers

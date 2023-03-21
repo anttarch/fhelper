@@ -10,6 +10,7 @@ class ListChoice extends StatelessWidget {
     this.attributeList,
     this.cardList,
     this.intList,
+    this.hiddenIndex,
   })  : assert(
           (intList != null && attributeList == null && cardList == null) ||
               (intList == null && attributeList != null && cardList == null) ||
@@ -20,6 +21,7 @@ class ListChoice extends StatelessWidget {
 
   final List<Attribute>? attributeList;
   final List<fhelper.Card>? cardList;
+  final int? hiddenIndex;
   final int groupValue;
   final void Function(int? value)? onChanged;
   final List<int>? intList;
@@ -36,6 +38,9 @@ class ListChoice extends StatelessWidget {
                 : intList!.length,
         shrinkWrap: true,
         itemBuilder: (context, index) {
+          if ((hiddenIndex != null || hiddenIndex != -1) && hiddenIndex == index) {
+            return const SizedBox.shrink();
+          }
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -71,11 +76,16 @@ class ListChoice extends StatelessWidget {
             ],
           );
         },
-        separatorBuilder: (_, __) => Divider(
-          height: 1,
-          thickness: 1,
-          color: Theme.of(context).colorScheme.outlineVariant,
-        ),
+        separatorBuilder: (_, index) {
+          if ((hiddenIndex != null || hiddenIndex != -1) && hiddenIndex == index) {
+            return const SizedBox.shrink();
+          }
+          return Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).colorScheme.outlineVariant,
+          );
+        },
       ),
     );
   }

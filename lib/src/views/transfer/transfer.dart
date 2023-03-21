@@ -193,6 +193,10 @@ class _TransferViewState extends State<TransferView> {
                                                       onChanged: (value) async {
                                                         setState(() {
                                                           _accountId = value!;
+                                                          if (_accountIdEnd == value) {
+                                                            _accountIdEnd = -1;
+                                                            displayText[1] = null;
+                                                          }
                                                         });
                                                         await getSumValueByAttribute(
                                                           Isar.getInstance()!,
@@ -251,10 +255,6 @@ class _TransferViewState extends State<TransferView> {
                                       ),
                                       enableDrag: false,
                                       builder: (context) {
-                                        final List<Attribute>? displayList = snapshot.data;
-                                        if (displayList != null) {
-                                          displayList.remove(snapshot.data![_accountId]);
-                                        }
                                         return StatefulBuilder(
                                           builder: (context, setState) {
                                             return Column(
@@ -279,13 +279,14 @@ class _TransferViewState extends State<TransferView> {
                                                 ),
                                                 ListChoice(
                                                   groupValue: _accountIdEnd,
+                                                  hiddenIndex: _accountId,
                                                   onChanged: (value) {
                                                     setState(() {
                                                       _accountIdEnd = value!;
                                                     });
                                                     Navigator.pop(context);
                                                   },
-                                                  attributeList: displayList ?? [],
+                                                  attributeList: snapshot.hasData ? snapshot.data! : [],
                                                 ),
                                               ],
                                             );

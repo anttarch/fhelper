@@ -48,6 +48,12 @@
 ## Internationalization (l10n)
 - [ ] Enable internationalization to default attributes
 
+## Critical bugs
+- [ ] Refactor transfer description to avoid visual bugs
+        - The description is saved as ```"$originAccountName $finalAccountName"```dart to allow for convinient parsing, and the method is read with ```description.split(' ')```dart resulting in a list with 2 words, the origin and final account names.
+        - Refactoring is needed to allow names with spaces (this possibly will block special characters as /.;>< ect.)
+
+
 ## Other
 - [ ] Add default attributes
 - [ ] Make textfield open datepicker, bottom sheet, etc (maybe it's possible?)

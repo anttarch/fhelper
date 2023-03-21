@@ -142,7 +142,13 @@ Future<double> getSumValueByAttribute(Isar isar, int attributeId, AttributeType 
   } else {
     switch (attributeType) {
       case AttributeType.account:
-        value = await isar.exchanges.where().filter().accountIdEqualTo(attributeId).valueProperty().sum();
+        // Normal exchanges
+        value = await isar.exchanges.where().filter().accountIdEqualTo(attributeId).and().not().eTypeEqualTo(EType.transfer).valueProperty().sum();
+        // Transfers from account
+        value -= await isar.exchanges.where().filter().accountIdEqualTo(attributeId).and().eTypeEqualTo(EType.transfer).valueProperty().sum();
+        // Transfers to account
+        value += await isar.exchanges.where().filter().accountIdEndEqualTo(attributeId).valueProperty().sum();
+
         return value;
       default:
         return value;

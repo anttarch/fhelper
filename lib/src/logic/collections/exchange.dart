@@ -1,5 +1,5 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
-import 'package:fhelper/src/logic/collections/card.dart';
+import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
@@ -135,25 +135,30 @@ Future<double> getSumValue(
   return timeTable[time]!;
 }
 
-Future<double> getSumValueByAttribute(Isar isar, int attributeId, AttributeType attributeType) async {
+Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? attributeType) async {
   double value = 0;
 
-  if (attributeId == -1) {
+  if (propertyId == -1) {
     return value;
   } else {
-    switch (attributeType) {
-      case AttributeType.account:
-        // Normal exchanges
-        value = await isar.exchanges.where().filter().accountIdEqualTo(attributeId).and().not().eTypeEqualTo(EType.transfer).valueProperty().sum();
-        // Transfers from account
-        value -= await isar.exchanges.where().filter().accountIdEqualTo(attributeId).and().eTypeEqualTo(EType.transfer).valueProperty().sum();
-        // Transfers to account
-        value += await isar.exchanges.where().filter().accountIdEndEqualTo(attributeId).valueProperty().sum();
+    if (attributeType != null) {
+      switch (attributeType) {
+        case AttributeType.account:
+          // Normal exchanges
+          value = await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().not().eTypeEqualTo(EType.transfer).valueProperty().sum();
+          // Transfers from account
+          value -= await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().eTypeEqualTo(EType.transfer).valueProperty().sum();
+          // Transfers to account
+          value += await isar.exchanges.where().filter().accountIdEndEqualTo(propertyId).valueProperty().sum();
 
-        return value;
-      default:
-        return value;
+          return value;
+        default:
+          return value;
+      }
+    } else {
+      value = await isar.exchanges.where().filter().cardIdEqualTo(propertyId).valueProperty().sum();
     }
+    return value;
   }
 }
 
@@ -231,4 +236,9 @@ Future<List<Exchange>> getExchanges(
   };
 
   return timeTable[time]!;
+}
+
+Future<double> getAvailableLimit(Isar isar, fhelper.Card card) async {
+  final double usedLimit = (await getSumValueByAttribute(isar, card.id, null)) * (-1);
+  return card.limit - usedLimit;
 }

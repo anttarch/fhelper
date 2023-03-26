@@ -26,6 +26,7 @@
     "home": "Início",
     "income": "Receita",
     "insufficientFunds": "Saldo insuficiente",
+    "insufficientLimit": "Limite insuficiente",
     "invalidValue": "Valor inválido",
     "latest": "Recente:",
     "limit": "Limite",

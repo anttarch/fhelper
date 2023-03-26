@@ -64,6 +64,7 @@
     "home": "Home",
     "income": "Income",
     "insufficientFunds": "Insufficient funds",
+    "insufficientLimit": "Insufficient limit",
     "invalidValue": "Invalid Value",
     "latest": "Latest:",
     "limit": "Limit",

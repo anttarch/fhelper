@@ -6,7 +6,7 @@
 
 - ### Add View
     - [x] Add Isar logic for selecting cards
-    - [ ] Add validation for cards limits
+    - [x] Add validation for cards limits
     - [ ] Add installments
 
 - ### Details View

@@ -23,6 +23,7 @@ class _AddViewState extends State<AddView> {
   int _accountId = -1;
   int _cardIndex = -1;
   bool _accountFieldLock = false;
+  double _availabeLimit = 0;
   final List<String?> displayText = [
     // Date
     DateTime.now().toString(),
@@ -219,10 +220,13 @@ class _AddViewState extends State<AddView> {
                                     )
                                   ],
                                   validator: (value) {
+                                    final String price = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
                                     if (value!.isEmpty) {
                                       return AppLocalizations.of(context)!.emptyField;
                                     } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
                                       return AppLocalizations.of(context)!.invalidValue;
+                                    } else if (_cardIndex != -1 && double.parse(price) / 100 > _availabeLimit) {
+                                      return AppLocalizations.of(context)!.insufficientLimit;
                                     }
                                     return null;
                                   },
@@ -346,6 +350,12 @@ class _AddViewState extends State<AddView> {
                                         label: AppLocalizations.of(context)!.card(1),
                                         readOnly: true,
                                         placeholder: displayText[3],
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return AppLocalizations.of(context)!.emptyField;
+                                          }
+                                          return null;
+                                        },
                                         onTap: () => showModalBottomSheet<void>(
                                           context: context,
                                           constraints: BoxConstraints(
@@ -382,11 +392,17 @@ class _AddViewState extends State<AddView> {
                                                     ),
                                                     ListChoice(
                                                       groupValue: _cardIndex,
-                                                      onChanged: (value) {
+                                                      onChanged: (value) async {
                                                         setState(() {
                                                           _cardIndex = value!;
                                                         });
-                                                        Navigator.pop(context);
+                                                        await getAvailableLimit(
+                                                          Isar.getInstance()!,
+                                                          snapshot.data![_cardIndex],
+                                                        ).then((freeLimit) {
+                                                          setState(() => _availabeLimit = freeLimit);
+                                                          Navigator.pop(context);
+                                                        });
                                                       },
                                                       cardList: snapshot.hasData ? snapshot.data! : null,
                                                     )

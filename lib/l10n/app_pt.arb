@@ -27,6 +27,7 @@
     "income": "Receita",
     "insufficientFunds": "Saldo insuficiente",
     "insufficientLimit": "Limite insuficiente",
+    "invalidName": "Nome inválido",
     "invalidValue": "Valor inválido",
     "latest": "Recente:",
     "limit": "Limite",

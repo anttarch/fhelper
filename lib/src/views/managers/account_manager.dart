@@ -180,6 +180,8 @@ class _AccountManagerState extends State<AccountManager> {
                                                                     return AppLocalizations.of(context)!.emptyField;
                                                                   } else if (value.length < 3) {
                                                                     return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                                                  } else if (value.contains('#/spt#/')) {
+                                                                    return AppLocalizations.of(context)!.invalidName;
                                                                   }
                                                                   return null;
                                                                 },
@@ -288,6 +290,8 @@ class _AccountManagerState extends State<AccountManager> {
                                       return AppLocalizations.of(context)!.emptyField;
                                     } else if (value.length < 3) {
                                       return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                    } else if (value.contains('#/spt#/')) {
+                                      return AppLocalizations.of(context)!.invalidName;
                                     }
                                     return null;
                                   },

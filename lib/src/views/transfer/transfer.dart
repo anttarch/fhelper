@@ -366,7 +366,7 @@ class _TransferViewState extends State<TransferView> {
                           final Attribute to = (await getAttributes(isar, AttributeType.account))[_accountIdEnd];
                           final Exchange exchange = Exchange(
                             eType: EType.transfer,
-                            description: '${from.name} ${to.name}',
+                            description: '${from.name}#/spt#/${to.name}',
                             value: double.parse(value) / 100,
                             date: DateTime.now(),
                             typeId: -1,

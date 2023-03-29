@@ -62,7 +62,7 @@ class _DetailsViewState extends State<DetailsView> {
                               placeholder: widget.item.eType != EType.transfer
                                   ? widget.item.description
                                   : AppLocalizations.of(context)!
-                                      .transferDescription(widget.item.description.split(' ')[0], widget.item.description.split(' ')[1]),
+                                      .transferDescription(widget.item.description.split('#/spt#/')[0], widget.item.description.split('#/spt#/')[1]),
                               readOnly: true,
                             ),
                           ),

@@ -286,7 +286,7 @@ class _AddViewState extends State<AddView> {
                                       onTap: () => showModalBottomSheet<void>(
                                         context: context,
                                         constraints: BoxConstraints(
-                                          maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                          minHeight: MediaQuery.of(context).size.height / 3,
                                         ),
                                         enableDrag: false,
                                         builder: (context) {
@@ -294,6 +294,7 @@ class _AddViewState extends State<AddView> {
                                             builder: (context, setState) {
                                               return Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Padding(
                                                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -359,7 +360,7 @@ class _AddViewState extends State<AddView> {
                                         onTap: () => showModalBottomSheet<void>(
                                           context: context,
                                           constraints: BoxConstraints(
-                                            maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                            minHeight: MediaQuery.of(context).size.height / 3,
                                           ),
                                           enableDrag: false,
                                           builder: (context) {
@@ -367,6 +368,7 @@ class _AddViewState extends State<AddView> {
                                               builder: (context, setState) {
                                                 return Column(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisSize: MainAxisSize.min,
                                                   children: [
                                                     Padding(
                                                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -460,7 +462,7 @@ class _AddViewState extends State<AddView> {
                                       onTap: () => showModalBottomSheet<void>(
                                         context: context,
                                         constraints: BoxConstraints(
-                                          maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                          minHeight: MediaQuery.of(context).size.height / 3,
                                         ),
                                         enableDrag: false,
                                         builder: (context) {
@@ -468,6 +470,7 @@ class _AddViewState extends State<AddView> {
                                             builder: (context, setState) {
                                               return Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Padding(
                                                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),

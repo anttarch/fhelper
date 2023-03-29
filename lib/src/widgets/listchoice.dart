@@ -29,7 +29,7 @@ class ListChoice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2.5 - 68),
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2 - 68),
       child: ListView.separated(
         itemCount: attributeList != null
             ? attributeList!.length

@@ -236,15 +236,13 @@ class _CardManagerState extends State<CardManager> {
                               },
                               onTap: () => showModalBottomSheet<void>(
                                 context: context,
-                                constraints: BoxConstraints(
-                                  maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                ),
                                 enableDrag: false,
                                 builder: (context) {
                                   return StatefulBuilder(
                                     builder: (context, setState) {
                                       return Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.all(20),
@@ -291,15 +289,13 @@ class _CardManagerState extends State<CardManager> {
                               },
                               onTap: () => showModalBottomSheet<void>(
                                 context: context,
-                                constraints: BoxConstraints(
-                                  maxHeight: MediaQuery.of(context).size.height / 2.5,
-                                ),
                                 enableDrag: false,
                                 builder: (context) {
                                   return StatefulBuilder(
                                     builder: (context, setState) {
                                       return Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.all(20),
@@ -374,7 +370,7 @@ class _CardManagerState extends State<CardManager> {
                                   onTap: () => showModalBottomSheet<void>(
                                     context: context,
                                     constraints: BoxConstraints(
-                                      maxHeight: MediaQuery.of(context).size.height / 2.5,
+                                      minHeight: MediaQuery.of(context).size.height / 3,
                                     ),
                                     enableDrag: false,
                                     builder: (context) {
@@ -383,6 +379,7 @@ class _CardManagerState extends State<CardManager> {
                                         builder: (context, setState) {
                                           return Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Padding(
                                                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -491,83 +488,83 @@ class _CardManagerState extends State<CardManager> {
                                         ),
                                         onTap: () => showModalBottomSheet<void>(
                                           context: context,
-                                          constraints: BoxConstraints(
-                                            maxHeight: MediaQuery.of(context).size.height / 3.2,
-                                          ),
                                           builder: (context) {
-                                            return Padding(
-                                              padding: const EdgeInsets.all(20),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    cards[index].name,
-                                                    style: Theme.of(context).textTheme.headlineMedium,
-                                                  ),
-                                                  const SizedBox(height: 15),
-                                                  FutureBuilder(
-                                                    future: checkForAttributeDependencies(Isar.getInstance()!, cards[index].id, null),
-                                                    builder: (context, snapshot) {
-                                                      return OutlinedButton.icon(
-                                                        icon: const Icon(Icons.delete),
-                                                        onPressed: () async {
-                                                          final Isar isar = Isar.getInstance()!;
-                                                          if (snapshot.data != null && snapshot.data! > 0) {
-                                                            await showDialog<void>(
-                                                              context: context,
-                                                              builder: (context) {
-                                                                return AlertDialog(
-                                                                  title: Text(AppLocalizations.of(context)!.proceedQuestion),
-                                                                  icon: const Icon(Icons.warning),
-                                                                  content: Text(AppLocalizations.of(context)!.dependencyPhrase(snapshot.data!)),
-                                                                  actions: [
-                                                                    TextButton(
-                                                                      onPressed: () => Navigator.pop(context),
-                                                                      child: Text(
-                                                                        AppLocalizations.of(context)!.cancel,
+                                            return SafeArea(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(20),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      cards[index].name,
+                                                      style: Theme.of(context).textTheme.headlineMedium,
+                                                    ),
+                                                    const SizedBox(height: 15),
+                                                    FutureBuilder(
+                                                      future: checkForAttributeDependencies(Isar.getInstance()!, cards[index].id, null),
+                                                      builder: (context, snapshot) {
+                                                        return OutlinedButton.icon(
+                                                          icon: const Icon(Icons.delete),
+                                                          onPressed: () async {
+                                                            final Isar isar = Isar.getInstance()!;
+                                                            if (snapshot.data != null && snapshot.data! > 0) {
+                                                              await showDialog<void>(
+                                                                context: context,
+                                                                builder: (context) {
+                                                                  return AlertDialog(
+                                                                    title: Text(AppLocalizations.of(context)!.proceedQuestion),
+                                                                    icon: const Icon(Icons.warning),
+                                                                    content: Text(AppLocalizations.of(context)!.dependencyPhrase(snapshot.data!)),
+                                                                    actions: [
+                                                                      TextButton(
+                                                                        onPressed: () => Navigator.pop(context),
+                                                                        child: Text(
+                                                                          AppLocalizations.of(context)!.cancel,
+                                                                        ),
                                                                       ),
-                                                                    ),
-                                                                    FilledButton.tonal(
-                                                                      onPressed: () async {
-                                                                        await isar.writeTxn(() async {
-                                                                          await isar.cards.delete(cards[index].id);
-                                                                        }).then((_) => Navigator.pop(context));
-                                                                      },
-                                                                      child: Text(AppLocalizations.of(context)!.proceed),
-                                                                    )
-                                                                  ],
-                                                                );
-                                                              },
-                                                            );
-                                                          } else {
-                                                            await isar.writeTxn(() async {
-                                                              await isar.cards.delete(cards[index].id);
-                                                            }).then((_) => Navigator.pop(context));
-                                                          }
-                                                        },
-                                                        label: Text(AppLocalizations.of(context)!.delete),
-                                                      );
-                                                    },
-                                                  ),
-                                                  FilledButton.icon(
-                                                    onPressed: () async {
-                                                      final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[index].accountId);
-                                                      await _showFullscreenForm(edit: true, card: cards[index], cardAttribute: attribute);
-                                                    },
-                                                    icon: const Icon(Icons.edit),
-                                                    label: Text(AppLocalizations.of(context)!.edit),
-                                                  ),
-                                                  const Divider(
-                                                    height: 24,
-                                                    thickness: 2,
-                                                  ),
-                                                  FilledButton.tonalIcon(
-                                                    onPressed: () => Navigator.pop(context),
-                                                    icon: const Icon(Icons.arrow_back),
-                                                    label: Text(AppLocalizations.of(context)!.back),
-                                                  )
-                                                ],
+                                                                      FilledButton.tonal(
+                                                                        onPressed: () async {
+                                                                          await isar.writeTxn(() async {
+                                                                            await isar.cards.delete(cards[index].id);
+                                                                          }).then((_) => Navigator.pop(context));
+                                                                        },
+                                                                        child: Text(AppLocalizations.of(context)!.proceed),
+                                                                      )
+                                                                    ],
+                                                                  );
+                                                                },
+                                                              );
+                                                            } else {
+                                                              await isar.writeTxn(() async {
+                                                                await isar.cards.delete(cards[index].id);
+                                                              }).then((_) => Navigator.pop(context));
+                                                            }
+                                                          },
+                                                          label: Text(AppLocalizations.of(context)!.delete),
+                                                        );
+                                                      },
+                                                    ),
+                                                    FilledButton.icon(
+                                                      onPressed: () async {
+                                                        final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[index].accountId);
+                                                        await _showFullscreenForm(edit: true, card: cards[index], cardAttribute: attribute);
+                                                      },
+                                                      icon: const Icon(Icons.edit),
+                                                      label: Text(AppLocalizations.of(context)!.edit),
+                                                    ),
+                                                    const Divider(
+                                                      height: 24,
+                                                      thickness: 2,
+                                                    ),
+                                                    FilledButton.tonalIcon(
+                                                      onPressed: () => Navigator.pop(context),
+                                                      icon: const Icon(Icons.arrow_back),
+                                                      label: Text(AppLocalizations.of(context)!.back),
+                                                    )
+                                                  ],
+                                                ),
                                               ),
                                             );
                                           },

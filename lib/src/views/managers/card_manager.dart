@@ -169,38 +169,39 @@ class _CardManagerState extends State<CardManager> {
         return StatefulBuilder(
           builder: (context, setState) {
             return Dialog.fullscreen(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AppBar(
-                      title: Text(edit ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.addCard),
-                      leading: IconButton(
-                        onPressed: () {
+              child: CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    forceElevated: true,
+                    title: Text(edit ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.addCard),
+                    leading: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (edit) {
                           Navigator.pop(context);
-                          if (edit) {
-                            Navigator.pop(context);
-                          }
-                          cleanForm();
-                        },
-                        icon: const Icon(Icons.close),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () async {
-                            if (formKey.currentState!.validate()) {
-                              if (edit) {
-                                await _editCard(card!);
-                              } else {
-                                await _addCard();
-                              }
-                            }
-                          },
-                          child: Text(edit ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),
-                        ),
-                      ],
+                        }
+                        cleanForm();
+                      },
+                      icon: const Icon(Icons.close),
                     ),
-                    Padding(
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            if (edit) {
+                              await _editCard(card!);
+                            } else {
+                              await _addCard();
+                            }
+                          }
+                        },
+                        child: Text(edit ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),
+                      ),
+                    ],
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Form(
                         key: formKey,
@@ -433,8 +434,8 @@ class _CardManagerState extends State<CardManager> {
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },

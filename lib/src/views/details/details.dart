@@ -38,7 +38,7 @@ class _DetailsViewState extends State<DetailsView> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height - 88 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top,
+              height: MediaQuery.of(context).size.height - 68 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top,
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar.medium(
@@ -156,7 +156,7 @@ class _DetailsViewState extends State<DetailsView> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: FilledButton.tonalIcon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back),

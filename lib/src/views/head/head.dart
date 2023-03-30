@@ -1,6 +1,7 @@
 import 'package:fhelper/src/views/head/history.dart';
 import 'package:fhelper/src/views/head/home.dart';
 import 'package:fhelper/src/views/head/settings.dart';
+import 'package:fhelper/src/widgets/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -51,6 +52,12 @@ class _HeadViewState extends State<HeadView> {
   int? _pageIndex;
 
   @override
+  void dispose() {
+    _pageCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final List<String> headline = [
       _getHomeString(context),
@@ -59,37 +66,32 @@ class _HeadViewState extends State<HeadView> {
     ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: PreferredSize(
-        preferredSize:
-            Size(double.infinity, MediaQuery.of(context).size.height / 8),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Align(
-              alignment: Alignment.bottomLeft,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.medium(
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
                 headline[_pageIndex ?? 0],
-                textAlign: TextAlign.start,
-                style: Theme.of(context)
-                    .textTheme
-                    .displaySmall!
-                    .apply(color: Theme.of(context).colorScheme.onBackground),
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
           ),
-        ),
-      ),
-      body: PageView(
-        controller: _pageCtrl,
-        children: const [
-          HomePage(),
-          HistoryPage(),
-          SettingsPage(),
+          SliverToBoxAdapter(
+            child: ExpandablePageView(
+              controller: _pageCtrl,
+              minHeight: MediaQuery.sizeOf(context).height - 216 - MediaQuery.paddingOf(context).bottom,
+              children: const [
+                HomePage(),
+                HistoryPage(),
+                SettingsPage(),
+              ],
+              onPageChanged: (page) => setState(() {
+                _pageIndex = page;
+              }),
+            ),
+          ),
         ],
-        onPageChanged: (page) => setState(() {
-          _pageIndex = page;
-        }),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _pageIndex ?? 0,
@@ -116,5 +118,59 @@ class _HeadViewState extends State<HeadView> {
         },
       ),
     );
+
+    // return Scaffold(
+    //   appBar: PreferredSize(
+    //     preferredSize: Size(double.infinity, MediaQuery.of(context).size.height / 8),
+    //     child: SafeArea(
+    //       child: Padding(
+    //         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+    //         child: Align(
+    //           alignment: Alignment.bottomLeft,
+    //           child: Text(
+    //             headline[_pageIndex ?? 0],
+    //             textAlign: TextAlign.start,
+    //             style: Theme.of(context).textTheme.displaySmall!.apply(color: Theme.of(context).colorScheme.onBackground),
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    //   body: PageView(
+    //     controller: _pageCtrl,
+    //     children: const [
+    //       HomePage(),
+    //       HistoryPage(),
+    //       SettingsPage(),
+    //     ],
+    //     onPageChanged: (page) => setState(() {
+    //       _pageIndex = page;
+    //     }),
+    //   ),
+    //   bottomNavigationBar: NavigationBar(
+    //     selectedIndex: _pageIndex ?? 0,
+    //     destinations: [
+    //       NavigationDestination(
+    //         icon: const Icon(Icons.home),
+    //         label: AppLocalizations.of(context)!.home,
+    //       ),
+    //       NavigationDestination(
+    //         icon: const Icon(Icons.history),
+    //         label: AppLocalizations.of(context)!.history,
+    //       ),
+    //       NavigationDestination(
+    //         icon: const Icon(Icons.settings),
+    //         label: AppLocalizations.of(context)!.settings,
+    //       ),
+    //     ],
+    //     onDestinationSelected: (dest) {
+    //       _pageCtrl.animateToPage(
+    //         dest,
+    //         duration: const Duration(milliseconds: 250),
+    //         curve: Curves.easeIn,
+    //       );
+    //     },
+    //   ),
+    // );
   }
 }

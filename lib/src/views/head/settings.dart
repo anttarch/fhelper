@@ -47,6 +47,9 @@ class SettingsPage extends StatelessWidget {
       () {},
     ];
     return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
       itemCount: elements.length,
       itemBuilder: (context, index) {
         return Column(

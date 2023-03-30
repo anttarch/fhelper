@@ -112,7 +112,7 @@ class _TransferViewState extends State<TransferView> {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height - 88 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top,
+              height: MediaQuery.of(context).size.height - 68 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top,
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar.medium(
@@ -347,7 +347,7 @@ class _TransferViewState extends State<TransferView> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

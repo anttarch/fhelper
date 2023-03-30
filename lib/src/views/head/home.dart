@@ -21,6 +21,7 @@ class HomePage extends StatelessWidget {
         builder: (context, _) {
           final exchange = Isar.getInstance()!.exchanges.where().sortByDateDesc().findFirstSync();
           return Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Visibility(
                 visible: exchange != null || exchange != null && exchange.eType == EType.transfer,
@@ -151,55 +152,58 @@ class HomePage extends StatelessWidget {
                   );
                 },
               ),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.transfer,
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.titleLarge!.apply(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      FutureBuilder(
-                        future: getAttributes(Isar.getInstance()!, AttributeType.account),
-                        builder: (context, snapshot) {
-                          return Visibility(
-                            visible: Isar.getInstance()!.exchanges.countSync() == 0 || snapshot.hasData && snapshot.data!.length == 1,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              child: Text(
-                                snapshot.hasData && snapshot.data!.length == 1
-                                    ? AppLocalizations.of(context)!.transferAccountRequirement
-                                    : AppLocalizations.of(context)!.transferExchangeRequirement,
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.bodyLarge!.apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.transfer,
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.titleLarge!.apply(
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
-                            ),
-                          );
-                        },
-                      ),
-                      FutureBuilder(
-                        future: getAttributes(Isar.getInstance()!, AttributeType.account),
-                        builder: (context, snapshot) {
-                          return FilledButton.tonalIcon(
-                            onPressed: Isar.getInstance()!.exchanges.countSync() > 0 && snapshot.hasData && snapshot.data!.length > 1
-                                ? () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute<TransferView>(
-                                        builder: (context) => const TransferView(),
-                                      ),
-                                    )
-                                : null,
-                            icon: const Icon(Icons.swap_horiz),
-                            label: Text(AppLocalizations.of(context)!.transfer),
-                          );
-                        },
-                      ),
-                    ],
+                        ),
+                        FutureBuilder(
+                          future: getAttributes(Isar.getInstance()!, AttributeType.account),
+                          builder: (context, snapshot) {
+                            return Visibility(
+                              visible: Isar.getInstance()!.exchanges.countSync() == 0 || snapshot.hasData && snapshot.data!.length == 1,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 5),
+                                child: Text(
+                                  snapshot.hasData && snapshot.data!.length == 1
+                                      ? AppLocalizations.of(context)!.transferAccountRequirement
+                                      : AppLocalizations.of(context)!.transferExchangeRequirement,
+                                  textAlign: TextAlign.start,
+                                  style: Theme.of(context).textTheme.bodyLarge!.apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        FutureBuilder(
+                          future: getAttributes(Isar.getInstance()!, AttributeType.account),
+                          builder: (context, snapshot) {
+                            return FilledButton.tonalIcon(
+                              onPressed: Isar.getInstance()!.exchanges.countSync() > 0 && snapshot.hasData && snapshot.data!.length > 1
+                                  ? () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute<TransferView>(
+                                          builder: (context) => const TransferView(),
+                                        ),
+                                      )
+                                  : null,
+                              icon: const Icon(Icons.swap_horiz),
+                              label: Text(AppLocalizations.of(context)!.transfer),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

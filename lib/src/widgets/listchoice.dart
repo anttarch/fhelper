@@ -37,6 +37,7 @@ class ListChoice extends StatelessWidget {
                 ? cardList!.length
                 : intList!.length,
         shrinkWrap: true,
+        padding: EdgeInsets.zero,
         itemBuilder: (context, index) {
           if ((hiddenIndex != null || hiddenIndex != -1) && hiddenIndex == index) {
             return const SizedBox.shrink();

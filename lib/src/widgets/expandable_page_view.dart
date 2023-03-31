@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 ///     minHeight - Sets a minimum height (allows full body swipes)
 ///     avoid auto disposal of externally provided controller
 ///     add a non-animated view (lighter-ish resource use)
+///     remove external listener
 ///
 /// Available at: https://gist.github.com/andrzejchm/02c1728b6f31a69fde2fb4e10b636060
 class ExpandablePageView extends StatefulWidget {
@@ -26,40 +27,35 @@ class ExpandablePageView extends StatefulWidget {
   final PageController? controller;
   final double? minHeight;
   final ScrollPhysics physics;
-  final ValueChanged<int>? onPageChanged;
+  final void Function(int)? onPageChanged;
 
   @override
   _ExpandablePageViewState createState() => _ExpandablePageViewState();
 }
 
-class _ExpandablePageViewState extends State<ExpandablePageView> with TickerProviderStateMixin {
+class _ExpandablePageViewState extends State<ExpandablePageView> {
   late PageController _pageController;
   late List<double> _heights;
-  int _currentPage = 0;
 
-  double _getCurrentHeight(double currentHeight) {
-    if (widget.minHeight != null && widget.minHeight! > currentHeight) {
-      return widget.minHeight!;
+  // get current height based on current page
+  double _getCurrentHeight() {
+    if (_pageController.positions.isNotEmpty) {
+      final double currentHeight = _heights[_pageController.page!.round()];
+      if (widget.minHeight != null && widget.minHeight! > currentHeight) {
+        return widget.minHeight!;
+      }
+      return currentHeight;
     }
-    return currentHeight;
+    return 0;
   }
 
-  double get _currentHeight => _getCurrentHeight(_heights[_currentPage]);
+  double get _currentHeight => _getCurrentHeight();
 
   @override
   void initState() {
     _heights = widget.children.map((e) => 0.0).toList();
+    _pageController = widget.controller ?? PageController();
     super.initState();
-    _pageController = widget.controller ?? PageController()
-      ..addListener(() {
-        final newPage = _pageController.page!.round();
-        if (_currentPage != newPage) {
-          if (widget.onPageChanged != null) {
-            widget.onPageChanged?.call(newPage);
-          }
-          setState(() => _currentPage = newPage);
-        }
-      });
   }
 
   @override
@@ -71,21 +67,6 @@ class _ExpandablePageViewState extends State<ExpandablePageView> with TickerProv
     super.dispose();
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return TweenAnimationBuilder<double>(
-  //     curve: Curves.easeInOutCubic,
-  //     duration: const Duration(milliseconds: 1),
-  //     tween: Tween<double>(begin: _heights[0], end: _currentHeight),
-  //     builder: (context, value, child) => SizedBox(height: value, child: child),
-  //     child: PageView(
-  //       controller: _pageController,
-  //       physics: widget.physics,
-  //       children: _sizeReportingChildren,
-  //     ),
-  //   );
-  // }
-
   // Non-animated page view
   @override
   Widget build(BuildContext context) {
@@ -94,6 +75,7 @@ class _ExpandablePageViewState extends State<ExpandablePageView> with TickerProv
       child: PageView(
         controller: _pageController,
         physics: widget.physics,
+        onPageChanged: widget.onPageChanged,
         children: _sizeReportingChildren,
       ),
     );
@@ -146,7 +128,7 @@ class _SizeReportingWidgetState extends State<SizeReportingWidget> {
         return true;
       },
       child: SizeChangedLayoutNotifier(
-        child: Container(
+        child: SizedBox(
           key: _widgetKey,
           child: widget.child,
         ),

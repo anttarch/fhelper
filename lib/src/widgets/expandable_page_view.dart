@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 ///     physics - ScrollPhysics selection for PageView
 ///     minHeight - Sets a minimum height (allows full body swipes)
 ///     avoid auto disposal of externally provided controller
+///     add a non-animated view (lighter-ish resource use)
 ///
 /// Available at: https://gist.github.com/andrzejchm/02c1728b6f31a69fde2fb4e10b636060
 class ExpandablePageView extends StatefulWidget {
@@ -70,13 +71,26 @@ class _ExpandablePageViewState extends State<ExpandablePageView> with TickerProv
     super.dispose();
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   return TweenAnimationBuilder<double>(
+  //     curve: Curves.easeInOutCubic,
+  //     duration: const Duration(milliseconds: 1),
+  //     tween: Tween<double>(begin: _heights[0], end: _currentHeight),
+  //     builder: (context, value, child) => SizedBox(height: value, child: child),
+  //     child: PageView(
+  //       controller: _pageController,
+  //       physics: widget.physics,
+  //       children: _sizeReportingChildren,
+  //     ),
+  //   );
+  // }
+
+  // Non-animated page view
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      curve: Curves.easeInOutCubic,
-      duration: const Duration(milliseconds: 1),
-      tween: Tween<double>(begin: _heights[0], end: _currentHeight),
-      builder: (context, value, child) => SizedBox(height: value, child: child),
+    return SizedBox(
+      height: _currentHeight,
       child: PageView(
         controller: _pageController,
         physics: widget.physics,

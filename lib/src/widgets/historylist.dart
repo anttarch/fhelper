@@ -20,6 +20,17 @@ class HistoryList extends StatelessWidget {
   final List<Exchange> items;
   final bool showTotal;
 
+  Icon? _getLeadingIcon(Exchange exchange) {
+    if (exchange.installments != null) {
+      return const Icon(Icons.credit_card);
+    } else if (exchange.eType == EType.transfer) {
+      return const Icon(Icons.swap_horiz);
+    } else if (exchange.id == -1) {
+      return const Icon(Icons.receipt_long);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -53,11 +64,17 @@ class HistoryList extends StatelessWidget {
           itemCount: items.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            final Color valueColor = Color(items[index].value.isNegative ? 0xffbd1c1c : 0xff199225).harmonizeWith(Theme.of(context).colorScheme.primary);
+            Color valueColor = Color(items[index].value.isNegative ? 0xffbd1c1c : 0xff199225).harmonizeWith(Theme.of(context).colorScheme.primary);
+            if (items[index].installments != null) {
+              valueColor = Theme.of(context).colorScheme.inverseSurface;
+            } else if (items[index].eType == EType.transfer) {
+              valueColor = Theme.of(context).colorScheme.tertiary;
+            }
             return Column(
               children: [
                 ListTile(
                   contentPadding: contentPadding,
+                  leading: _getLeadingIcon(items[index]),
                   title: Text(
                     items[index].eType != EType.transfer
                         ? items[index].description

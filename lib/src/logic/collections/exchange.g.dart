@@ -171,11 +171,13 @@ const _ExchangeeTypeEnumValueMap = {
   'income': 0,
   'expense': 1,
   'transfer': 2,
+  'installment': 3,
 };
 const _ExchangeeTypeValueEnumMap = {
   0: EType.income,
   1: EType.expense,
   2: EType.transfer,
+  3: EType.installment,
 };
 
 Id _exchangeGetId(Exchange object) {

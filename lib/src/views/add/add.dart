@@ -1,6 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
+import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/listchoice.dart';
@@ -22,6 +23,7 @@ class _AddViewState extends State<AddView> {
   int _typeId = -1;
   int _accountId = -1;
   int _cardIndex = -1;
+  int _installments = 0;
   bool _accountFieldLock = false;
   double _availabeLimit = 0;
   final List<String?> displayText = [
@@ -33,8 +35,11 @@ class _AddViewState extends State<AddView> {
     null,
     // Card
     null,
+    // Installments
+    '1',
   ];
   final List<TextEditingController> textController = [
+    TextEditingController(),
     TextEditingController(),
     TextEditingController(),
   ];
@@ -339,97 +344,183 @@ class _AddViewState extends State<AddView> {
                         child: FutureBuilder(
                           future: fhelper.getCards(Isar.getInstance()!),
                           builder: (context, snapshot) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: InputField(
-                                label: AppLocalizations.of(context)!.card(1),
-                                readOnly: true,
-                                placeholder: displayText[3],
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return AppLocalizations.of(context)!.emptyField;
-                                  }
-                                  return null;
-                                },
-                                onTap: () => showModalBottomSheet<void>(
-                                  context: context,
-                                  constraints: BoxConstraints(
-                                    minHeight: MediaQuery.of(context).size.height / 3,
-                                  ),
-                                  enableDrag: false,
-                                  builder: (context) {
-                                    return StatefulBuilder(
-                                      builder: (context, setState) {
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    AppLocalizations.of(context)!.selectCard,
-                                                    style: Theme.of(context).textTheme.titleLarge,
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: AppLocalizations.of(context)!.card(1),
+                                    readOnly: true,
+                                    placeholder: displayText[3],
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return AppLocalizations.of(context)!.emptyField;
+                                      }
+                                      return null;
+                                    },
+                                    onTap: () => showModalBottomSheet<void>(
+                                      context: context,
+                                      constraints: BoxConstraints(
+                                        minHeight: MediaQuery.of(context).size.height / 3,
+                                      ),
+                                      enableDrag: false,
+                                      builder: (context) {
+                                        return StatefulBuilder(
+                                          builder: (context, setState) {
+                                            return Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        AppLocalizations.of(context)!.selectCard,
+                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                      ),
+                                                      if (_cardIndex != -1)
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              _cardIndex = -1;
+                                                            });
+                                                            Navigator.pop(context);
+                                                          },
+                                                          child: Text(AppLocalizations.of(context)!.clear),
+                                                        ),
+                                                    ],
                                                   ),
-                                                  if (_cardIndex != -1)
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          _cardIndex = -1;
-                                                        });
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text(AppLocalizations.of(context)!.clear),
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                            ListChoice(
-                                              groupValue: _cardIndex,
-                                              onChanged: (value) async {
-                                                setState(() {
-                                                  _cardIndex = value!;
-                                                });
-                                                await getAvailableLimit(
-                                                  Isar.getInstance()!,
-                                                  snapshot.data![_cardIndex],
-                                                ).then((freeLimit) {
-                                                  setState(() => _availabeLimit = freeLimit);
-                                                  Navigator.pop(context);
-                                                });
-                                              },
-                                              cardList: snapshot.hasData ? snapshot.data! : null,
-                                            )
-                                          ],
+                                                ),
+                                                ListChoice(
+                                                  groupValue: _cardIndex,
+                                                  onChanged: (value) async {
+                                                    setState(() {
+                                                      _cardIndex = value!;
+                                                    });
+                                                    await getAvailableLimit(
+                                                      Isar.getInstance()!,
+                                                      snapshot.data![_cardIndex],
+                                                    ).then((freeLimit) {
+                                                      setState(() => _availabeLimit = freeLimit);
+                                                      Navigator.pop(context);
+                                                    });
+                                                  },
+                                                  cardList: snapshot.hasData ? snapshot.data! : null,
+                                                )
+                                              ],
+                                            );
+                                          },
                                         );
                                       },
-                                    );
-                                  },
-                                ).then(
-                                  (_) async {
-                                    if (_cardIndex != -1) {
-                                      final Attribute? account = await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId);
-                                      setState(
-                                        () {
-                                          displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null;
-                                          if (snapshot.hasData) {
-                                            displayText[2] = account!.name;
-                                            _accountFieldLock = true;
+                                    ).then(
+                                      (_) async {
+                                        if (_cardIndex != -1) {
+                                          final Attribute? account = await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId);
+                                          setState(
+                                            () {
+                                              displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null;
+                                              if (snapshot.hasData) {
+                                                displayText[2] = account!.name;
+                                                _accountFieldLock = true;
+                                              }
+                                            },
+                                          );
+                                        } else if (_accountFieldLock == true) {
+                                          setState(() {
+                                            _accountFieldLock = false;
+                                            displayText[2] = null;
+                                            displayText[3] = null;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: _cardIndex != -1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 15),
+                                    child: InputField(
+                                      label: AppLocalizations.of(context)!.installments,
+                                      readOnly: true,
+                                      placeholder: displayText[4],
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return AppLocalizations.of(context)!.emptyField;
+                                        }
+                                        return null;
+                                      },
+                                      onTap: () => showModalBottomSheet<void>(
+                                        context: context,
+                                        enableDrag: false,
+                                        builder: (context) {
+                                          return StatefulBuilder(
+                                            builder: (context, setState) {
+                                              return Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(20),
+                                                    child: Text(
+                                                      AppLocalizations.of(context)!.installments,
+                                                      style: Theme.of(context).textTheme.titleLarge,
+                                                    ),
+                                                  ),
+                                                  ListChoice(
+                                                    groupValue: _installments,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _installments = value!;
+                                                      });
+                                                      Navigator.pop(context);
+                                                    },
+                                                    intList: List.generate(48, (index) => index + 1),
+                                                  )
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ).then(
+                                        (_) {
+                                          if (_installments > 1) {
+                                            setState(
+                                              () => displayText[4] = '${_installments + 1}',
+                                            );
                                           }
                                         },
-                                      );
-                                    } else if (_accountFieldLock == true) {
-                                      setState(() {
-                                        _accountFieldLock = false;
-                                        displayText[2] = null;
-                                        displayText[3] = null;
-                                      });
-                                    }
-                                  },
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Visibility(
+                                  visible: _installments > 0,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 15),
+                                    child: InputField(
+                                      controller: textController[2],
+                                      label: AppLocalizations.of(context)!.perInstallmentValue,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        CurrencyInputFormatter(
+                                          locale: Localizations.localeOf(context).languageCode,
+                                        )
+                                      ],
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return AppLocalizations.of(context)!.emptyField;
+                                        } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
+                                          return AppLocalizations.of(context)!.invalidValue;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
                             );
                           },
                         ),
@@ -535,6 +626,7 @@ class _AddViewState extends State<AddView> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
+                      final String installmentValue = textController[2].text.replaceAll(RegExp('[^0-9]'), '');
                       final Isar isar = Isar.getInstance()!;
                       final Exchange exchange = Exchange(
                         eType: _eType.single,
@@ -546,10 +638,19 @@ class _AddViewState extends State<AddView> {
                             ? (await fhelper.getCards(isar))[_cardIndex].accountId
                             : (await getAttributes(isar, AttributeType.account))[_accountId].id,
                         cardId: _eType.single == EType.expense && _cardIndex > -1 ? (await fhelper.getCards(isar))[_cardIndex].id : null,
+                        installments: _cardIndex > -1 ? _installments + 1 : null,
+                        installmentValue: _cardIndex > -1
+                            ? _installments > 0
+                                ? double.parse(installmentValue) / 100
+                                : null
+                            : null,
                       );
                       await isar.writeTxn(() async {
                         await isar.exchanges.put(exchange);
                       }).then((_) => Navigator.pop(context));
+                      if (_cardIndex != -1) {
+                        await processInstallments(isar, exchange);
+                      }
                     }
                   },
                   icon: const Icon(Icons.add),

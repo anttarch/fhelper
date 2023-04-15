@@ -1,4 +1,4 @@
-# TODO
+# TODO - 1.1.0 release
 
 ## Views
 - [x] Transfer View
@@ -7,11 +7,11 @@
 - ### Add View
     - [x] Add Isar logic for selecting cards
     - [x] Add validation for cards limits
-    - [ ] Add installments
+    - [x] Add installments
 
 - ### Details View
     - [x] Add Isar logic for displaying cards
-    - [ ] Add installments
+    - [x] Add installments
 
 - ### Head View
 
@@ -62,3 +62,8 @@
 - [ ] Add default attributes
 - [ ] Make textfield open datepicker, bottom sheet, etc (maybe it's possible?)
 - [x] Dispose TextControllers
+
+# TODO - 2.x.x
+
+## Cards Management
+- [ ] Add minimum payment support

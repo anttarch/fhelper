@@ -5,7 +5,7 @@ import 'package:isar/isar.dart';
 
 part 'exchange.g.dart';
 
-enum EType { income, expense, transfer }
+enum EType { income, expense, transfer, installment }
 
 @Collection()
 class Exchange {
@@ -35,9 +35,14 @@ class Exchange {
   final double? installmentValue; // Value of each installment
   final int typeId; // Type (attribute) linked
   final double value; // Monetary value
+
+  @override
+  String toString() {
+    return 'Exchange(id: $id, accountId: $accountId, accountIdEnd: $accountIdEnd, cardId: $cardId, date: $date, description: $description, eType: $eType, installments: $installments, installmentValue: $installmentValue, typeId: $typeId, value: $value)';
+  }
 }
 
-int _getWeekday(BuildContext context) {
+int getWeekday(BuildContext context) {
   final MaterialLocalizations localizations = MaterialLocalizations.of(context);
   // 0 = sunday ... 6 = saturday
   final int firstDayOfWeek = localizations.firstDayOfWeekIndex;
@@ -83,7 +88,7 @@ Future<double> getSumValue(
   BuildContext context, {
   int time = 0,
 }) async {
-  final int weekday = _getWeekday(context);
+  final int weekday = getWeekday(context);
 
   final double today = await isar.exchanges
       .where()
@@ -96,9 +101,10 @@ Future<double> getSumValue(
         ),
         DateTime.now(),
       )
-      .and()
       .not()
-      .eTypeEqualTo(EType.transfer)
+      .eTypeGreaterThan(EType.transfer)
+      .not()
+      .installmentsIsNotNull()
       .valueProperty()
       .sum();
 
@@ -110,7 +116,9 @@ Future<double> getSumValue(
         DateTime.now(),
       )
       .not()
-      .eTypeEqualTo(EType.transfer)
+      .eTypeGreaterThan(EType.transfer)
+      .not()
+      .installmentsIsNotNull()
       .valueProperty()
       .sum();
 
@@ -122,7 +130,9 @@ Future<double> getSumValue(
         DateTime.now(),
       )
       .not()
-      .eTypeEqualTo(EType.transfer)
+      .eTypeGreaterThan(EType.transfer)
+      .not()
+      .installmentsIsNotNull()
       .valueProperty()
       .sum();
 
@@ -135,6 +145,7 @@ Future<double> getSumValue(
   return timeTable[time]!;
 }
 
+// TODO: remove installments sum
 Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? attributeType) async {
   double value = 0;
 
@@ -193,7 +204,7 @@ Future<List<Exchange>> getExchanges(
   BuildContext context, {
   int time = 0,
 }) async {
-  final int weekday = _getWeekday(context);
+  final int weekday = getWeekday(context);
 
   final List<Exchange> today = await isar.exchanges
       .where()
@@ -206,6 +217,8 @@ Future<List<Exchange>> getExchanges(
         ),
         DateTime.now(),
       )
+      .not()
+      .eTypeEqualTo(EType.installment)
       .sortByDateDesc()
       .findAll();
 
@@ -216,6 +229,8 @@ Future<List<Exchange>> getExchanges(
         DateTime.now().subtract(Duration(days: weekday)),
         DateTime.now(),
       )
+      .not()
+      .eTypeEqualTo(EType.installment)
       .sortByDateDesc()
       .findAll();
 
@@ -226,6 +241,8 @@ Future<List<Exchange>> getExchanges(
         DateTime(DateTime.now().year, DateTime.now().month),
         DateTime.now(),
       )
+      .not()
+      .eTypeEqualTo(EType.installment)
       .sortByDateDesc()
       .findAll();
 

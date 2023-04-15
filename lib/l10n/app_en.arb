@@ -21,7 +21,17 @@
         }
     },
     "clear": "Clear",
+    "confirm": "Confirm",
+    "confirmPay": "Confirm Pay",
     "date": "Date",
+    "dateSelector": "{count, plural, =1{This Week} =2{This Month} other{Today}}",
+    "@dateSelector": {
+        "placeholders": {
+            "count": {
+                "type": "num"
+            }
+        }
+    },
     "dayOfMonth": "Day {dayAsNumber} of each month",
     "@dayOfMonth": {
         "placeholders": {
@@ -65,6 +75,7 @@
     "income": "Income",
     "insufficientFunds": "Insufficient funds",
     "insufficientLimit": "Insufficient limit",
+    "installments": "Installments",
     "invalidName": "Invalid name",
     "invalidValue": "Invalid value",
     "latest": "Latest:",
@@ -72,6 +83,7 @@
     "month": "Month",
     "name": "Name",
     "paymentDue": "Payment Due",
+    "perInstallmentValue": "Per-installment value",
     "price": "Price",
     "privacy": "Privacy",
     "proceed": "Proceed",

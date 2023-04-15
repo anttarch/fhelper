@@ -1,6 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
+import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class DetailsView extends StatefulWidget {
 }
 
 class _DetailsViewState extends State<DetailsView> {
+  bool isCardBill = false;
   String exchangeDate(DateTime date) {
     final dateWithoutTime = DateTime(date.year, date.month, date.day);
     if (date.isAtSameMomentAs(dateWithoutTime)) {
@@ -27,6 +29,14 @@ class _DetailsViewState extends State<DetailsView> {
     return DateFormat.yMd(
       Localizations.localeOf(context).languageCode,
     ).add_jm().format(date);
+  }
+
+  @override
+  void initState() {
+    if (widget.item.id == -1) {
+      isCardBill = true;
+    }
+    super.initState();
   }
 
   @override
@@ -45,7 +55,7 @@ class _DetailsViewState extends State<DetailsView> {
                     title: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
-                        AppLocalizations.of(context)!.details,
+                        isCardBill ? widget.item.description : AppLocalizations.of(context)!.details,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
@@ -55,19 +65,22 @@ class _DetailsViewState extends State<DetailsView> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: InputField(
-                              label: AppLocalizations.of(context)!.description,
-                              placeholder: widget.item.eType != EType.transfer
-                                  ? widget.item.description
-                                  : AppLocalizations.of(context)!
-                                      .transferDescription(widget.item.description.split('#/spt#/')[0], widget.item.description.split('#/spt#/')[1]),
-                              readOnly: true,
+                          Visibility(
+                            visible: !isCardBill,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: InputField(
+                                label: AppLocalizations.of(context)!.description,
+                                placeholder: widget.item.eType != EType.transfer
+                                    ? widget.item.description
+                                    : AppLocalizations.of(context)!
+                                        .transferDescription(widget.item.description.split('#/spt#/')[0], widget.item.description.split('#/spt#/')[1]),
+                                readOnly: true,
+                              ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 20),
+                            padding: isCardBill ? EdgeInsets.zero : const EdgeInsets.only(top: 20),
                             child: InputField(
                               label: widget.item.value.isNegative ? AppLocalizations.of(context)!.price : AppLocalizations.of(context)!.amount,
                               placeholder: NumberFormat.simpleCurrency(
@@ -90,7 +103,7 @@ class _DetailsViewState extends State<DetailsView> {
                             ),
                           ),
                           Visibility(
-                            visible: widget.item.eType != EType.transfer,
+                            visible: widget.item.eType != EType.transfer && isCardBill == false,
                             child: FutureBuilder(
                               future: getAttributeFromId(Isar.getInstance()!, widget.item.typeId),
                               builder: (context, snapshot) {
@@ -146,6 +159,88 @@ class _DetailsViewState extends State<DetailsView> {
                                     readOnly: true,
                                   ),
                                 );
+                              },
+                            ),
+                          if (widget.item.id == -1)
+                            FutureBuilder(
+                              future: getCardBillFromId(Isar.getInstance()!, widget.item.typeId).then((value) async {
+                                final List<Exchange> installments = [];
+                                for (final id in value!.installmentIdList) {
+                                  final Exchange? installment = await Isar.getInstance()!.exchanges.get(id);
+                                  if (installment != null) {
+                                    installments.add(installment);
+                                  }
+                                }
+                                return {value: installments};
+                              }),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final cardBill = snapshot.data!.keys.first;
+                                  final installments = snapshot.data!.values.first;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: Material(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            AppLocalizations.of(context)!.installments,
+                                            style: Theme.of(context).textTheme.titleLarge,
+                                          ),
+                                          ListView.separated(
+                                            shrinkWrap: true,
+                                            itemCount: cardBill.installmentIdList.length,
+                                            physics: const NeverScrollableScrollPhysics(),
+                                            itemBuilder: (context, index) {
+                                              return Column(
+                                                children: [
+                                                  ListTile(
+                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                                    leading: const Icon(Icons.credit_card),
+                                                    title: Text(
+                                                      installments[index].description,
+                                                      style: Theme.of(context).textTheme.bodyLarge,
+                                                    ),
+                                                    subtitle: Text(
+                                                      NumberFormat.simpleCurrency(
+                                                        locale: Localizations.localeOf(context).languageCode,
+                                                      ).format(installments[index].value),
+                                                      style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                                                    ),
+                                                    trailing: Icon(
+                                                      Icons.arrow_right,
+                                                      color: Theme.of(context).colorScheme.onSurface,
+                                                    ),
+                                                    onTap: () => Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute<DetailsView>(
+                                                        builder: (context) => DetailsView(
+                                                          item: installments[index],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (index == installments.length - 1)
+                                                    Divider(
+                                                      height: 1,
+                                                      thickness: 1,
+                                                      color: Theme.of(context).colorScheme.outlineVariant,
+                                                    ),
+                                                ],
+                                              );
+                                            },
+                                            separatorBuilder: (_, __) => Divider(
+                                              height: 1,
+                                              thickness: 1,
+                                              color: Theme.of(context).colorScheme.outlineVariant,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const CircularProgressIndicator.adaptive();
                               },
                             ),
                         ],

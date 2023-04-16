@@ -1,6 +1,7 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,9 @@ class _CardManagerState extends State<CardManager> {
   int _pdDate = -1;
   final List<TextEditingController> _controller = [
     TextEditingController(),
+    TextEditingController(),
+
+    // controller for dialog
     TextEditingController(),
   ];
 
@@ -79,67 +83,6 @@ class _CardManagerState extends State<CardManager> {
     for (final element in _controller) {
       element.clear();
     }
-  }
-
-  void _addAccountDialog() {
-    final TextEditingController controller = TextEditingController();
-    showDialog<void>(
-      context: context,
-      builder: (context) {
-        final formKey = GlobalKey<FormState>();
-        return AlertDialog(
-          title: Text(
-            AppLocalizations.of(context)!.add,
-          ),
-          icon: const Icon(Icons.add),
-          content: Form(
-            key: formKey,
-            child: InputField(
-              controller: controller,
-              label: AppLocalizations.of(context)!.name,
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(15),
-              ],
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return AppLocalizations.of(context)!.emptyField;
-                } else if (value.length < 3) {
-                  return AppLocalizations.of(context)!.threeCharactersMinimum;
-                }
-                return null;
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                AppLocalizations.of(context)!.cancel,
-              ),
-            ),
-            FilledButton.tonalIcon(
-              icon: const Icon(Icons.add),
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  final Isar isar = Isar.getInstance()!;
-                  final Attribute attribute = Attribute(
-                    name: controller.text,
-                    type: AttributeType.account,
-                  );
-                  await isar.writeTxn(() async {
-                    await isar.attributes.put(attribute);
-                  }).then((_) {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  });
-                }
-              },
-              label: Text(AppLocalizations.of(context)!.add),
-            ),
-          ],
-        );
-      },
-    ).then((_) => controller.clear());
   }
 
   @override
@@ -395,7 +338,11 @@ class _CardManagerState extends State<CardManager> {
                                                         style: Theme.of(context).textTheme.titleLarge,
                                                       ),
                                                       TextButton.icon(
-                                                        onPressed: _addAccountDialog,
+                                                        onPressed: () => showAttributeDialog<void>(
+                                                          context: context,
+                                                          attributeType: AttributeType.account,
+                                                          controller: _controller[2],
+                                                        ).then((_) => _controller[2].clear()),
                                                         icon: const Icon(Icons.add),
                                                         label: Text(AppLocalizations.of(context)!.add),
                                                       ),

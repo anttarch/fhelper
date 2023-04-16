@@ -3,6 +3,7 @@ import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
@@ -42,75 +43,10 @@ class _AddViewState extends State<AddView> {
     TextEditingController(),
     TextEditingController(),
     TextEditingController(),
-  ];
 
-  void _addDialog(AttributeType attributeType) {
-    final TextEditingController controller = TextEditingController();
-    showDialog<void>(
-      context: context,
-      builder: (context) {
-        final formKey = GlobalKey<FormState>();
-        return WillPopScope(
-          onWillPop: () {
-            controller.clear();
-            return Future<bool>.value(true);
-          },
-          child: AlertDialog(
-            title: Text(
-              AppLocalizations.of(context)!.add,
-            ),
-            icon: const Icon(Icons.add),
-            content: Form(
-              key: formKey,
-              child: InputField(
-                controller: controller,
-                label: AppLocalizations.of(context)!.name,
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(15),
-                ],
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.emptyField;
-                  } else if (value.length < 3) {
-                    return AppLocalizations.of(context)!.threeCharactersMinimum;
-                  }
-                  return null;
-                },
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  AppLocalizations.of(context)!.cancel,
-                ),
-              ),
-              FilledButton.tonalIcon(
-                icon: const Icon(Icons.add),
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    final Isar isar = Isar.getInstance()!;
-                    final Attribute attribute = Attribute(
-                      name: controller.text,
-                      type: attributeType,
-                    );
-                    await isar.writeTxn(() async {
-                      await isar.attributes.put(attribute);
-                    }).then((_) {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    });
-                    controller.clear();
-                  }
-                },
-                label: Text(AppLocalizations.of(context)!.add),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+    // controller for dialog
+    TextEditingController(),
+  ];
 
   final _formKey = GlobalKey<FormState>();
 
@@ -305,8 +241,11 @@ class _AddViewState extends State<AddView> {
                                                   style: Theme.of(context).textTheme.titleLarge,
                                                 ),
                                                 TextButton.icon(
-                                                  onPressed: () =>
-                                                      _addDialog(_eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType),
+                                                  onPressed: () => showAttributeDialog<void>(
+                                                    context: context,
+                                                    attributeType: _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType,
+                                                    controller: textController[3],
+                                                  ),
                                                   icon: const Icon(Icons.add),
                                                   label: Text(AppLocalizations.of(context)!.add),
                                                 ),
@@ -567,7 +506,11 @@ class _AddViewState extends State<AddView> {
                                                   style: Theme.of(context).textTheme.titleLarge,
                                                 ),
                                                 TextButton.icon(
-                                                  onPressed: () => _addDialog(AttributeType.account),
+                                                  onPressed: () => showAttributeDialog<void>(
+                                                    context: context,
+                                                    attributeType: AttributeType.account,
+                                                    controller: textController[3],
+                                                  ),
                                                   icon: const Icon(Icons.add),
                                                   label: Text(AppLocalizations.of(context)!.add),
                                                 ),

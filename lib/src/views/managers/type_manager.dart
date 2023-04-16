@@ -1,8 +1,7 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
-import 'package:fhelper/src/widgets/inputfield.dart';
+import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:isar/isar.dart';
 
@@ -167,119 +166,18 @@ class _TypeManagerState extends State<TypeManager> {
                                                   },
                                                 ),
                                                 FilledButton.icon(
-                                                  onPressed: () => showDialog<void>(
-                                                    context: context,
-                                                    useSafeArea: MediaQuery.orientationOf(context) == Orientation.portrait,
-                                                    builder: (context) {
-                                                      final formKey = GlobalKey<FormState>();
+                                                  onPressed: () async {
+                                                    if (_controller.text.isEmpty) {
                                                       _controller.text = attributes[index].name;
-                                                      if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                                                        return AlertDialog(
-                                                          title: Text(AppLocalizations.of(context)!.edit),
-                                                          icon: const Icon(Icons.edit),
-                                                          content: Form(
-                                                            key: formKey,
-                                                            child: InputField(
-                                                              controller: _controller,
-                                                              label: AppLocalizations.of(context)!.name,
-                                                              inputFormatters: [
-                                                                LengthLimitingTextInputFormatter(15),
-                                                              ],
-                                                              validator: (value) {
-                                                                if (value!.isEmpty) {
-                                                                  return AppLocalizations.of(context)!.emptyField;
-                                                                } else if (value.length < 3) {
-                                                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                                                }
-                                                                return null;
-                                                              },
-                                                            ),
-                                                          ),
-                                                          actions: [
-                                                            TextButton(
-                                                              onPressed: () => Navigator.pop(context),
-                                                              child: Text(AppLocalizations.of(context)!.cancel),
-                                                            ),
-                                                            FilledButton.tonalIcon(
-                                                              icon: const Icon(Icons.done),
-                                                              onPressed: () async {
-                                                                if (formKey.currentState!.validate()) {
-                                                                  final Isar isar = Isar.getInstance()!;
-                                                                  final Attribute attribute = attributes[index].copyWith(name: _controller.text);
-                                                                  await isar.writeTxn(() async {
-                                                                    await isar.attributes.put(attribute);
-                                                                  }).then((_) {
-                                                                    Navigator.pop(context);
-                                                                    Navigator.pop(context);
-                                                                  });
-                                                                }
-                                                              },
-                                                              label: Text(AppLocalizations.of(context)!.save),
-                                                            ),
-                                                          ],
-                                                        );
-                                                      }
-
-                                                      return Dialog.fullscreen(
-                                                        child: CustomScrollView(
-                                                          slivers: [
-                                                            SliverAppBar(
-                                                              pinned: true,
-                                                              forceElevated: true,
-                                                              title: Text(AppLocalizations.of(context)!.edit),
-                                                              leading: IconButton(
-                                                                onPressed: () => Navigator.pop(context),
-                                                                icon: const Icon(Icons.close),
-                                                              ),
-                                                              actions: [
-                                                                TextButton(
-                                                                  onPressed: () async {
-                                                                    if (formKey.currentState!.validate()) {
-                                                                      final Isar isar = Isar.getInstance()!;
-                                                                      final Attribute attribute = attributes[index].copyWith(name: _controller.text);
-                                                                      await isar.writeTxn(() async {
-                                                                        await isar.attributes.put(attribute);
-                                                                      }).then((_) {
-                                                                        Navigator.pop(context);
-                                                                        Navigator.pop(context);
-                                                                      });
-                                                                    }
-                                                                  },
-                                                                  child: Text(AppLocalizations.of(context)!.save),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            SliverToBoxAdapter(
-                                                              child: Padding(
-                                                                padding: const EdgeInsets.symmetric(horizontal: 24),
-                                                                child: Form(
-                                                                  key: formKey,
-                                                                  child: Padding(
-                                                                    padding: const EdgeInsets.only(top: 15),
-                                                                    child: InputField(
-                                                                      controller: _controller,
-                                                                      label: AppLocalizations.of(context)!.name,
-                                                                      inputFormatters: [
-                                                                        LengthLimitingTextInputFormatter(15),
-                                                                      ],
-                                                                      validator: (value) {
-                                                                        if (value!.isEmpty) {
-                                                                          return AppLocalizations.of(context)!.emptyField;
-                                                                        } else if (value.length < 3) {
-                                                                          return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                                                        }
-                                                                        return null;
-                                                                      },
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                  ).then((_) => _controller.clear()),
+                                                    }
+                                                    await showAttributeDialog<void>(
+                                                      context: context,
+                                                      attribute: attributes[index],
+                                                      attributeType: _attributeType.single,
+                                                      controller: _controller,
+                                                      editMode: true,
+                                                    ).then((_) => _controller.clear());
+                                                  },
                                                   icon: const Icon(Icons.edit),
                                                   label: Text(AppLocalizations.of(context)!.edit),
                                                 ),
@@ -339,120 +237,10 @@ class _TypeManagerState extends State<TypeManager> {
               const SizedBox(width: 20),
               Expanded(
                 child: FilledButton.icon(
-                  onPressed: () => showDialog<void>(
+                  onPressed: () => showAttributeDialog<void>(
                     context: context,
-                    useSafeArea: MediaQuery.orientationOf(context) == Orientation.portrait,
-                    builder: (context) {
-                      final formKey = GlobalKey<FormState>();
-                      if (MediaQuery.orientationOf(context) == Orientation.portrait) {
-                        return AlertDialog(
-                          title: Text(
-                            AppLocalizations.of(context)!.add,
-                          ),
-                          icon: const Icon(Icons.add),
-                          content: Form(
-                            key: formKey,
-                            child: InputField(
-                              controller: _controller,
-                              label: AppLocalizations.of(context)!.name,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(15),
-                              ],
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return AppLocalizations.of(context)!.emptyField;
-                                } else if (value.length < 3) {
-                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: Text(
-                                AppLocalizations.of(context)!.cancel,
-                              ),
-                            ),
-                            FilledButton.tonalIcon(
-                              icon: const Icon(Icons.add),
-                              onPressed: () async {
-                                if (formKey.currentState!.validate()) {
-                                  final Isar isar = Isar.getInstance()!;
-                                  final Attribute attribute = Attribute(
-                                    name: _controller.text,
-                                    type: _attributeType.single,
-                                  );
-                                  await isar.writeTxn(() async {
-                                    await isar.attributes.put(attribute);
-                                  }).then((_) => Navigator.pop(context));
-                                }
-                              },
-                              label: Text(AppLocalizations.of(context)!.add),
-                            ),
-                          ],
-                        );
-                      }
-                      return Dialog.fullscreen(
-                        child: CustomScrollView(
-                          slivers: [
-                            SliverAppBar(
-                              pinned: true,
-                              forceElevated: true,
-                              title: Text(AppLocalizations.of(context)!.add),
-                              leading: IconButton(
-                                onPressed: () => Navigator.pop(context),
-                                icon: const Icon(Icons.close),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () async {
-                                    if (formKey.currentState!.validate()) {
-                                      final Isar isar = Isar.getInstance()!;
-                                      final Attribute attribute = Attribute(
-                                        name: _controller.text,
-                                        type: _attributeType.single,
-                                      );
-                                      await isar.writeTxn(() async {
-                                        await isar.attributes.put(attribute);
-                                      }).then((_) => Navigator.pop(context));
-                                    }
-                                  },
-                                  child: Text(AppLocalizations.of(context)!.add),
-                                ),
-                              ],
-                            ),
-                            SliverToBoxAdapter(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 24),
-                                child: Form(
-                                  key: formKey,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 15),
-                                    child: InputField(
-                                      controller: _controller,
-                                      label: AppLocalizations.of(context)!.name,
-                                      inputFormatters: [
-                                        LengthLimitingTextInputFormatter(15),
-                                      ],
-                                      validator: (value) {
-                                        if (value!.isEmpty) {
-                                          return AppLocalizations.of(context)!.emptyField;
-                                        } else if (value.length < 3) {
-                                          return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                    attributeType: _attributeType.single,
+                    controller: _controller,
                   ).then((_) => _controller.clear()),
                   icon: const Icon(Icons.add),
                   label: Text(AppLocalizations.of(context)!.add),

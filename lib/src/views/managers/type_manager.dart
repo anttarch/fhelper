@@ -169,52 +169,114 @@ class _TypeManagerState extends State<TypeManager> {
                                                 FilledButton.icon(
                                                   onPressed: () => showDialog<void>(
                                                     context: context,
+                                                    useSafeArea: MediaQuery.orientationOf(context) == Orientation.portrait,
                                                     builder: (context) {
                                                       final formKey = GlobalKey<FormState>();
                                                       _controller.text = attributes[index].name;
-                                                      return AlertDialog(
-                                                        title: Text(AppLocalizations.of(context)!.edit),
-                                                        icon: const Icon(Icons.edit),
-                                                        content: Form(
-                                                          key: formKey,
-                                                          child: InputField(
-                                                            controller: _controller,
-                                                            label: AppLocalizations.of(context)!.name,
-                                                            inputFormatters: [
-                                                              LengthLimitingTextInputFormatter(15),
-                                                            ],
-                                                            validator: (value) {
-                                                              if (value!.isEmpty) {
-                                                                return AppLocalizations.of(context)!.emptyField;
-                                                              } else if (value.length < 3) {
-                                                                return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                                              }
-                                                              return null;
-                                                            },
+                                                      if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                                                        return AlertDialog(
+                                                          title: Text(AppLocalizations.of(context)!.edit),
+                                                          icon: const Icon(Icons.edit),
+                                                          content: Form(
+                                                            key: formKey,
+                                                            child: InputField(
+                                                              controller: _controller,
+                                                              label: AppLocalizations.of(context)!.name,
+                                                              inputFormatters: [
+                                                                LengthLimitingTextInputFormatter(15),
+                                                              ],
+                                                              validator: (value) {
+                                                                if (value!.isEmpty) {
+                                                                  return AppLocalizations.of(context)!.emptyField;
+                                                                } else if (value.length < 3) {
+                                                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                                                }
+                                                                return null;
+                                                              },
+                                                            ),
                                                           ),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () => Navigator.pop(context),
+                                                              child: Text(AppLocalizations.of(context)!.cancel),
+                                                            ),
+                                                            FilledButton.tonalIcon(
+                                                              icon: const Icon(Icons.done),
+                                                              onPressed: () async {
+                                                                if (formKey.currentState!.validate()) {
+                                                                  final Isar isar = Isar.getInstance()!;
+                                                                  final Attribute attribute = attributes[index].copyWith(name: _controller.text);
+                                                                  await isar.writeTxn(() async {
+                                                                    await isar.attributes.put(attribute);
+                                                                  }).then((_) {
+                                                                    Navigator.pop(context);
+                                                                    Navigator.pop(context);
+                                                                  });
+                                                                }
+                                                              },
+                                                              label: Text(AppLocalizations.of(context)!.save),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      }
+
+                                                      return Dialog.fullscreen(
+                                                        child: CustomScrollView(
+                                                          slivers: [
+                                                            SliverAppBar(
+                                                              pinned: true,
+                                                              forceElevated: true,
+                                                              title: Text(AppLocalizations.of(context)!.edit),
+                                                              leading: IconButton(
+                                                                onPressed: () => Navigator.pop(context),
+                                                                icon: const Icon(Icons.close),
+                                                              ),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () async {
+                                                                    if (formKey.currentState!.validate()) {
+                                                                      final Isar isar = Isar.getInstance()!;
+                                                                      final Attribute attribute = attributes[index].copyWith(name: _controller.text);
+                                                                      await isar.writeTxn(() async {
+                                                                        await isar.attributes.put(attribute);
+                                                                      }).then((_) {
+                                                                        Navigator.pop(context);
+                                                                        Navigator.pop(context);
+                                                                      });
+                                                                    }
+                                                                  },
+                                                                  child: Text(AppLocalizations.of(context)!.save),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            SliverToBoxAdapter(
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                                                child: Form(
+                                                                  key: formKey,
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.only(top: 15),
+                                                                    child: InputField(
+                                                                      controller: _controller,
+                                                                      label: AppLocalizations.of(context)!.name,
+                                                                      inputFormatters: [
+                                                                        LengthLimitingTextInputFormatter(15),
+                                                                      ],
+                                                                      validator: (value) {
+                                                                        if (value!.isEmpty) {
+                                                                          return AppLocalizations.of(context)!.emptyField;
+                                                                        } else if (value.length < 3) {
+                                                                          return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                                                        }
+                                                                        return null;
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed: () => Navigator.pop(context),
-                                                            child: Text(AppLocalizations.of(context)!.cancel),
-                                                          ),
-                                                          FilledButton.tonalIcon(
-                                                            icon: const Icon(Icons.done),
-                                                            onPressed: () async {
-                                                              if (formKey.currentState!.validate()) {
-                                                                final Isar isar = Isar.getInstance()!;
-                                                                final Attribute attribute = attributes[index].copyWith(name: _controller.text);
-                                                                await isar.writeTxn(() async {
-                                                                  await isar.attributes.put(attribute);
-                                                                }).then((_) {
-                                                                  Navigator.pop(context);
-                                                                  Navigator.pop(context);
-                                                                });
-                                                              }
-                                                            },
-                                                            label: Text(AppLocalizations.of(context)!.save),
-                                                          ),
-                                                        ],
                                                       );
                                                     },
                                                   ).then((_) => _controller.clear()),
@@ -279,55 +341,116 @@ class _TypeManagerState extends State<TypeManager> {
                 child: FilledButton.icon(
                   onPressed: () => showDialog<void>(
                     context: context,
+                    useSafeArea: MediaQuery.orientationOf(context) == Orientation.portrait,
                     builder: (context) {
                       final formKey = GlobalKey<FormState>();
-                      return AlertDialog(
-                        title: Text(
-                          AppLocalizations.of(context)!.add,
-                        ),
-                        icon: const Icon(Icons.add),
-                        content: Form(
-                          key: formKey,
-                          child: InputField(
-                            controller: _controller,
-                            label: AppLocalizations.of(context)!.name,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(15),
-                            ],
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return AppLocalizations.of(context)!.emptyField;
-                              } else if (value.length < 3) {
-                                return AppLocalizations.of(context)!.threeCharactersMinimum;
-                              }
-                              return null;
-                            },
+                      if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+                        return AlertDialog(
+                          title: Text(
+                            AppLocalizations.of(context)!.add,
                           ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              AppLocalizations.of(context)!.cancel,
+                          icon: const Icon(Icons.add),
+                          content: Form(
+                            key: formKey,
+                            child: InputField(
+                              controller: _controller,
+                              label: AppLocalizations.of(context)!.name,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(15),
+                              ],
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return AppLocalizations.of(context)!.emptyField;
+                                } else if (value.length < 3) {
+                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                }
+                                return null;
+                              },
                             ),
                           ),
-                          FilledButton.tonalIcon(
-                            icon: const Icon(Icons.add),
-                            onPressed: () async {
-                              if (formKey.currentState!.validate()) {
-                                final Isar isar = Isar.getInstance()!;
-                                final Attribute attribute = Attribute(
-                                  name: _controller.text,
-                                  type: _attributeType.single,
-                                );
-                                await isar.writeTxn(() async {
-                                  await isar.attributes.put(attribute);
-                                }).then((_) => Navigator.pop(context));
-                              }
-                            },
-                            label: Text(AppLocalizations.of(context)!.add),
-                          ),
-                        ],
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                AppLocalizations.of(context)!.cancel,
+                              ),
+                            ),
+                            FilledButton.tonalIcon(
+                              icon: const Icon(Icons.add),
+                              onPressed: () async {
+                                if (formKey.currentState!.validate()) {
+                                  final Isar isar = Isar.getInstance()!;
+                                  final Attribute attribute = Attribute(
+                                    name: _controller.text,
+                                    type: _attributeType.single,
+                                  );
+                                  await isar.writeTxn(() async {
+                                    await isar.attributes.put(attribute);
+                                  }).then((_) => Navigator.pop(context));
+                                }
+                              },
+                              label: Text(AppLocalizations.of(context)!.add),
+                            ),
+                          ],
+                        );
+                      }
+                      return Dialog.fullscreen(
+                        child: CustomScrollView(
+                          slivers: [
+                            SliverAppBar(
+                              pinned: true,
+                              forceElevated: true,
+                              title: Text(AppLocalizations.of(context)!.add),
+                              leading: IconButton(
+                                onPressed: () => Navigator.pop(context),
+                                icon: const Icon(Icons.close),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () async {
+                                    if (formKey.currentState!.validate()) {
+                                      final Isar isar = Isar.getInstance()!;
+                                      final Attribute attribute = Attribute(
+                                        name: _controller.text,
+                                        type: _attributeType.single,
+                                      );
+                                      await isar.writeTxn(() async {
+                                        await isar.attributes.put(attribute);
+                                      }).then((_) => Navigator.pop(context));
+                                    }
+                                  },
+                                  child: Text(AppLocalizations.of(context)!.add),
+                                ),
+                              ],
+                            ),
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: Form(
+                                  key: formKey,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 15),
+                                    child: InputField(
+                                      controller: _controller,
+                                      label: AppLocalizations.of(context)!.name,
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(15),
+                                      ],
+                                      validator: (value) {
+                                        if (value!.isEmpty) {
+                                          return AppLocalizations.of(context)!.emptyField;
+                                        } else if (value.length < 3) {
+                                          return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ).then((_) => _controller.clear()),

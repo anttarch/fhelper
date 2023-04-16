@@ -164,6 +164,7 @@ class _CardManagerState extends State<CardManager> {
     }
     return showDialog<void>(
       context: context,
+      useSafeArea: false,
       builder: (context) {
         final formKey = GlobalKey<FormState>();
         return StatefulBuilder(

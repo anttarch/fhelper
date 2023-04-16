@@ -13,10 +13,9 @@ Future<T?> showAttributeDialog<T>({
   bool editMode = false,
 }) {
   assert(editMode ? attribute != null : attribute == null);
-  // TODO: figure out why it dosen't update when StatefulBuilder is applied (on AddView)
   return showDialog<T>(
     context: context,
-    useSafeArea: MediaQuery.orientationOf(context) == Orientation.portrait,
+    useSafeArea: false,
     builder: (context) {
       return OrientationBuilder(
         builder: (context, orientation) {

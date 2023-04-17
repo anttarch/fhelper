@@ -9,10 +9,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  await Isar.open([ExchangeSchema, AttributeSchema, CardSchema, CardBillSchema]);
+  WidgetsFlutterBinding.ensureInitialized();
+  final dir = await getApplicationSupportDirectory();
+  await Isar.open([ExchangeSchema, AttributeSchema, CardSchema, CardBillSchema], directory: dir.path);
   runApp(const MyApp());
 
   // Set default values for first launch

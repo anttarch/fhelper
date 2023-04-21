@@ -26,13 +26,7 @@ class HomePage extends StatelessWidget {
               Visibility(
                 visible: exchange != null || exchange != null && exchange.eType == EType.transfer,
                 child: Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  ),
+                  elevation: 4,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -100,7 +94,7 @@ class HomePage extends StatelessWidget {
                 builder: (context, snapshot) {
                   return Card(
                     elevation: 0,
-                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    color: Theme.of(context).colorScheme.secondaryContainer,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -113,25 +107,34 @@ class HomePage extends StatelessWidget {
                                 AppLocalizations.of(context)!.today,
                                 textAlign: TextAlign.start,
                                 style: Theme.of(context).textTheme.titleLarge!.apply(
-                                      color: Theme.of(context).colorScheme.onSurface,
+                                      color: Theme.of(context).colorScheme.onSecondaryContainer,
                                     ),
                               ),
                               if (snapshot.hasData)
-                                Text(
-                                  NumberFormat.simpleCurrency(
-                                    locale: Localizations.localeOf(context).languageCode,
-                                  ).format(snapshot.data),
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(context).textTheme.titleLarge!.apply(
-                                        color: Color(
-                                          snapshot.data!.isNegative ? 0xffbd1c1c : 0xff199225,
-                                        ).harmonizeWith(
-                                          Theme.of(context).colorScheme.primary,
-                                        ),
-                                      ),
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    child: Text(
+                                      NumberFormat.simpleCurrency(
+                                        locale: Localizations.localeOf(context).languageCode,
+                                      ).format(snapshot.data),
+                                      textAlign: TextAlign.start,
+                                      style: Theme.of(context).textTheme.titleLarge!.apply(
+                                            color: Color(
+                                              snapshot.data!.isNegative ? 0xffbd1c1c : 0xff199225,
+                                            ).harmonizeWith(
+                                              Theme.of(context).colorScheme.primary,
+                                            ),
+                                          ),
+                                    ),
+                                  ),
                                 )
                               else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting)
-                                const CircularProgressIndicator()
+                                const CircularProgressIndicator.adaptive()
                               else
                                 const Text('OOPS')
                             ],
@@ -155,6 +158,13 @@ class HomePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 15),
                 child: Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(

@@ -2,6 +2,7 @@ import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
@@ -415,121 +416,126 @@ class _CardManagerState extends State<CardManager> {
                     future: fhelper.getCards(Isar.getInstance()!),
                     builder: (context, snapshot) {
                       final List<fhelper.Card> cards = snapshot.hasData ? snapshot.data! : [];
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemCount: cards.length,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              ListTile(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                                title: Text(
-                                  cards[index].name,
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                trailing: Icon(
-                                  Icons.arrow_right,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
-                                onTap: () => showModalBottomSheet<void>(
-                                  context: context,
-                                  builder: (context) {
-                                    return SafeArea(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(20),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              cards[index].name,
-                                              style: Theme.of(context).textTheme.headlineMedium,
-                                            ),
-                                            const SizedBox(height: 15),
-                                            FutureBuilder(
-                                              future: checkForAttributeDependencies(Isar.getInstance()!, cards[index].id, null),
-                                              builder: (context, snapshot) {
-                                                return OutlinedButton.icon(
-                                                  icon: const Icon(Icons.delete),
-                                                  onPressed: () async {
-                                                    final Isar isar = Isar.getInstance()!;
-                                                    if (snapshot.data != null && snapshot.data! > 0) {
-                                                      await showDialog<void>(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return AlertDialog(
-                                                            title: Text(AppLocalizations.of(context)!.proceedQuestion),
-                                                            icon: const Icon(Icons.warning),
-                                                            content: Text(AppLocalizations.of(context)!.dependencyPhrase(snapshot.data!)),
-                                                            actions: [
-                                                              TextButton(
-                                                                onPressed: () => Navigator.pop(context),
-                                                                child: Text(
-                                                                  AppLocalizations.of(context)!.cancel,
+                      return Card(
+                        elevation: 0,
+                        margin: const EdgeInsets.fromLTRB(22, 15, 22, 0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
+                        ),
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: cards.length,
+                          itemBuilder: (context, index) {
+                            return Column(
+                              children: [
+                                ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                  shape: wid_utils.getShapeBorder(index, cards.length - 1),
+                                  title: Text(
+                                    cards[index].name,
+                                    style: Theme.of(context).textTheme.bodyLarge,
+                                  ),
+                                  trailing: Icon(
+                                    Icons.arrow_right,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                  onTap: () => showModalBottomSheet<void>(
+                                    context: context,
+                                    builder: (context) {
+                                      return SafeArea(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                cards[index].name,
+                                                style: Theme.of(context).textTheme.headlineMedium,
+                                              ),
+                                              const SizedBox(height: 15),
+                                              FutureBuilder(
+                                                future: checkForAttributeDependencies(Isar.getInstance()!, cards[index].id, null),
+                                                builder: (context, snapshot) {
+                                                  return OutlinedButton.icon(
+                                                    icon: const Icon(Icons.delete),
+                                                    onPressed: () async {
+                                                      final Isar isar = Isar.getInstance()!;
+                                                      if (snapshot.data != null && snapshot.data! > 0) {
+                                                        await showDialog<void>(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return AlertDialog(
+                                                              title: Text(AppLocalizations.of(context)!.proceedQuestion),
+                                                              icon: const Icon(Icons.warning),
+                                                              content: Text(AppLocalizations.of(context)!.dependencyPhrase(snapshot.data!)),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () => Navigator.pop(context),
+                                                                  child: Text(
+                                                                    AppLocalizations.of(context)!.cancel,
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                              FilledButton.tonal(
-                                                                onPressed: () async {
-                                                                  await isar.writeTxn(() async {
-                                                                    await isar.cards.delete(cards[index].id);
-                                                                  }).then((_) => Navigator.pop(context));
-                                                                },
-                                                                child: Text(AppLocalizations.of(context)!.proceed),
-                                                              )
-                                                            ],
-                                                          );
-                                                        },
-                                                      );
-                                                    } else {
-                                                      await isar.writeTxn(() async {
-                                                        await isar.cards.delete(cards[index].id);
-                                                      }).then((_) => Navigator.pop(context));
-                                                    }
-                                                  },
-                                                  label: Text(AppLocalizations.of(context)!.delete),
-                                                );
-                                              },
-                                            ),
-                                            FilledButton.icon(
-                                              onPressed: () async {
-                                                final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[index].accountId);
-                                                await _showFullscreenForm(edit: true, card: cards[index], cardAttribute: attribute);
-                                              },
-                                              icon: const Icon(Icons.edit),
-                                              label: Text(AppLocalizations.of(context)!.edit),
-                                            ),
-                                            const Divider(
-                                              height: 24,
-                                              thickness: 2,
-                                            ),
-                                            FilledButton.tonalIcon(
-                                              onPressed: () => Navigator.pop(context),
-                                              icon: const Icon(Icons.arrow_back),
-                                              label: Text(AppLocalizations.of(context)!.back),
-                                            )
-                                          ],
+                                                                FilledButton.tonal(
+                                                                  onPressed: () async {
+                                                                    await isar.writeTxn(() async {
+                                                                      await isar.cards.delete(cards[index].id);
+                                                                    }).then((_) => Navigator.pop(context));
+                                                                  },
+                                                                  child: Text(AppLocalizations.of(context)!.proceed),
+                                                                )
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      } else {
+                                                        await isar.writeTxn(() async {
+                                                          await isar.cards.delete(cards[index].id);
+                                                        }).then((_) => Navigator.pop(context));
+                                                      }
+                                                    },
+                                                    label: Text(AppLocalizations.of(context)!.delete),
+                                                  );
+                                                },
+                                              ),
+                                              FilledButton.icon(
+                                                onPressed: () async {
+                                                  final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[index].accountId);
+                                                  await _showFullscreenForm(edit: true, card: cards[index], cardAttribute: attribute);
+                                                },
+                                                icon: const Icon(Icons.edit),
+                                                label: Text(AppLocalizations.of(context)!.edit),
+                                              ),
+                                              const Divider(
+                                                height: 24,
+                                                thickness: 2,
+                                              ),
+                                              FilledButton.tonalIcon(
+                                                onPressed: () => Navigator.pop(context),
+                                                icon: const Icon(Icons.arrow_back),
+                                                label: Text(AppLocalizations.of(context)!.back),
+                                              )
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                              if (index == cards.length - 1)
-                                Divider(
-                                  height: 1,
-                                  thickness: 1,
-                                  color: Theme.of(context).colorScheme.outlineVariant,
-                                ),
-                            ],
-                          );
-                        },
-                        separatorBuilder: (_, __) => Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Theme.of(context).colorScheme.outlineVariant,
+                              ],
+                            );
+                          },
+                          separatorBuilder: (_, __) => Divider(
+                            height: 2,
+                            thickness: 1.5,
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
                         ),
                       );
                     },

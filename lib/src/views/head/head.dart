@@ -1,3 +1,4 @@
+import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/head/history.dart';
 import 'package:fhelper/src/views/head/home.dart';
 import 'package:fhelper/src/views/head/settings.dart';
@@ -66,9 +67,11 @@ class _HeadViewState extends State<HeadView> {
     ];
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           SliverAppBar.medium(
+            backgroundColor: Theme.of(context).colorScheme.surface,
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
@@ -80,7 +83,7 @@ class _HeadViewState extends State<HeadView> {
           SliverToBoxAdapter(
             child: ExpandablePageView(
               controller: _pageCtrl,
-              minHeight: MediaQuery.sizeOf(context).height - 216 - MediaQuery.paddingOf(context).bottom,
+              minHeight: MediaQuery.sizeOf(context).height - 1 - MediaQuery.paddingOf(context).bottom,
               children: const [
                 HomePage(),
                 HistoryPage(),
@@ -92,6 +95,17 @@ class _HeadViewState extends State<HeadView> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute<AddView>(
+            builder: (context) => const AddView(),
+          ),
+        ),
+        label: Text(AppLocalizations.of(context)!.add),
+        icon: const Icon(Icons.add),
+        isExtended: _pageIndex == 0,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _pageIndex ?? 0,

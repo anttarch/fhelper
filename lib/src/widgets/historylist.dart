@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -75,6 +76,7 @@ class HistoryList extends StatelessWidget {
                 ListTile(
                   contentPadding: contentPadding,
                   leading: _getLeadingIcon(items[index]),
+                  shape: showTotal ? null : wid_utils.getShapeBorder(index, items.length - 1),
                   title: Text(
                     items[index].eType != EType.transfer
                         ? items[index].description
@@ -100,18 +102,14 @@ class HistoryList extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (index == items.length - 1)
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
               ],
             );
           },
           separatorBuilder: (_, __) => Divider(
-            height: 1,
-            thickness: 1,
+            height: 2,
+            thickness: 1.5,
+            indent: 16,
+            endIndent: 16,
             color: Theme.of(context).colorScheme.outlineVariant,
           ),
         ),

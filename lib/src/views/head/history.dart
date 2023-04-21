@@ -40,9 +40,7 @@ class _HistoryPageState extends State<HistoryPage> {
           child: Text(
             AppLocalizations.of(context)!.showOnly,
             textAlign: TextAlign.start,
-            style: Theme.of(context).textTheme.labelMedium!.apply(
-                  color: Theme.of(context).colorScheme.onBackground,
-                ),
+            style: Theme.of(context).textTheme.labelMedium,
           ),
         ),
         Padding(
@@ -109,14 +107,8 @@ class _HistoryPageState extends State<HistoryPage> {
                         duration: const Duration(milliseconds: 100),
                         curve: Curves.easeInOut,
                         child: Card(
-                          elevation: 0,
-                          color: Theme.of(context).colorScheme.surface,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                          ),
+                          color: Theme.of(context).colorScheme.tertiaryContainer,
+                          margin: const EdgeInsets.only(bottom: 15),
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(
@@ -128,27 +120,36 @@ class _HistoryPageState extends State<HistoryPage> {
                                       AppLocalizations.of(context)!.dateSelector(_indexMap[_time]!),
                                       textAlign: TextAlign.start,
                                       style: Theme.of(context).textTheme.titleLarge!.apply(
-                                            color: Theme.of(context).colorScheme.onSurface,
+                                            color: Theme.of(context).colorScheme.onTertiaryContainer,
                                           ),
                                     ),
-                                    Text(
-                                      NumberFormat.simpleCurrency(
-                                        locale: Localizations.localeOf(context).languageCode,
-                                      ).format(
-                                        snapshot.hasData ? snapshot.data!.values.first.first : 0,
+                                    DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.surface,
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                      textAlign: TextAlign.start,
-                                      style: Theme.of(context).textTheme.titleLarge!.apply(
-                                            color: Color(
-                                              snapshot.hasData
-                                                  ? snapshot.data!.values.first.first.isNegative
-                                                      ? 0xffbd1c1c
-                                                      : 0xff199225
-                                                  : 0xff000000,
-                                            ).harmonizeWith(
-                                              Theme.of(context).colorScheme.primary,
-                                            ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        child: Text(
+                                          NumberFormat.simpleCurrency(
+                                            locale: Localizations.localeOf(context).languageCode,
+                                          ).format(
+                                            snapshot.hasData ? snapshot.data!.values.first.first : 0,
                                           ),
+                                          textAlign: TextAlign.start,
+                                          style: Theme.of(context).textTheme.titleLarge!.apply(
+                                                color: Color(
+                                                  snapshot.hasData
+                                                      ? snapshot.data!.values.first.first.isNegative
+                                                          ? 0xffbd1c1c
+                                                          : 0xff199225
+                                                      : 0xff000000,
+                                                ).harmonizeWith(
+                                                  Theme.of(context).colorScheme.primary,
+                                                ),
+                                              ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -270,8 +271,8 @@ class _HistoryPageState extends State<HistoryPage> {
                                           );
                                         },
                                         separatorBuilder: (_, __) => Divider(
-                                          height: 1,
-                                          thickness: 1,
+                                          height: 2,
+                                          thickness: 1.5,
                                           color: Theme.of(context).colorScheme.outlineVariant,
                                         ),
                                       ),
@@ -338,50 +339,74 @@ class _HistoryPageState extends State<HistoryPage> {
                             }
                           }
                         }
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          padding: EdgeInsets.zero,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: exchangeLists.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: HistoryList(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
+                        return Card(
+                          elevation: 0,
+                          margin: const EdgeInsets.symmetric(horizontal: 22),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color: Theme.of(context).colorScheme.outlineVariant,
+                            ),
+                          ),
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: exchangeLists.length,
+                              itemBuilder: (context, index) {
+                                return HistoryList(
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                                  day: days.keys.toList()[index] == DateTime.now().day
+                                      ? AppLocalizations.of(context)!.today
+                                      : days.keys.toList()[index] == DateTime.now().day - 1
+                                          ? AppLocalizations.of(context)!.yesterday
+                                          : _indexMap[_time]! == 1
+                                              ? DateFormat.EEEE(
+                                                  Localizations.localeOf(
+                                                    context,
+                                                  ).languageCode,
+                                                ).format(
+                                                  DateTime(
+                                                    DateTime.now().year,
+                                                    DateTime.now().month,
+                                                    days.keys.toList()[index],
+                                                  ),
+                                                )
+                                              : AppLocalizations.of(context)!.historyListDayDate(
+                                                  DateTime(
+                                                    DateTime.now().year,
+                                                    DateTime.now().month,
+                                                    days.keys.toList()[index],
+                                                  ),
+                                                ),
+                                  dayTotal: days.values.toList()[index],
+                                  items: exchangeLists[index],
+                                );
+                              },
+                              separatorBuilder: (_, __) => Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Divider(
+                                  height: 2,
+                                  thickness: 1.5,
+                                  color: Theme.of(context).colorScheme.outlineVariant,
                                 ),
-                                day: days.keys.toList()[index] == DateTime.now().day
-                                    ? AppLocalizations.of(context)!.today
-                                    : days.keys.toList()[index] == DateTime.now().day - 1
-                                        ? AppLocalizations.of(context)!.yesterday
-                                        : _indexMap[_time]! == 1
-                                            ? DateFormat.EEEE(
-                                                Localizations.localeOf(
-                                                  context,
-                                                ).languageCode,
-                                              ).format(
-                                                DateTime(
-                                                  DateTime.now().year,
-                                                  DateTime.now().month,
-                                                  days.keys.toList()[index],
-                                                ),
-                                              )
-                                            : AppLocalizations.of(context)!.historyListDayDate(
-                                                DateTime(
-                                                  DateTime.now().year,
-                                                  DateTime.now().month,
-                                                  days.keys.toList()[index],
-                                                ),
-                                              ),
-                                dayTotal: days.values.toList()[index],
-                                items: exchangeLists[index],
                               ),
-                            );
-                          },
+                            ),
+                          ),
                         );
                       }
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                      return Card(
+                        elevation: 0,
+                        margin: const EdgeInsets.symmetric(horizontal: 22),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
+                        ),
                         child: HistoryList(
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20,
@@ -394,7 +419,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       );
                     } else {
                       if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        return const CircularProgressIndicator.adaptive();
                       }
                       return const Text('OOPS');
                     }

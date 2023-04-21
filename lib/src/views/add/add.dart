@@ -425,10 +425,16 @@ class _AddViewState extends State<AddView> {
                                         },
                                       ).then(
                                         (_) {
-                                          if (_installments > 1) {
-                                            setState(
-                                              () => displayText[4] = '${_installments + 1}',
-                                            );
+                                          if (_installments >= 0) {
+                                            setState(() => displayText[4] = '${_installments + 1}');
+                                            final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
+                                            if (_installments > 0 && (value != '000' || value.isNotEmpty)) {
+                                              final double price = double.parse(value) / 100;
+                                              setState(
+                                                () => textController[2].text = NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
+                                                    .format(price / (_installments + 1)),
+                                              );
+                                            }
                                           }
                                         },
                                       ),

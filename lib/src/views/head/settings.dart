@@ -1,3 +1,4 @@
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/managers/account_manager.dart';
 import 'package:fhelper/src/views/managers/card_manager.dart';
 import 'package:fhelper/src/views/managers/type_manager.dart';
@@ -46,39 +47,44 @@ class SettingsPage extends StatelessWidget {
       // Security
       () {},
     ];
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.zero,
-      itemCount: elements.length,
-      itemBuilder: (context, index) {
-        return Column(
-          children: [
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-              title: Text(
-                elements[index],
-                style: Theme.of(context).textTheme.bodyLarge,
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.symmetric(horizontal: 22),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outlineVariant,
+        ),
+      ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        itemCount: elements.length,
+        itemBuilder: (context, index) {
+          return Column(
+            children: [
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                shape: wid_utils.getShapeBorder(index, elements.length - 1),
+                title: Text(
+                  elements[index],
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                trailing: Icon(
+                  Icons.arrow_right,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onTap: callbacks[index],
               ),
-              trailing: Icon(
-                Icons.arrow_right,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              onTap: callbacks[index],
-            ),
-            if (index == elements.length - 1)
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Theme.of(context).colorScheme.outlineVariant,
-              ),
-          ],
-        );
-      },
-      separatorBuilder: (_, __) => Divider(
-        height: 1,
-        thickness: 1,
-        color: Theme.of(context).colorScheme.outlineVariant,
+            ],
+          );
+        },
+        separatorBuilder: (_, __) => Divider(
+          height: 2,
+          thickness: 1.5,
+          color: Theme.of(context).colorScheme.outlineVariant,
+        ),
       ),
     );
   }

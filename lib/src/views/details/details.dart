@@ -183,56 +183,68 @@ class _DetailsViewState extends State<DetailsView> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(bottom: 10),
+                                            child: Divider(
+                                              height: 4,
+                                              thickness: 2,
+                                              color: Theme.of(context).colorScheme.outlineVariant,
+                                            ),
+                                          ),
                                           Text(
                                             AppLocalizations.of(context)!.installments,
                                             style: Theme.of(context).textTheme.titleLarge,
                                           ),
-                                          ListView.separated(
-                                            shrinkWrap: true,
-                                            itemCount: cardBill.installmentIdList.length,
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            itemBuilder: (context, index) {
-                                              return Column(
-                                                children: [
-                                                  ListTile(
-                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                                                    leading: const Icon(Icons.credit_card),
-                                                    title: Text(
-                                                      installments[index].description,
-                                                      style: Theme.of(context).textTheme.bodyLarge,
-                                                    ),
-                                                    subtitle: Text(
-                                                      NumberFormat.simpleCurrency(
-                                                        locale: Localizations.localeOf(context).languageCode,
-                                                      ).format(installments[index].value),
-                                                      style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
-                                                    ),
-                                                    trailing: Icon(
-                                                      Icons.arrow_right,
-                                                      color: Theme.of(context).colorScheme.onSurface,
-                                                    ),
-                                                    onTap: () => Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute<DetailsView>(
-                                                        builder: (context) => DetailsView(
-                                                          item: installments[index],
+                                          Card(
+                                            elevation: 0,
+                                            margin: const EdgeInsets.only(top: 15),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                              side: BorderSide(
+                                                color: Theme.of(context).colorScheme.outlineVariant,
+                                              ),
+                                            ),
+                                            child: ListView.separated(
+                                              shrinkWrap: true,
+                                              itemCount: cardBill.installmentIdList.length,
+                                              physics: const NeverScrollableScrollPhysics(),
+                                              itemBuilder: (context, index) {
+                                                return Column(
+                                                  children: [
+                                                    ListTile(
+                                                      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                                      leading: const Icon(Icons.credit_card),
+                                                      title: Text(
+                                                        installments[index].description,
+                                                        style: Theme.of(context).textTheme.bodyLarge,
+                                                      ),
+                                                      subtitle: Text(
+                                                        NumberFormat.simpleCurrency(
+                                                          locale: Localizations.localeOf(context).languageCode,
+                                                        ).format(installments[index].value),
+                                                        style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+                                                      ),
+                                                      trailing: Icon(
+                                                        Icons.arrow_right,
+                                                        color: Theme.of(context).colorScheme.onSurface,
+                                                      ),
+                                                      onTap: () => Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute<DetailsView>(
+                                                          builder: (context) => DetailsView(
+                                                            item: installments[index],
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  if (index == installments.length - 1)
-                                                    Divider(
-                                                      height: 1,
-                                                      thickness: 1,
-                                                      color: Theme.of(context).colorScheme.outlineVariant,
-                                                    ),
-                                                ],
-                                              );
-                                            },
-                                            separatorBuilder: (_, __) => Divider(
-                                              height: 1,
-                                              thickness: 1,
-                                              color: Theme.of(context).colorScheme.outlineVariant,
+                                                  ],
+                                                );
+                                              },
+                                              separatorBuilder: (_, __) => Divider(
+                                                height: 2,
+                                                thickness: 1.5,
+                                                color: Theme.of(context).colorScheme.outlineVariant,
+                                              ),
                                             ),
                                           ),
                                         ],

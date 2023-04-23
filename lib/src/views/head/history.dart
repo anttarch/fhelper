@@ -83,7 +83,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           finalValue += bill.value;
                         }
                       }
-                      // This is necessary to avoid calling context across async gaps
+                      // This still is necessary to avoid calling context across async gaps
                       if (!mounted) {
                         return {
                           '': [finalValue]

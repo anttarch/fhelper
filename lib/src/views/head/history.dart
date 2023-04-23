@@ -75,22 +75,26 @@ class _HistoryPageState extends State<HistoryPage> {
               children: [
                 FutureBuilder(
                   future: getSumValue(isar, context, time: _indexMap[_time]!).then((value) async {
-                    final List<Exchange> billsAsExchange = await getCardBillsAsExchanges(isar, context, time: _indexMap[_time]!);
-                    double finalValue = value;
-                    if (billsAsExchange.isNotEmpty) {
-                      for (final bill in billsAsExchange) {
-                        finalValue += bill.value;
+                    if (mounted) {
+                      final List<Exchange> billsAsExchange = await getCardBillsAsExchanges(isar, context, time: _indexMap[_time]!);
+                      double finalValue = value;
+                      if (billsAsExchange.isNotEmpty) {
+                        for (final bill in billsAsExchange) {
+                          finalValue += bill.value;
+                        }
                       }
-                    }
-                    if (!mounted) {
+                      // This is necessary to avoid calling context across async gaps
+                      if (!mounted) {
+                        return {
+                          '': [finalValue]
+                        };
+                      }
                       return {
-                        '': [finalValue]
+                        '': [finalValue],
+                        ...await getPendingCardBills(isar, context, time: _indexMap[_time]!)
                       };
                     }
-                    return {
-                      '': [finalValue],
-                      ...await getPendingCardBills(isar, context, time: _indexMap[_time]!)
-                    };
+                    return {'': <double>[]};
                   }),
                   builder: (context, snapshot) {
                     final Map<String, List<double>> cardsValues = {};
@@ -288,14 +292,17 @@ class _HistoryPageState extends State<HistoryPage> {
                 ),
                 FutureBuilder(
                   future: getExchanges(isar, context, time: _indexMap[_time]!).then((value) async {
-                    final List<Exchange> billExchange = await getCardBillsAsExchanges(isar, context, time: 2);
-                    if (billExchange.isNotEmpty) {
-                      final List<Exchange> list = [...value, ...billExchange]..sort(
-                          (a, b) => b.date.compareTo(a.date),
-                        );
-                      return list;
+                    if (mounted) {
+                      final List<Exchange> billExchange = await getCardBillsAsExchanges(isar, context, time: 2);
+                      if (billExchange.isNotEmpty) {
+                        final List<Exchange> list = [...value, ...billExchange]..sort(
+                            (a, b) => b.date.compareTo(a.date),
+                          );
+                        return list;
+                      }
+                      return value;
                     }
-                    return value;
+                    return <Exchange>[];
                   }),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {

@@ -2,7 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/add/add.dart';
-import 'package:fhelper/src/views/details/details.dart';
+import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:fhelper/src/views/transfer/transfer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -76,8 +76,8 @@ class HomePage extends StatelessWidget {
                         OutlinedButton(
                           onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute<DetailsView>(
-                              builder: (context) => DetailsView(
+                            MaterialPageRoute<ExchangeDetailsView>(
+                              builder: (context) => ExchangeDetailsView(
                                 item: exchange!,
                               ),
                             ),

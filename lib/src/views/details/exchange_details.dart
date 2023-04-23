@@ -9,15 +9,15 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
-class DetailsView extends StatefulWidget {
-  const DetailsView({super.key, required this.item});
+class ExchangeDetailsView extends StatefulWidget {
+  const ExchangeDetailsView({super.key, required this.item});
   final Exchange item;
 
   @override
-  State<DetailsView> createState() => _DetailsViewState();
+  State<ExchangeDetailsView> createState() => _ExchangeDetailsViewState();
 }
 
-class _DetailsViewState extends State<DetailsView> {
+class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
   bool isCardBill = false;
   String exchangeDate(DateTime date) {
     final dateWithoutTime = DateTime(date.year, date.month, date.day);
@@ -230,8 +230,8 @@ class _DetailsViewState extends State<DetailsView> {
                                                       ),
                                                       onTap: () => Navigator.push(
                                                         context,
-                                                        MaterialPageRoute<DetailsView>(
-                                                          builder: (context) => DetailsView(
+                                                        MaterialPageRoute<ExchangeDetailsView>(
+                                                          builder: (context) => ExchangeDetailsView(
                                                             item: installments[index],
                                                           ),
                                                         ),

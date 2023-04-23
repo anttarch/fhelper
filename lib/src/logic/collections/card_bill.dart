@@ -231,6 +231,32 @@ Future<List<Exchange>> getCardBillsAsExchanges(
   return cardBillExchange;
 }
 
+Future<double> getCardBillSumByAccount(Isar isar, int accountId) async {
+  double value = 0;
+
+  if (accountId == -1) {
+    return value;
+  } else {
+    final List<fhelper.Card> cards = await isar.cards.filter().accountIdEqualTo(accountId).findAll();
+    for (final card in cards) {
+      final List<CardBill> cardBills = await isar.cardBills.filter().cardIdEqualTo(card.id).dateLessThan(DateTime.now()).findAll();
+      if (cardBills.isNotEmpty) {
+        double installmentValue = 0;
+        for (final cardBill in cardBills) {
+          for (final id in cardBill.installmentIdList) {
+            final Exchange? installment = await isar.exchanges.get(id);
+            if (installment != null) {
+              installmentValue -= installment.value;
+            }
+          }
+        }
+        value += installmentValue;
+      }
+    }
+    return value;
+  }
+}
+
 Future<void> processInstallments(Isar isar, Exchange exchange) async {
   int installments = exchange.installments!;
   final fhelper.Card card = (await fhelper.getCardFromId(isar, exchange.cardId))!;

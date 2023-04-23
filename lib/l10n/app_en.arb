@@ -9,6 +9,15 @@
     },
     "add": "Add",
     "addCard": "Add card",
+    "all": "All",
+    "allAccountStatistics": "{percent, plural, =0{No transaction is} other{About {percent}% of all transactions are related}} to this account",
+    "@allAccountStatistics": {
+        "placeholders": {
+            "percent": {
+                "type": "num"
+            }
+        }
+    },
     "amount": "Amount",
     "back": "Back",
     "cancel": "Cancel",
@@ -88,6 +97,8 @@
     "privacy": "Privacy",
     "proceed": "Proceed",
     "proceedQuestion": "Proceed?",
+    "relatedCardsDescription": "Related cards:",
+    "relatedTransactionsDescription": "Related transactions:",
     "save": "Save",
     "security": "Security",
     "selectAccount": "Select Account",
@@ -97,12 +108,23 @@
     "settings": "Settings",
     "showOnly": "Show only:",
     "statementClosing": "Statement Closing",
+    "statistics": "Statistics",
     "theme": "Theme",
     "thisMonth": "This Month",
     "thisWeek": "This Week",
     "threeCharactersMinimum": "At least 3 characters",
     "to": "To:",
     "today": "Today",
+    "todayAccountStatistics": "{percent, plural, =0{No} other{About {percent}% of}} transactions made today are related to this account",
+    "@todayAccountStatistics": {
+        "placeholders": {
+            "percent": {
+                "type": "num"
+            }
+        }
+    },
+    "todayDescription": "Today:",
+    "totalDescription": "Total:",
     "transfer": "Transfer",
     "transferAccountRequirement": "At least 2 accounts are needed",
     "transferDescription": "{from} to {to}",

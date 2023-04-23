@@ -1,11 +1,10 @@
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
+import 'package:fhelper/src/views/details/attribute_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 class AccountManager extends StatefulWidget {
@@ -17,6 +16,18 @@ class AccountManager extends StatefulWidget {
 
 class _AccountManagerState extends State<AccountManager> {
   final TextEditingController _controller = TextEditingController();
+  int selectedIndex = -1;
+  List<Attribute> attributes = [];
+
+  Widget _selectedIndicator(int index) {
+    return Radio(
+      value: index,
+      groupValue: selectedIndex,
+      onChanged: (value) => setState(() {
+        selectedIndex = value!;
+      }),
+    );
+  }
 
   @override
   void dispose() {
@@ -33,10 +44,18 @@ class _AccountManagerState extends State<AccountManager> {
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
-                AppLocalizations.of(context)!.account(-1),
+                selectedIndex > -1 ? 'Select' : AppLocalizations.of(context)!.account(-1),
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
+            actions: selectedIndex > -1
+                ? [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: IconButton(onPressed: () => setState(() => selectedIndex = -1), icon: const Icon(Icons.deselect)),
+                    )
+                  ]
+                : null,
           ),
           SliverToBoxAdapter(
             child: Material(
@@ -49,7 +68,7 @@ class _AccountManagerState extends State<AccountManager> {
                       AttributeType.account,
                     ),
                     builder: (context, snapshot) {
-                      final List<Attribute> attributes = snapshot.hasData ? snapshot.data! : [];
+                      attributes = snapshot.hasData ? snapshot.data! : [];
                       return Card(
                         elevation: 0,
                         margin: const EdgeInsets.symmetric(horizontal: 22),
@@ -71,131 +90,157 @@ class _AccountManagerState extends State<AccountManager> {
                                 ListTile(
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                                   shape: wid_utils.getShapeBorder(index, attributes.length - 1),
+                                  tileColor: selectedIndex == index ? Theme.of(context).colorScheme.surfaceVariant : null,
                                   title: Text(
                                     attributes[index].name,
                                     style: Theme.of(context).textTheme.bodyLarge,
                                   ),
-                                  trailing: Icon(
-                                    Icons.arrow_right,
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                  onTap: () => showModalBottomSheet<void>(
-                                    context: context,
-                                    enableDrag: false,
-                                    builder: (context) {
-                                      return SafeArea(
-                                        child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      attributes[index].name,
-                                                      style: Theme.of(context).textTheme.headlineMedium,
-                                                    ),
-                                                    FutureBuilder(
-                                                      future: getSumValueByAttribute(Isar.getInstance()!, attributes[index].id, AttributeType.account),
-                                                      builder: (context, snapshot) {
-                                                        return Text(
-                                                          snapshot.hasData
-                                                              ? NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
-                                                                  .format(snapshot.data)
-                                                              : '',
-                                                          style: Theme.of(context).textTheme.headlineMedium!.apply(
-                                                                color: Color(
-                                                                  snapshot.hasData && snapshot.data! < 0 ? 0xffbd1c1c : 0xff199225,
-                                                                ).harmonizeWith(
-                                                                  Theme.of(context).colorScheme.primary,
-                                                                ),
-                                                              ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(height: 15),
-                                                FutureBuilder(
-                                                  future: checkForAttributeDependencies(Isar.getInstance()!, attributes[index].id, AttributeType.account),
-                                                  builder: (context, snapshot) {
-                                                    return OutlinedButton.icon(
-                                                      icon: const Icon(Icons.delete),
-                                                      onPressed: () async {
-                                                        final Isar isar = Isar.getInstance()!;
-                                                        if (snapshot.data != null && snapshot.data! > 0) {
-                                                          await showDialog<void>(
-                                                            context: context,
-                                                            builder: (context) {
-                                                              return AlertDialog(
-                                                                title: Text(AppLocalizations.of(context)!.proceedQuestion),
-                                                                icon: const Icon(Icons.warning),
-                                                                content: Text(AppLocalizations.of(context)!.dependencyPhrase(snapshot.data!)),
-                                                                actions: [
-                                                                  TextButton(
-                                                                    onPressed: () => Navigator.pop(context),
-                                                                    child: Text(
-                                                                      AppLocalizations.of(context)!.cancel,
-                                                                    ),
-                                                                  ),
-                                                                  FilledButton.tonal(
-                                                                    onPressed: () async {
-                                                                      await isar.writeTxn(() async {
-                                                                        await isar.attributes.delete(attributes[index].id);
-                                                                      }).then((_) => Navigator.pop(context));
-                                                                    },
-                                                                    child: Text(AppLocalizations.of(context)!.proceed),
-                                                                  )
-                                                                ],
-                                                              );
-                                                            },
-                                                          );
-                                                        } else {
-                                                          await isar.writeTxn(() async {
-                                                            await isar.attributes.delete(attributes[index].id);
-                                                          }).then((_) => Navigator.pop(context));
-                                                        }
-                                                      },
-                                                      label: Text(AppLocalizations.of(context)!.delete),
-                                                    );
-                                                  },
-                                                ),
-                                                FilledButton.icon(
-                                                  onPressed: () async {
-                                                    if (_controller.text.isEmpty) {
-                                                      _controller.text = attributes[index].name;
-                                                    }
-                                                    await showAttributeDialog<void>(
-                                                      context: context,
-                                                      attribute: attributes[index],
-                                                      attributeType: AttributeType.account,
-                                                      controller: _controller,
-                                                      editMode: true,
-                                                    ).then((_) => _controller.clear());
-                                                  },
-                                                  icon: const Icon(Icons.edit),
-                                                  label: Text(AppLocalizations.of(context)!.edit),
-                                                ),
-                                                const Divider(
-                                                  height: 24,
-                                                  thickness: 2,
-                                                ),
-                                                FilledButton.tonalIcon(
-                                                  onPressed: () => Navigator.pop(context),
-                                                  icon: const Icon(Icons.arrow_back),
-                                                  label: Text(AppLocalizations.of(context)!.back),
-                                                )
-                                              ],
-                                            ),
+                                  trailing: selectedIndex == -1
+                                      ? Icon(
+                                          Icons.arrow_right,
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                        )
+                                      : _selectedIndicator(index),
+                                  onTap: () {
+                                    if (selectedIndex > -1) {
+                                      if (selectedIndex != index) {
+                                        setState(() {
+                                          selectedIndex = index;
+                                        });
+                                      }
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute<AttributeDetailsView>(
+                                          builder: (context) => AttributeDetailsView(
+                                            attribute: attributes[index],
                                           ),
                                         ),
                                       );
-                                    },
-                                  ),
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    setState(() {
+                                      selectedIndex = index;
+                                    });
+                                  },
+                                  // onTap: () => showModalBottomSheet<void>(
+                                  //   context: context,
+                                  //   enableDrag: false,
+                                  //   builder: (context) {
+                                  //     return SafeArea(
+                                  //       child: Padding(
+                                  //         padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                  //         child: SingleChildScrollView(
+                                  //           child: Column(
+                                  //             crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  //             mainAxisAlignment: MainAxisAlignment.end,
+                                  //             mainAxisSize: MainAxisSize.min,
+                                  //             children: [
+                                  //               Row(
+                                  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  //                 children: [
+                                  //                   Text(
+                                  //                     attributes[index].name,
+                                  //                     style: Theme.of(context).textTheme.headlineMedium,
+                                  //                   ),
+                                  //                   FutureBuilder(
+                                  //                     future: getSumValueByAttribute(Isar.getInstance()!, attributes[index].id, AttributeType.account),
+                                  //                     builder: (context, snapshot) {
+                                  //                       return Text(
+                                  //                         snapshot.hasData
+                                  //                             ? NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
+                                  //                                 .format(snapshot.data)
+                                  //                             : '',
+                                  //                         style: Theme.of(context).textTheme.headlineMedium!.apply(
+                                  //                               color: Color(
+                                  //                                 snapshot.hasData && snapshot.data! < 0 ? 0xffbd1c1c : 0xff199225,
+                                  //                               ).harmonizeWith(
+                                  //                                 Theme.of(context).colorScheme.primary,
+                                  //                               ),
+                                  //                             ),
+                                  //                       );
+                                  //                     },
+                                  //                   ),
+                                  //                 ],
+                                  //               ),
+                                  //               const SizedBox(height: 15),
+                                  //               FutureBuilder(
+                                  //                 future: checkForAttributeDependencies(Isar.getInstance()!, attributes[index].id, AttributeType.account),
+                                  //                 builder: (context, snapshot) {
+                                  //                   return OutlinedButton.icon(
+                                  //                     icon: const Icon(Icons.delete),
+                                  //                     onPressed: () async {
+                                  //                       final Isar isar = Isar.getInstance()!;
+                                  //                       if (snapshot.data != null && snapshot.data! > 0) {
+                                  //                         await showDialog<void>(
+                                  //                           context: context,
+                                  //                           builder: (context) {
+                                  //                             return AlertDialog(
+                                  //                               title: Text(AppLocalizations.of(context)!.proceedQuestion),
+                                  //                               icon: const Icon(Icons.warning),
+                                  //                               content: Text(AppLocalizations.of(context)!.dependencyPhrase(snapshot.data!)),
+                                  //                               actions: [
+                                  //                                 TextButton(
+                                  //                                   onPressed: () => Navigator.pop(context),
+                                  //                                   child: Text(
+                                  //                                     AppLocalizations.of(context)!.cancel,
+                                  //                                   ),
+                                  //                                 ),
+                                  //                                 FilledButton.tonal(
+                                  //                                   onPressed: () async {
+                                  //                                     await isar.writeTxn(() async {
+                                  //                                       await isar.attributes.delete(attributes[index].id);
+                                  //                                     }).then((_) => Navigator.pop(context));
+                                  //                                   },
+                                  //                                   child: Text(AppLocalizations.of(context)!.proceed),
+                                  //                                 )
+                                  //                               ],
+                                  //                             );
+                                  //                           },
+                                  //                         );
+                                  //                       } else {
+                                  //                         await isar.writeTxn(() async {
+                                  //                           await isar.attributes.delete(attributes[index].id);
+                                  //                         }).then((_) => Navigator.pop(context));
+                                  //                       }
+                                  //                     },
+                                  //                     label: Text(AppLocalizations.of(context)!.delete),
+                                  //                   );
+                                  //                 },
+                                  //               ),
+                                  //               FilledButton.icon(
+                                  //                 onPressed: () async {
+                                  //                   if (_controller.text.isEmpty) {
+                                  //                     _controller.text = attributes[index].name;
+                                  //                   }
+                                  //                   await showAttributeDialog<void>(
+                                  //                     context: context,
+                                  //                     attribute: attributes[index],
+                                  //                     attributeType: AttributeType.account,
+                                  //                     controller: _controller,
+                                  //                     editMode: true,
+                                  //                   ).then((_) => _controller.clear());
+                                  //                 },
+                                  //                 icon: const Icon(Icons.edit),
+                                  //                 label: Text(AppLocalizations.of(context)!.edit),
+                                  //               ),
+                                  //               const Divider(
+                                  //                 height: 24,
+                                  //                 thickness: 2,
+                                  //               ),
+                                  //               FilledButton.tonalIcon(
+                                  //                 onPressed: () => Navigator.pop(context),
+                                  //                 icon: const Icon(Icons.arrow_back),
+                                  //                 label: Text(AppLocalizations.of(context)!.back),
+                                  //               )
+                                  //             ],
+                                  //           ),
+                                  //         ),
+                                  //       ),
+                                  //     );
+                                  //   },
+                                  // ),
                                 ),
                               ],
                             );
@@ -215,34 +260,96 @@ class _AccountManagerState extends State<AccountManager> {
           ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context)!.back),
-                ),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () => showAttributeDialog<void>(
-                    context: context,
-                    attributeType: AttributeType.account,
-                    controller: _controller,
-                  ).then((_) => _controller.clear()),
-                  icon: const Icon(Icons.add),
-                  label: Text(AppLocalizations.of(context)!.add),
-                ),
-              )
-            ],
-          ),
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => showAttributeDialog<void>(
+          context: context,
+          attributeType: AttributeType.account,
+          controller: _controller,
+        ).then((_) {
+          _controller.clear();
+          setState(() => selectedIndex = -1);
+        }),
+        label: Text(AppLocalizations.of(context)!.account(1)),
+        icon: const Icon(Icons.add),
+        elevation: selectedIndex > -1 ? 0 : null,
       ),
+      floatingActionButtonLocation: selectedIndex > -1 ? FloatingActionButtonLocation.endContained : null,
+      bottomNavigationBar: selectedIndex > -1
+          ? BottomAppBar(
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute<AttributeDetailsView>(
+                        builder: (context) => AttributeDetailsView(
+                          attribute: attributes[selectedIndex],
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(Icons.info),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      await checkForAttributeDependencies(Isar.getInstance()!, attributes[selectedIndex].id, AttributeType.account).then(
+                        (value) async {
+                          final Isar isar = Isar.getInstance()!;
+                          if (value > 0) {
+                            await showDialog<void>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(AppLocalizations.of(context)!.proceedQuestion),
+                                  icon: const Icon(Icons.warning),
+                                  content: Text(AppLocalizations.of(context)!.dependencyPhrase(value)),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text(
+                                        AppLocalizations.of(context)!.cancel,
+                                      ),
+                                    ),
+                                    FilledButton.tonal(
+                                      onPressed: () async {
+                                        await isar.writeTxn(() async {
+                                          await isar.attributes.delete(attributes[selectedIndex].id);
+                                        }).then((_) => setState(() => selectedIndex = -1));
+                                      },
+                                      child: Text(AppLocalizations.of(context)!.proceed),
+                                    )
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            await isar.writeTxn(() async {
+                              await isar.attributes.delete(attributes[selectedIndex].id);
+                            }).then((_) => setState(() => selectedIndex = -1));
+                          }
+                        },
+                      );
+                    },
+                    icon: const Icon(Icons.delete),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      if (_controller.text.isEmpty) {
+                        _controller.text = attributes[selectedIndex].name;
+                      }
+                      await showAttributeDialog<void>(
+                        context: context,
+                        attribute: attributes[selectedIndex],
+                        attributeType: AttributeType.account,
+                        controller: _controller,
+                        editMode: true,
+                      ).then((_) => _controller.clear());
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
+                ],
+              ),
+            )
+          : null,
     );
   }
 }

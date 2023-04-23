@@ -1,5 +1,6 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
+import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
@@ -146,6 +147,7 @@ Future<double> getSumValue(
 }
 
 // TODO: remove installments sum
+// TODO: add time specification
 Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? attributeType) async {
   double value = 0;
 
@@ -161,6 +163,8 @@ Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? 
           value -= await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().eTypeEqualTo(EType.transfer).valueProperty().sum();
           // Transfers to account
           value += await isar.exchanges.where().filter().accountIdEndEqualTo(propertyId).valueProperty().sum();
+          // CardBills associated
+          value += await getCardBillSumByAccount(isar, propertyId);
 
           return value;
         default:
@@ -173,7 +177,10 @@ Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? 
   }
 }
 
-Future<int> checkForAttributeDependencies(Isar isar, int propertyId, AttributeType? attributeType) async {
+/// `dependency` map
+/// 0 -> [Exchange]
+/// 1 -> [Card] (Not available for types)
+Future<int> checkForAttributeDependencies(Isar isar, int propertyId, AttributeType? attributeType, {int dependency = -1}) async {
   int dependenciesCount = 0;
 
   if (propertyId == -1) {
@@ -182,12 +189,23 @@ Future<int> checkForAttributeDependencies(Isar isar, int propertyId, AttributeTy
     if (attributeType != null) {
       switch (attributeType) {
         case AttributeType.account:
-          dependenciesCount = await isar.exchanges.filter().accountIdEqualTo(propertyId).or().accountIdEndEqualTo(propertyId).count();
-          dependenciesCount += await isar.cards.filter().accountIdEqualTo(propertyId).count();
+          final exchanges = await isar.exchanges.filter().accountIdEqualTo(propertyId).or().accountIdEndEqualTo(propertyId).count();
+          final cards = await isar.cards.filter().accountIdEqualTo(propertyId).count();
+          if (dependency > -1) {
+            if (dependency == 1) {
+              return cards;
+            }
+            return exchanges;
+          }
+          dependenciesCount = exchanges + cards;
           return dependenciesCount;
         case AttributeType.incomeType:
         case AttributeType.expenseType:
-          dependenciesCount = await isar.exchanges.filter().typeIdEqualTo(propertyId).count();
+          final exchanges = await isar.exchanges.filter().typeIdEqualTo(propertyId).count();
+          if (dependency == 0) {
+            return exchanges;
+          }
+          dependenciesCount = exchanges;
           return dependenciesCount;
         default:
           return dependenciesCount;
@@ -197,6 +215,63 @@ Future<int> checkForAttributeDependencies(Isar isar, int propertyId, AttributeTy
     }
     return dependenciesCount;
   }
+}
+
+/// `time` map
+/// 0 -> today
+/// 1 -> all
+Future<int> getAttributeUsage(Isar isar, int attributeId, AttributeType attributeType, int time) async {
+  if (time == 0) {
+    final todayExchanges = await isar.exchanges
+        .where()
+        .filter()
+        .dateBetween(
+          DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+          ),
+          DateTime.now(),
+        )
+        .count();
+    if (todayExchanges > 0) {
+      switch (attributeType) {
+        case AttributeType.account:
+          {
+            final accountCount = await isar.exchanges
+                .where()
+                .filter()
+                .accountIdEqualTo(attributeId)
+                .dateBetween(
+                  DateTime(
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day,
+                  ),
+                  DateTime.now(),
+                )
+                .count();
+            return (accountCount / todayExchanges).round();
+          }
+        default:
+          return 0;
+      }
+    }
+    return 0;
+  }
+  final totalExchanges = await isar.exchanges.count();
+  if (totalExchanges > 0) {
+    switch (attributeType) {
+      case AttributeType.account:
+        {
+          final accountCount = await isar.exchanges.where().filter().accountIdEqualTo(attributeId).count();
+          return ((accountCount / totalExchanges) * 100).round();
+        }
+      default:
+        return 0;
+    }
+  }
+  return 0;
 }
 
 Future<List<Exchange>> getExchanges(

@@ -1,7 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
-import 'package:fhelper/src/views/details/details.dart';
+import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -95,8 +95,8 @@ class HistoryList extends StatelessWidget {
                   ),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute<DetailsView>(
-                      builder: (context) => DetailsView(
+                    MaterialPageRoute<ExchangeDetailsView>(
+                      builder: (context) => ExchangeDetailsView(
                         item: items[index],
                       ),
                     ),

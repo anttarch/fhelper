@@ -52,7 +52,7 @@ Future<T?> showAttributeDialog<T>({
                   ),
                 ),
                 FilledButton.tonalIcon(
-                  icon: const Icon(Icons.add),
+                  icon: Icon(editMode ? Icons.save : Icons.add),
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
                       final Isar isar = Isar.getInstance()!;

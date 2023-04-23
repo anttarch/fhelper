@@ -274,82 +274,84 @@ class _AccountManagerState extends State<AccountManager> {
         elevation: selectedIndex > -1 ? 0 : null,
       ),
       floatingActionButtonLocation: selectedIndex > -1 ? FloatingActionButtonLocation.endContained : null,
-      bottomNavigationBar: selectedIndex > -1
-          ? BottomAppBar(
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<AttributeDetailsView>(
-                        builder: (context) => AttributeDetailsView(
-                          attribute: attributes[selectedIndex],
-                        ),
-                      ),
+      bottomNavigationBar: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        height: selectedIndex > -1 ? 80 + MediaQuery.paddingOf(context).bottom : 0,
+        child: BottomAppBar(
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<AttributeDetailsView>(
+                    builder: (context) => AttributeDetailsView(
+                      attribute: attributes[selectedIndex],
                     ),
-                    icon: const Icon(Icons.info),
                   ),
-                  IconButton(
-                    onPressed: () async {
-                      await checkForAttributeDependencies(Isar.getInstance()!, attributes[selectedIndex].id, AttributeType.account).then(
-                        (value) async {
-                          final Isar isar = Isar.getInstance()!;
-                          if (value > 0) {
-                            await showDialog<void>(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text(AppLocalizations.of(context)!.proceedQuestion),
-                                  icon: const Icon(Icons.warning),
-                                  content: Text(AppLocalizations.of(context)!.dependencyPhrase(value)),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text(
-                                        AppLocalizations.of(context)!.cancel,
-                                      ),
-                                    ),
-                                    FilledButton.tonal(
-                                      onPressed: () async {
-                                        await isar.writeTxn(() async {
-                                          await isar.attributes.delete(attributes[selectedIndex].id);
-                                        }).then((_) => setState(() => selectedIndex = -1));
-                                      },
-                                      child: Text(AppLocalizations.of(context)!.proceed),
-                                    )
-                                  ],
-                                );
-                              },
-                            );
-                          } else {
-                            await isar.writeTxn(() async {
-                              await isar.attributes.delete(attributes[selectedIndex].id);
-                            }).then((_) => setState(() => selectedIndex = -1));
-                          }
-                        },
-                      );
-                    },
-                    icon: const Icon(Icons.delete),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      if (_controller.text.isEmpty) {
-                        _controller.text = attributes[selectedIndex].name;
-                      }
-                      await showAttributeDialog<void>(
-                        context: context,
-                        attribute: attributes[selectedIndex],
-                        attributeType: AttributeType.account,
-                        controller: _controller,
-                        editMode: true,
-                      ).then((_) => _controller.clear());
-                    },
-                    icon: const Icon(Icons.edit),
-                  ),
-                ],
+                ),
+                icon: const Icon(Icons.info),
               ),
-            )
-          : null,
+              IconButton(
+                onPressed: () async {
+                  await checkForAttributeDependencies(Isar.getInstance()!, attributes[selectedIndex].id, AttributeType.account).then(
+                    (value) async {
+                      final Isar isar = Isar.getInstance()!;
+                      if (value > 0) {
+                        await showDialog<void>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text(AppLocalizations.of(context)!.proceedQuestion),
+                              icon: const Icon(Icons.warning),
+                              content: Text(AppLocalizations.of(context)!.dependencyPhrase(value)),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.cancel,
+                                  ),
+                                ),
+                                FilledButton.tonal(
+                                  onPressed: () async {
+                                    await isar.writeTxn(() async {
+                                      await isar.attributes.delete(attributes[selectedIndex].id);
+                                    }).then((_) => setState(() => selectedIndex = -1));
+                                  },
+                                  child: Text(AppLocalizations.of(context)!.proceed),
+                                )
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        await isar.writeTxn(() async {
+                          await isar.attributes.delete(attributes[selectedIndex].id);
+                        }).then((_) => setState(() => selectedIndex = -1));
+                      }
+                    },
+                  );
+                },
+                icon: const Icon(Icons.delete),
+              ),
+              IconButton(
+                onPressed: () async {
+                  if (_controller.text.isEmpty) {
+                    _controller.text = attributes[selectedIndex].name;
+                  }
+                  await showAttributeDialog<void>(
+                    context: context,
+                    attribute: attributes[selectedIndex],
+                    attributeType: AttributeType.account,
+                    controller: _controller,
+                    editMode: true,
+                  ).then((_) => _controller.clear());
+                },
+                icon: const Icon(Icons.edit),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -307,7 +307,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Visibility(
-                        visible: exchange != null,
+                        visible: exchange != null || widget.attribute.type == AttributeType.account,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 10, bottom: 15),
                           child: Divider(

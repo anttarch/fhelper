@@ -357,7 +357,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           ),
                           clipBehavior: Clip.antiAliasWithSaveLayer,
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 16),
+                            padding: exchangeLists.isNotEmpty ? const EdgeInsets.only(top: 16) : EdgeInsets.zero,
                             child: ListView.separated(
                               shrinkWrap: true,
                               padding: EdgeInsets.zero,

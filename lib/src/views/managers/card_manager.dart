@@ -181,7 +181,7 @@ class _CardManagerState extends State<CardManager> {
                                   onPressed: () async {
                                     await isar.writeTxn(() async {
                                       await isar.cards.delete(cards[selectedIndex].id);
-                                    }).then((_) => Navigator.pop(context));
+                                    }).then((_) => setState(() => selectedIndex = -1));
                                   },
                                   child: Text(AppLocalizations.of(context)!.proceed),
                                 )
@@ -192,7 +192,7 @@ class _CardManagerState extends State<CardManager> {
                       } else {
                         await isar.writeTxn(() async {
                           await isar.cards.delete(cards[selectedIndex].id);
-                        }).then((_) => Navigator.pop(context));
+                        }).then((_) => setState(() => selectedIndex = -1));
                       }
                     },
                   );

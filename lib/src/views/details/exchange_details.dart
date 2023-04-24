@@ -72,9 +72,15 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                               child: InputField(
                                 label: AppLocalizations.of(context)!.description,
                                 placeholder: widget.item.eType != EType.transfer
-                                    ? widget.item.description
+                                    ? widget.item.eType == EType.installment
+                                        ? widget.item.description.split('#/spt#/')[1]
+                                        : widget.item.description
                                     : AppLocalizations.of(context)!
                                         .transferDescription(widget.item.description.split('#/spt#/')[0], widget.item.description.split('#/spt#/')[1]),
+                                suffix: widget.item.eType == EType.installment ? widget.item.description.split('#/spt#/')[0] : null,
+                                suffixStyle: widget.item.eType == EType.installment
+                                    ? Theme.of(context).textTheme.bodyMedium!.apply(color: Theme.of(context).colorScheme.tertiary)
+                                    : null,
                                 readOnly: true,
                               ),
                             ),
@@ -134,6 +140,28 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                               );
                             },
                           ),
+                          if (widget.item.installments != null)
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: AppLocalizations.of(context)!.installments,
+                                    placeholder: widget.item.installments.toString(),
+                                    readOnly: true,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: AppLocalizations.of(context)!.perInstallmentValue,
+                                    placeholder:
+                                        NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(widget.item.installmentValue),
+                                    readOnly: true,
+                                  ),
+                                ),
+                              ],
+                            ),
                           FutureBuilder(
                             future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId),
                             builder: (context, snapshot) {
@@ -209,13 +237,18 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                               itemCount: cardBill.installmentIdList.length,
                                               physics: const NeverScrollableScrollPhysics(),
                                               itemBuilder: (context, index) {
+                                                final String installmentNumber = installments[index].description.split('#/spt#/')[0];
+                                                final String description = installments[index].description.split('#/spt#/')[1];
                                                 return Column(
                                                   children: [
                                                     ListTile(
                                                       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                                                       leading: const Icon(Icons.credit_card),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(12),
+                                                      ),
                                                       title: Text(
-                                                        installments[index].description,
+                                                        description,
                                                         style: Theme.of(context).textTheme.bodyLarge,
                                                       ),
                                                       subtitle: Text(
@@ -224,9 +257,18 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                                         ).format(installments[index].value),
                                                         style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
                                                       ),
-                                                      trailing: Icon(
-                                                        Icons.arrow_right,
-                                                        color: Theme.of(context).colorScheme.onSurface,
+                                                      trailing: Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Text(
+                                                            installmentNumber,
+                                                            style: Theme.of(context).textTheme.bodyMedium!.apply(color: Theme.of(context).colorScheme.tertiary),
+                                                          ),
+                                                          Icon(
+                                                            Icons.arrow_right,
+                                                            color: Theme.of(context).colorScheme.onSurface,
+                                                          ),
+                                                        ],
                                                       ),
                                                       onTap: () => Navigator.push(
                                                         context,

@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -282,6 +283,9 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                   final String installmentNumber = installments[index].description.split('#/spt#/')[0];
                                   final String description = installments[index].description.split('#/spt#/')[1];
                                   return ListTile(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                     title: Text(description),
                                     subtitle: Text(
                                       NumberFormat.simpleCurrency(
@@ -293,9 +297,26 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                         ),
                                       ),
                                     ),
-                                    trailing: Text(
-                                      installmentNumber,
-                                      style: Theme.of(context).textTheme.bodyMedium!.apply(color: Theme.of(context).colorScheme.tertiary),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          installmentNumber,
+                                          style: Theme.of(context).textTheme.bodyMedium!.apply(color: Theme.of(context).colorScheme.tertiary),
+                                        ),
+                                        Icon(
+                                          Icons.arrow_right,
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute<ExchangeDetailsView>(
+                                        builder: (context) => ExchangeDetailsView(
+                                          item: installments[index],
+                                        ),
+                                      ),
                                     ),
                                   );
                                 },

@@ -35,7 +35,7 @@
     },
     "clear": "Clear",
     "confirm": "Confirm",
-    "confirmPay": "Confirm Pay",
+    "confirmPayQuestion": "Confirm pay?",
     "date": "Date",
     "dateSelector": "{count, plural, =1{This Week} =2{This Month} other{Today}}",
     "@dateSelector": {
@@ -91,6 +91,7 @@
     "installments": "Installments",
     "invalidName": "Invalid name",
     "invalidValue": "Invalid value",
+    "irreversibleAction": "This action is irreversible",
     "latest": "Latest:",
     "latestBill": "Latest bill",
     "latestBillDescriptor": "Latest bill:",

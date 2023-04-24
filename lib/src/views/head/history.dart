@@ -161,123 +161,90 @@ class _HistoryPageState extends State<HistoryPage> {
                                   Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Divider(),
-                                      ListView.separated(
-                                        shrinkWrap: true,
-                                        padding: EdgeInsets.zero,
-                                        physics: const NeverScrollableScrollPhysics(),
-                                        itemCount: cardsValues.entries.length,
-                                        itemBuilder: (context, index) {
-                                          return ExpansionTile(
-                                            tilePadding: EdgeInsets.zero,
-                                            shape: const Border.fromBorderSide(BorderSide.none),
-                                            childrenPadding: const EdgeInsets.symmetric(horizontal: 15),
-                                            title: Text(cardsValues.keys.elementAt(index)),
-                                            subtitle: Text(
-                                              NumberFormat.simpleCurrency(
-                                                locale: Localizations.localeOf(context).languageCode,
-                                              ).format(
-                                                snapshot.hasData ? cardsValues.values.elementAt(index).first : 0,
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Divider(
+                                          height: 4,
+                                          thickness: 2,
+                                          color: Theme.of(context).colorScheme.tertiary,
+                                        ),
+                                      ),
+                                      Card(
+                                        child: ListView.separated(
+                                          shrinkWrap: true,
+                                          padding: EdgeInsets.zero,
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          itemCount: cardsValues.entries.length,
+                                          itemBuilder: (context, index) {
+                                            return ListTile(
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
                                               ),
-                                              textAlign: TextAlign.start,
-                                              style: TextStyle(
-                                                color: Color(
-                                                  snapshot.hasData
-                                                      ? cardsValues.values.elementAt(index).first.isNegative
-                                                          ? 0xffbd1c1c
-                                                          : 0xff199225
-                                                      : 0xff000000,
-                                                ).harmonizeWith(
-                                                  Theme.of(context).colorScheme.primary,
+                                              title: Text(cardsValues.keys.elementAt(index)),
+                                              subtitle: Text(
+                                                NumberFormat.simpleCurrency(
+                                                  locale: Localizations.localeOf(context).languageCode,
+                                                ).format(
+                                                  snapshot.hasData ? cardsValues.values.elementAt(index).first : 0,
+                                                ),
+                                                textAlign: TextAlign.start,
+                                                style: TextStyle(
+                                                  color: Color(
+                                                    snapshot.hasData
+                                                        ? cardsValues.values.elementAt(index).first.isNegative
+                                                            ? 0xffbd1c1c
+                                                            : 0xff199225
+                                                        : 0xff000000,
+                                                  ).harmonizeWith(
+                                                    Theme.of(context).colorScheme.primary,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            children: [
-                                              FilledButton(
-                                                onPressed: () async {
-                                                  final Isar isar = Isar.getInstance()!;
-                                                  final int cardId = cardsValues.values.elementAt(index).last.toInt();
-                                                  final CardBill? bill = await isar.cardBills.get(cardId);
-                                                  if (bill != null) {
-                                                    final CardBill newBill = bill.copyWith(confirmed: true);
-                                                    await isar.writeTxn(() async {
-                                                      await isar.cardBills.put(newBill);
-                                                    });
-                                                  }
-                                                },
-                                                child: Text(AppLocalizations.of(context)!.confirmPay),
+                                              trailing: IconButton.filled(
+                                                onPressed: () => showDialog<void>(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return AlertDialog(
+                                                      title: Text(AppLocalizations.of(context)!.confirmPayQuestion),
+                                                      content: Text(AppLocalizations.of(context)!.irreversibleAction),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () => Navigator.pop(context),
+                                                          child: Text(AppLocalizations.of(context)!.cancel),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            final Isar isar = Isar.getInstance()!;
+                                                            final int cardId = cardsValues.values.elementAt(index).last.toInt();
+                                                            final CardBill? bill = await isar.cardBills.get(cardId);
+                                                            if (bill != null) {
+                                                              final CardBill newBill = bill.copyWith(confirmed: true);
+                                                              await isar.writeTxn(() async {
+                                                                await isar.cardBills.put(newBill);
+                                                              });
+                                                            }
+                                                          },
+                                                          child: Text(AppLocalizations.of(context)!.confirm),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
+                                                icon: Icon(
+                                                  Icons.check,
+                                                  color: Theme.of(context).colorScheme.onPrimary,
+                                                ),
                                               ),
-                                              // TODO(antarch): add support for minimum payment
-                                              //
-                                              // Row(
-                                              //   mainAxisAlignment: MainAxisAlignment.center,
-                                              //   children: [
-                                              //     const SizedBox(width: 20),
-                                              //     FilledButton.tonal(
-                                              //       onPressed: () => showDialog<void>(
-                                              //         context: context,
-                                              //         builder: (context) {
-                                              //           final formKey = GlobalKey<FormState>();
-                                              //           return Form(
-                                              //             key: formKey,
-                                              //             child: AlertDialog(
-                                              //               title: const Text('Pay Minimum?'),
-                                              //               content: InputField(
-                                              //                 label: AppLocalizations.of(context)!.amount,
-                                              //                 keyboardType: TextInputType.number,
-                                              //                 inputFormatters: [
-                                              //                   CurrencyInputFormatter(
-                                              //                     locale: Localizations.localeOf(context).languageCode,
-                                              //                   )
-                                              //                 ],
-                                              //                 validator: (value) {
-                                              //                   if (value!.isEmpty) {
-                                              //                     return AppLocalizations.of(context)!.emptyField;
-                                              //                   } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                              //                     return AppLocalizations.of(context)!.invalidValue;
-                                              //                   }
-                                              //                   return null;
-                                              //                 },
-                                              //               ),
-                                              //               actions: [
-                                              //                 TextButton(
-                                              //                   onPressed: () => Navigator.pop(context),
-                                              //                   child: Text(AppLocalizations.of(context)!.cancel),
-                                              //                 ),
-                                              //                 TextButton(
-                                              //                   onPressed: () async {
-                                              //                     if (formKey.currentState!.validate()) {
-                                              //                       final String value = _controller.text.replaceAll(RegExp('[^0-9]'), '');
-                                              //                       final Isar isar = Isar.getInstance()!;
-                                              //                       final int cardId = cardsValues.values.elementAt(index).last.toInt();
-                                              //                       final CardBill? bill = await isar.cardBills.get(cardId);
-                                              //                       if (bill != null) {
-                                              //                         final CardBill newBill =
-                                              //                             bill.copyWith(confirmed: true, minimal: double.parse(value) / 100);
-                                              //                         await isar.writeTxn(() async {
-                                              //                           await isar.cardBills.put(newBill);
-                                              //                         });
-                                              //                       }
-                                              //                     }
-                                              //                   },
-                                              //                   child: Text('Pay'),
-                                              //                 )
-                                              //               ],
-                                              //             ),
-                                              //           );
-                                              //         },
-                                              //       ),
-                                              //       child: const Text('Pay Minimum'),
-                                              //     ),
-                                              //   ],
-                                              // )
-                                            ],
-                                          );
-                                        },
-                                        separatorBuilder: (_, __) => Divider(
-                                          height: 2,
-                                          thickness: 1.5,
-                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                            );
+                                          },
+                                          separatorBuilder: (_, __) => Divider(
+                                            height: 2,
+                                            thickness: 1.5,
+                                            indent: 16,
+                                            endIndent: 16,
+                                            color: Theme.of(context).colorScheme.outlineVariant,
+                                          ),
                                         ),
                                       ),
                                     ],

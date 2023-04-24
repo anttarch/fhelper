@@ -65,12 +65,7 @@ Future<T?> showAttributeDialog<T>({
                       }
                       await isar.writeTxn(() async {
                         await isar.attributes.put(attr);
-                      }).then((_) {
-                        Navigator.pop(context);
-                        if (editMode) {
-                          Navigator.pop(context);
-                        }
-                      });
+                      }).then((_) => Navigator.pop(context));
                     }
                   },
                   label: Text(editMode ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),
@@ -103,12 +98,7 @@ Future<T?> showAttributeDialog<T>({
                           }
                           await isar.writeTxn(() async {
                             await isar.attributes.put(attr);
-                          }).then((_) {
-                            Navigator.pop(context);
-                            if (editMode) {
-                              Navigator.pop(context);
-                            }
-                          });
+                          }).then((_) => Navigator.pop(context));
                         }
                       },
                       child: Text(editMode ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),

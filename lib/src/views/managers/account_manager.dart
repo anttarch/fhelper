@@ -344,7 +344,10 @@ class _AccountManagerState extends State<AccountManager> {
                     attributeType: AttributeType.account,
                     controller: _controller,
                     editMode: true,
-                  ).then((_) => _controller.clear());
+                  ).then((_) {
+                    _controller.clear();
+                    setState(() => selectedIndex = -1);
+                  });
                 },
                 icon: const Icon(Icons.edit),
               ),

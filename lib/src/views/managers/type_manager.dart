@@ -359,7 +359,10 @@ class _TypeManagerState extends State<TypeManager> {
                     attributeType: _attributeType.single,
                     controller: _controller,
                     editMode: true,
-                  ).then((_) => _controller.clear());
+                  ).then((_) {
+                    _controller.clear();
+                    setState(() => selectedIndex = -1);
+                  });
                 },
                 icon: const Icon(Icons.edit),
               ),

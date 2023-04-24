@@ -55,6 +55,14 @@
     },
     "delete": "Delete",
     "deleted": "Deleted",
+    "deletedSnackBar": "\"{name}\" deleted",
+    "@deletedSnackBar": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
     "dependencyPhrase": "{count, plural, =1{1 dependency was} other{{count} dependencies were}} found",
     "@dependencyPhrase": {
         "placeholders": {
@@ -157,6 +165,7 @@
             }
         }
     },
+    "undo": "Undo",
     "usedDescriptor": "Used:",
     "week": "Week",
     "yesterday": "Yesterday"

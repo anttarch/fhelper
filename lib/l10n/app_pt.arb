@@ -16,7 +16,8 @@
     "dateSelector": "{count, plural, =1{Essa semana} =2{Esse mês} other{Hoje}}",
     "dayOfMonth": "Dia {dayAsNumber} de cada mês",
     "delete": "Excluir",
-    "deleted": "Excluido",
+    "deleted": "Excluído",
+    "deletedSnackBar": "\"{name}\" excluído",
     "dependencyPhrase": "{count, plural, =1{1 dependência foi} other{{count} dependências foram}} encontradas",
     "description": "Descrição",
     "details": "Detalhes",
@@ -75,6 +76,7 @@
     "transferDescription": "{from} para {to}",
     "transferExchangeRequirement": "É necessário uma transação",
     "type": "{count, plural, =1{Categoria} other{Categorias}}",
+    "undo": "Desfazer",
     "usedDescriptor": "Em uso:",
     "week": "Semana",
     "yesterday": "Ontem"

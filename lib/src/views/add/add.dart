@@ -4,6 +4,7 @@ import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
+import 'package:fhelper/src/logic/widgets/show_card_dialog.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
@@ -321,15 +322,22 @@ class _AddViewState extends State<AddView> {
                                                         AppLocalizations.of(context)!.selectCard,
                                                         style: Theme.of(context).textTheme.titleLarge,
                                                       ),
-                                                      if (_cardIndex != -1)
-                                                        TextButton(
+                                                      if (_cardIndex == -1)
+                                                        TextButton.icon(
+                                                          onPressed: () => showCardForm(context: context),
+                                                          icon: const Icon(Icons.add),
+                                                          label: Text(AppLocalizations.of(context)!.add),
+                                                        )
+                                                      else
+                                                        TextButton.icon(
                                                           onPressed: () {
                                                             setState(() {
                                                               _cardIndex = -1;
                                                             });
                                                             Navigator.pop(context);
                                                           },
-                                                          child: Text(AppLocalizations.of(context)!.clear),
+                                                          icon: const Icon(Icons.clear),
+                                                          label: Text(AppLocalizations.of(context)!.clear),
                                                         ),
                                                     ],
                                                   ),

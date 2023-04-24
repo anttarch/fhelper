@@ -83,7 +83,7 @@ class _HeadViewState extends State<HeadView> {
           SliverToBoxAdapter(
             child: ExpandablePageView(
               controller: _pageCtrl,
-              minHeight: MediaQuery.sizeOf(context).height - 1 - MediaQuery.paddingOf(context).bottom,
+              minHeight: MediaQuery.sizeOf(context).height - 216 - MediaQuery.paddingOf(context).bottom,
               children: const [
                 HomePage(),
                 HistoryPage(),

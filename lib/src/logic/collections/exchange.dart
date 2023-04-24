@@ -267,6 +267,12 @@ Future<int> getAttributeUsage(Isar isar, int attributeId, AttributeType attribut
           final accountCount = await isar.exchanges.where().filter().accountIdEqualTo(attributeId).count();
           return ((accountCount / totalExchanges) * 100).round();
         }
+      case AttributeType.expenseType:
+      case AttributeType.incomeType:
+        {
+          final typeCount = await isar.exchanges.where().filter().typeIdEqualTo(attributeId).count();
+          return ((typeCount / totalExchanges) * 100).round();
+        }
       default:
         return 0;
     }

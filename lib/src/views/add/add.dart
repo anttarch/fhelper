@@ -138,6 +138,8 @@ class _AddViewState extends State<AddView> {
                               return AppLocalizations.of(context)!.emptyField;
                             } else if (value.length < 3) {
                               return AppLocalizations.of(context)!.threeCharactersMinimum;
+                            } else if (value.contains('#/spt#/')) {
+                              return AppLocalizations.of(context)!.invalidName;
                             }
                             return null;
                           },

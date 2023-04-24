@@ -104,7 +104,7 @@ Future<Map<String, List<double>>> getPendingCardBills(
       .filter()
       .dateBetween(
         DateTime(DateTime.now().year, DateTime.now().month),
-        DateTime.now(),
+        DateTime(DateTime.now().year, DateTime.now().month + 1),
       )
       .and()
       .confirmedEqualTo(false)
@@ -257,6 +257,21 @@ Future<double> getCardBillSumByAccount(Isar isar, int accountId) async {
   }
 }
 
+Future<List<Exchange>> getCardBillInstallments(Isar isar, int cardBillId) async {
+  final CardBill? cardBill = await isar.cardBills.get(cardBillId);
+  final List<Exchange> installments = [];
+
+  if (cardBill != null) {
+    for (final installmentId in cardBill.installmentIdList) {
+      final Exchange? installment = await isar.exchanges.get(installmentId);
+      if (installment != null) {
+        installments.add(installment);
+      }
+    }
+  }
+  return installments;
+}
+
 Future<void> processInstallments(Isar isar, Exchange exchange) async {
   int installments = exchange.installments!;
   final fhelper.Card card = (await fhelper.getCardFromId(isar, exchange.cardId))!;
@@ -276,11 +291,12 @@ Future<void> processInstallments(Isar isar, Exchange exchange) async {
       final Exchange installment = Exchange(
         accountId: exchange.accountId,
         cardId: exchange.cardId,
-        description: start == 1 ? '$i - ${exchange.description}' : '${i + 1} - ${exchange.description}',
+        description: start == 1 ? '$i/$installments#/spt#/${exchange.description}' : '${i + 1}/$installments#/spt#/${exchange.description}',
         date: exchange.date,
         eType: EType.installment,
         typeId: exchange.typeId,
         value: installments == 1 ? exchange.value : exchange.installmentValue!,
+        installments: exchange.id,
       );
       final installmentId = await isar.exchanges.put(installment);
       // check for a CardBill

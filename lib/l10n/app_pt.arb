@@ -5,6 +5,7 @@
     "all": "Tudo",
     "allAttributeStatistics": "{percent, plural, =0{Nenhuma transação está relacionada} other{Cerca de {percent}% das transações estão relacionadas}} a essa {isAccount, select, true{conta} other{categoria}}",
     "amount": "Valor",
+    "availableDescriptor": "Livre:",
     "back": "Voltar",
     "cancel": "Cancelar",
     "card": "{count, plural, =1{Cartão} other{Cartões}}",
@@ -36,6 +37,8 @@
     "invalidName": "Nome inválido",
     "invalidValue": "Valor inválido",
     "latest": "Recente:",
+    "latestBill": "Última conta",
+    "latestBillDescriptor": "Última conta:",
     "limit": "Limite",
     "month": "Mês",
     "name": "Nome",
@@ -71,6 +74,7 @@
     "transferDescription": "{from} para {to}",
     "transferExchangeRequirement": "É necessário uma transação",
     "type": "{count, plural, =1{Categoria} other{Categorias}}",
+    "usedDescriptor": "Em uso:",
     "week": "Semana",
     "yesterday": "Ontem"
   }

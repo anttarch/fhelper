@@ -171,7 +171,7 @@ Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? 
           return value;
       }
     } else {
-      value = await isar.exchanges.where().filter().cardIdEqualTo(propertyId).valueProperty().sum();
+      value = await isar.exchanges.where().filter().cardIdEqualTo(propertyId).not().eTypeEqualTo(EType.installment).valueProperty().sum();
     }
     return value;
   }

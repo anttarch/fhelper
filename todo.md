@@ -32,7 +32,7 @@
 
 - ### Card Manager
     - [x] Add editing logic and ui
-    - [ ] Add information about bills and limits
+    - [x] Add information about bills and limits
 
 - ### Type Manager
     - [x] Refactor for single TextController use

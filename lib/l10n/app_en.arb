@@ -22,6 +22,7 @@
         }
     },
     "amount": "Amount",
+    "availableDescriptor": "Available:",
     "back": "Back",
     "cancel": "Cancel",
     "card": "{count, plural, =1{Card} other{Cards}}",
@@ -91,6 +92,8 @@
     "invalidName": "Invalid name",
     "invalidValue": "Invalid value",
     "latest": "Latest:",
+    "latestBill": "Latest bill",
+    "latestBillDescriptor": "Latest bill:",
     "limit": "Limit",
     "month": "Month",
     "name": "Name",
@@ -153,6 +156,7 @@
             }
         }
     },
+    "usedDescriptor": "Used:",
     "week": "Week",
     "yesterday": "Yesterday"
 }

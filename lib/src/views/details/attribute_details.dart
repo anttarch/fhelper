@@ -268,14 +268,6 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                                         return Theme.of(context).colorScheme.surface;
                                                       },
                                                     ),
-                                                    overlayColor: MaterialStateProperty.resolveWith<Color>(
-                                                      (Set<MaterialState> states) {
-                                                        if (states.contains(MaterialState.selected)) {
-                                                          return Theme.of(context).colorScheme.onTertiaryContainer;
-                                                        }
-                                                        return Theme.of(context).colorScheme.onSurface;
-                                                      },
-                                                    ),
                                                   ),
                                                 ),
                                               ),

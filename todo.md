@@ -53,7 +53,6 @@
 
 ## Other
 - [ ] Add default attributes
-- [ ] Make textfield open datepicker, bottom sheet, etc (maybe it's possible?)
 - [x] Dispose TextControllers
 
 # TODO - 1.2.x
@@ -77,3 +76,9 @@
 
 ## Isar (database)
 - [ ] Add migration (on delete action) for types and accounts
+
+## Cards Management
+- [ ] Show next bill information on CardDetailsView (at least value)
+
+## Other
+- [ ] Make textfield open datepicker, bottom sheet, etc (maybe it's possible?)

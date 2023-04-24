@@ -18,12 +18,6 @@
     - #### Home Page
         - [x] Mention Transfer View
         - [x] Block transfer when isar is empty or when only one account is active
-        - [ ] Add graph to today summary (optional)
-
-    - #### Settings Page
-        - [ ] Add theme settings
-        - [ ] Add privacy settings
-        - [ ] Add security settings
         
 - ### Transfer View
     - [x] Add validation for transfered value
@@ -47,7 +41,6 @@
 - [ ] Add conflict verification for deletes (affects managers)
     - [x] Add confirmation for deletion
     - [ ] Handle transfers
-    - [ ] Add migration for types and accounts
 
 ## Internationalization (l10n)
 - [ ] Enable internationalization to default attributes
@@ -63,7 +56,24 @@
 - [ ] Make textfield open datepicker, bottom sheet, etc (maybe it's possible?)
 - [x] Dispose TextControllers
 
-# TODO - 2.x.x
+# TODO - 1.2.x
+
+## General UI
+- [ ] Add multi-select
+    - [ ] Add bulk delete
+
+## Security
+- [ ] Add theme settings
+- [ ] Add privacy settings
+- [ ] Add security settings
 
 ## Cards Management
 - [ ] Add minimum payment support
+
+# TODO - undefined
+
+## Home Page
+- [ ] Add graph to today summary (optional)
+
+## Isar (database)
+- [ ] Add migration (on delete action) for types and accounts

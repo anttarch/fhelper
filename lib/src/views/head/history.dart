@@ -222,7 +222,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                               final CardBill newBill = bill.copyWith(confirmed: true);
                                                               await isar.writeTxn(() async {
                                                                 await isar.cardBills.put(newBill);
-                                                              });
+                                                              }).then((_) => Navigator.pop(context));
                                                             }
                                                           },
                                                           child: Text(AppLocalizations.of(context)!.confirm),
@@ -260,7 +260,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 FutureBuilder(
                   future: getExchanges(isar, context, time: _indexMap[_time]!).then((value) async {
                     if (mounted) {
-                      final List<Exchange> billExchange = await getCardBillsAsExchanges(isar, context, time: 2);
+                      final List<Exchange> billExchange = await getCardBillsAsExchanges(isar, context, time: _indexMap[_time]!);
                       if (billExchange.isNotEmpty) {
                         final List<Exchange> list = [...value, ...billExchange]..sort(
                             (a, b) => b.date.compareTo(a.date),

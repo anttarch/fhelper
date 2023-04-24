@@ -44,12 +44,22 @@ class HomePage extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                exchange != null ? exchange.description : 'Placeholder',
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (exchange != null && exchange.installments != null)
+                                    const Padding(
+                                      padding: EdgeInsets.only(right: 5),
+                                      child: Icon(Icons.credit_card),
                                     ),
+                                  Text(
+                                    exchange != null ? exchange.description : 'Placeholder',
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                        ),
+                                  ),
+                                ],
                               ),
                               Text(
                                 NumberFormat.simpleCurrency(

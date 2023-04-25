@@ -1,6 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/utils.dart';
 import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -18,7 +19,6 @@ class AttributeDetailsView extends StatefulWidget {
 }
 
 class _AttributeDetailsViewState extends State<AttributeDetailsView> {
-  late final Exchange? exchange;
   Period _time = Period.today;
 
   IconData _getTrendingIcon(double value) {
@@ -37,46 +37,6 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
       default:
         return AppLocalizations.of(context)!.todayDescription;
     }
-  }
-
-  void _getLatest() {
-    switch (widget.attribute.type) {
-      case AttributeType.account:
-        {
-          exchange = Isar.getInstance()!
-              .exchanges
-              .where()
-              .filter()
-              .accountIdEqualTo(widget.attribute.id)
-              .not()
-              .eTypeEqualTo(EType.installment)
-              .sortByDateDesc()
-              .findFirstSync();
-        }
-        break;
-      case AttributeType.expenseType:
-      case AttributeType.incomeType:
-        {
-          exchange = Isar.getInstance()!
-              .exchanges
-              .where()
-              .filter()
-              .typeIdEqualTo(widget.attribute.id)
-              .not()
-              .eTypeEqualTo(EType.installment)
-              .sortByDateDesc()
-              .findFirstSync();
-        }
-        break;
-      default:
-        exchange = null;
-    }
-  }
-
-  @override
-  void initState() {
-    _getLatest();
-    super.initState();
   }
 
   @override
@@ -99,81 +59,103 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Visibility(
-                    visible: exchange != null || (exchange != null && exchange!.eType == EType.transfer),
-                    child: Card(
-                      elevation: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
+                  FutureBuilder(
+                    future: getLatest(Isar.getInstance()!, attributeId: widget.attribute.id, attributeType: widget.attribute.type),
+                    builder: (context, snapshot) {
+                      final Exchange? exchange = snapshot.data;
+                      return Visibility(
+                        visible: exchange != null || (exchange != null && exchange.eType == EType.transfer),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              AppLocalizations.of(context)!.latest,
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.titleLarge!.apply(
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (exchange != null && exchange!.installments != null)
-                                        const Padding(
-                                          padding: EdgeInsets.only(right: 5),
-                                          child: Icon(Icons.credit_card),
-                                        ),
-                                      Text(
-                                        exchange != null ? exchange!.description : 'Placeholder',
-                                        textAlign: TextAlign.start,
-                                        style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    NumberFormat.simpleCurrency(
-                                      locale: Localizations.localeOf(context).languageCode,
-                                    ).format(
-                                      exchange != null ? exchange!.value : 0,
+                            Card(
+                              elevation: 4,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      AppLocalizations.of(context)!.latest,
+                                      textAlign: TextAlign.start,
+                                      style: Theme.of(context).textTheme.titleLarge!.apply(
+                                            color: Theme.of(context).colorScheme.onSurface,
+                                          ),
                                     ),
-                                    textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                          color: Color(
-                                            exchange != null
-                                                ? exchange!.value.isNegative
-                                                    ? 0xffbd1c1c
-                                                    : 0xff199225
-                                                : 0xff000000,
-                                          ).harmonizeWith(
-                                            Theme.of(context).colorScheme.primary,
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              if (exchange != null && (exchange.installments != null || exchange.id == -1))
+                                                Padding(
+                                                  padding: const EdgeInsets.only(right: 5),
+                                                  child: Icon(exchange.id == -1 ? Icons.receipt_long : Icons.credit_card),
+                                                ),
+                                              Text(
+                                                exchange != null ? exchange.description : 'Placeholder',
+                                                textAlign: TextAlign.start,
+                                                style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                          Text(
+                                            NumberFormat.simpleCurrency(
+                                              locale: Localizations.localeOf(context).languageCode,
+                                            ).format(
+                                              exchange != null ? exchange.value : 0,
+                                            ),
+                                            textAlign: TextAlign.start,
+                                            style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                                  color: Color(
+                                                    exchange != null
+                                                        ? exchange.value.isNegative
+                                                            ? 0xffbd1c1c
+                                                            : 0xff199225
+                                                        : 0xff000000,
+                                                  ).harmonizeWith(
+                                                    Theme.of(context).colorScheme.primary,
+                                                  ),
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    OutlinedButton(
+                                      onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute<ExchangeDetailsView>(
+                                          builder: (context) => ExchangeDetailsView(
+                                            item: exchange!,
                                           ),
                                         ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            OutlinedButton(
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute<ExchangeDetailsView>(
-                                  builder: (context) => ExchangeDetailsView(
-                                    item: exchange!,
-                                  ),
+                                      ),
+                                      child: Text(AppLocalizations.of(context)!.details),
+                                    )
+                                  ],
                                 ),
                               ),
-                              child: Text(AppLocalizations.of(context)!.details),
-                            )
+                            ),
+                            Visibility(
+                              visible: exchange != null && widget.attribute.type != AttributeType.account,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 10, bottom: 15),
+                                child: Divider(
+                                  height: 4,
+                                  thickness: 2,
+                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                   Visibility(
                     visible: widget.attribute.type == AttributeType.account,
@@ -309,7 +291,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Visibility(
-                        visible: exchange != null || widget.attribute.type == AttributeType.account,
+                        visible: widget.attribute.type == AttributeType.account,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 10, bottom: 15),
                           child: Divider(

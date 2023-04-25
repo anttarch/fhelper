@@ -46,3 +46,6 @@ app.*.map.json
 # other files
 debug-info/
 pubspec.lock
+
+# isar generated
+*.g.dart

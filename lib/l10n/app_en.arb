@@ -24,6 +24,7 @@
     "amount": "Amount",
     "availableDescriptor": "Available:",
     "back": "Back",
+    "billDescriptor": "Bill:",
     "cancel": "Cancel",
     "card": "{count, plural, =1{Card} other{Cards}}",
     "@card": {
@@ -102,7 +103,6 @@
     "irreversibleAction": "This action is irreversible",
     "latest": "Latest:",
     "latestBill": "Latest bill",
-    "latestBillDescriptor": "Latest bill:",
     "limit": "Limit",
     "month": "Month",
     "name": "Name",

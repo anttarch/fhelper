@@ -105,7 +105,7 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                         children: [
                                           Flexible(
                                             child: Text(
-                                              AppLocalizations.of(context)!.account(1),
+                                              AppLocalizations.of(context)!.billDescriptor,
                                               style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
                                               overflow: TextOverflow.fade,
                                             ),
@@ -119,7 +119,7 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                             child: Padding(
                                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                               child: Text(
-                                                NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
+                                                NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(1500),
                                                 style: Theme.of(context).textTheme.titleLarge!.apply(
                                                       color: Color(
                                                         value.isNegative ? 0xffbd1c1c : 0xff199225,

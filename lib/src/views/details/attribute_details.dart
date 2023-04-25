@@ -123,7 +123,9 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                                 exchange != null
                                                     ? exchange.eType == EType.transfer
                                                         ? AppLocalizations.of(context)!.transferDescription(
-                                                            exchange.description.split('#/spt#/')[0], exchange.description.split('#/spt#/')[1])
+                                                            exchange.description.split('#/spt#/')[0],
+                                                            exchange.description.split('#/spt#/')[1],
+                                                          )
                                                         : exchange.description
                                                     : 'Placeholder',
                                                 textAlign: TextAlign.start,

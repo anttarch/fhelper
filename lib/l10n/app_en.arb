@@ -37,7 +37,7 @@
     "confirm": "Confirm",
     "confirmPayQuestion": "Confirm pay?",
     "date": "Date",
-    "dateSelector": "{count, plural, =1{This Week} =2{This Month} other{Today}}",
+    "dateSelector": "{count, plural, =0{Today} =1{This Week} other{This Month}}",
     "@dateSelector": {
         "placeholders": {
             "count": {
@@ -116,6 +116,7 @@
     "relatedTransactionsDescription": "Related transactions:",
     "save": "Save",
     "security": "Security",
+    "select": "Select",
     "selectAccount": "Select Account",
     "selectCard": "Select Card",
     "selectDay": "Select Day",

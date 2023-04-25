@@ -62,7 +62,7 @@ class _TypeManagerState extends State<TypeManager> {
                 title: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    selectedIndex > -1 ? 'Select' : AppLocalizations.of(context)!.type(-1),
+                    selectedIndex > -1 ? AppLocalizations.of(context)!.select : AppLocalizations.of(context)!.type(-1),
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/utils.dart';
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:fhelper/src/views/transfer/transfer.dart';
@@ -19,85 +20,90 @@ class HomePage extends StatelessWidget {
       child: StreamBuilder(
         stream: Isar.getInstance()!.exchanges.watchLazy(),
         builder: (context, _) {
-          final exchange = Isar.getInstance()!.exchanges.where().sortByDateDesc().findFirstSync();
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Visibility(
-                visible: exchange != null || exchange != null && exchange.eType == EType.transfer,
-                child: Card(
-                  elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.latest,
-                          textAlign: TextAlign.start,
-                          style: Theme.of(context).textTheme.titleLarge!.apply(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
+              FutureBuilder(
+                future: getLatest(Isar.getInstance()!),
+                builder: (context, snapshot) {
+                  final exchange = snapshot.data;
+                  return Visibility(
+                    visible: exchange != null || exchange != null && exchange.eType == EType.transfer,
+                    child: Card(
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)!.latest,
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context).textTheme.titleLarge!.apply(
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  if (exchange != null && exchange.installments != null)
-                                    const Padding(
-                                      padding: EdgeInsets.only(right: 5),
-                                      child: Icon(Icons.credit_card),
-                                    ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (exchange != null && (exchange.installments != null || exchange.id == -1))
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 5),
+                                          child: Icon(exchange.id == -1 ? Icons.receipt_long : Icons.credit_card),
+                                        ),
+                                      Text(
+                                        exchange != null ? exchange.description : 'Placeholder',
+                                        textAlign: TextAlign.start,
+                                        style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
                                   Text(
-                                    exchange != null ? exchange.description : 'Placeholder',
+                                    NumberFormat.simpleCurrency(
+                                      locale: Localizations.localeOf(context).languageCode,
+                                    ).format(
+                                      exchange != null ? exchange.value : 0,
+                                    ),
                                     textAlign: TextAlign.start,
                                     style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                          color: Color(
+                                            exchange != null
+                                                ? exchange.value.isNegative
+                                                    ? 0xffbd1c1c
+                                                    : 0xff199225
+                                                : 0xff000000,
+                                          ).harmonizeWith(
+                                            Theme.of(context).colorScheme.primary,
+                                          ),
                                         ),
                                   ),
                                 ],
                               ),
-                              Text(
-                                NumberFormat.simpleCurrency(
-                                  locale: Localizations.localeOf(context).languageCode,
-                                ).format(
-                                  exchange != null ? exchange.value : 0,
-                                ),
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                      color: Color(
-                                        exchange != null
-                                            ? exchange.value.isNegative
-                                                ? 0xffbd1c1c
-                                                : 0xff199225
-                                            : 0xff000000,
-                                      ).harmonizeWith(
-                                        Theme.of(context).colorScheme.primary,
-                                      ),
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        OutlinedButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute<ExchangeDetailsView>(
-                              builder: (context) => ExchangeDetailsView(
-                                item: exchange!,
-                              ),
                             ),
-                          ),
-                          child: Text(AppLocalizations.of(context)!.details),
-                        )
-                      ],
+                            OutlinedButton(
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute<ExchangeDetailsView>(
+                                  builder: (context) => ExchangeDetailsView(
+                                    item: exchange!,
+                                  ),
+                                ),
+                              ),
+                              child: Text(AppLocalizations.of(context)!.details),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
               FutureBuilder(
                 future: getSumValue(Isar.getInstance()!, context),

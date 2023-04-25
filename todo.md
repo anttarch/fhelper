@@ -38,9 +38,8 @@
     - [x] Refactor for single TextController use
 
 ## Isar (database)
-- [ ] Add conflict verification for deletes (affects managers)
+- [x] Add conflict verification for deletes (affects managers)
     - [x] Add confirmation for deletion
-    - [ ] Handle transfers
 
 ## Internationalization (l10n)
 - [ ] Enable internationalization to default attributes
@@ -60,6 +59,8 @@
 ## General UI
 - [ ] Add multi-select
     - [ ] Add bulk delete
+    - Allows for selecting more than one property at a time (mr. obivious)
+    - May require functions like showing information for more than one "thing"
 
 ## Security
 - [ ] Add theme settings
@@ -68,6 +69,7 @@
 
 ## Cards Management
 - [ ] Add minimum payment support
+    - Right now (1.1.0), paying the minimum amount of a credit card bill is not supported, this feature will allow this
 
 # TODO - undefined
 
@@ -76,6 +78,10 @@
 
 ## Isar (database)
 - [ ] Add migration (on delete action) for types and accounts
+    - [ ] Handle transfers
+    - Results in migration from accounts intended for deletion, it needs to handle transfers and cards, as well as the general exchange
+    - Right now (1.1.0), the default (and only) behavior is leaving this transactions on a kind of "limbo" where they have no account associated
+    (this allows for recovery, once this feature is implemented)
 
 ## Cards Management
 - [ ] Show next bill information on CardDetailsView (at least value)

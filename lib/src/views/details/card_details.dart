@@ -103,9 +103,12 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                       return Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            AppLocalizations.of(context)!.latestBillDescriptor,
-                                            style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                          Flexible(
+                                            child: Text(
+                                              AppLocalizations.of(context)!.account(1),
+                                              style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                              overflow: TextOverflow.fade,
+                                            ),
                                           ),
                                           const SizedBox(width: 15),
                                           DecoratedBox(

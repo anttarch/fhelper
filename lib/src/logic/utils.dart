@@ -58,24 +58,27 @@ Future<Exchange?> getLatest(Isar isar, {int? attributeId, AttributeType? attribu
   } else if (latestPaidCardBill == null && latestExchange != null) {
     return latestExchange;
   } else if (latestExchange!.date.isBefore(latestPaidCardBill!.date)) {
-    fhelper.Card? card;
-    double value = 0;
-    for (final id in latestPaidCardBill.installmentIdList) {
-      final Exchange? installment = await isar.exchanges.get(id);
-      if (installment != null) {
-        value -= installment.value;
+    if (latestPaidCardBill.date.isBefore(DateTime.now())) {
+      fhelper.Card? card;
+      double value = 0;
+      for (final id in latestPaidCardBill.installmentIdList) {
+        final Exchange? installment = await isar.exchanges.get(id);
+        if (installment != null) {
+          value -= installment.value;
+        }
       }
+      card = await fhelper.getCardFromId(isar, latestPaidCardBill.cardId);
+      return Exchange(
+        id: -1,
+        accountId: card!.accountId,
+        description: "${card.name}'s bill",
+        date: latestPaidCardBill.date,
+        eType: EType.expense,
+        typeId: latestPaidCardBill.id,
+        value: value,
+      );
     }
-    card = await fhelper.getCardFromId(isar, latestPaidCardBill.cardId);
-    return Exchange(
-      id: -1,
-      accountId: card!.accountId,
-      description: "${card.name}'s bill",
-      date: latestPaidCardBill.date,
-      eType: EType.expense,
-      typeId: latestPaidCardBill.id,
-      value: value,
-    );
+    return latestExchange;
   }
   return latestExchange;
 }

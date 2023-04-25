@@ -207,6 +207,7 @@ class _AddViewState extends State<AddView> {
                         future: getAttributes(
                           Isar.getInstance()!,
                           _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType,
+                          context: context,
                         ),
                         builder: (context, snapshot) {
                           return Padding(
@@ -366,7 +367,8 @@ class _AddViewState extends State<AddView> {
                                     ).then(
                                       (_) async {
                                         if (_cardIndex != -1) {
-                                          final Attribute? account = await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId);
+                                          final Attribute? account =
+                                              await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId, context: context);
                                           setState(
                                             () {
                                               displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null;
@@ -481,10 +483,7 @@ class _AddViewState extends State<AddView> {
                         ),
                       ),
                       FutureBuilder(
-                        future: getAttributes(
-                          Isar.getInstance()!,
-                          AttributeType.account,
-                        ),
+                        future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context),
                         builder: (context, snapshot) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 20),

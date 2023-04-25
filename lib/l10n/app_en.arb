@@ -212,5 +212,24 @@
                 "format": "simpleCurrency"
             }
         }
-    }
+    },
+
+
+    "mainBankAccountAccount": "Main bank account",
+    "walletAccount": "Wallet",
+
+    "benefitsIncomeType": "Benefits",
+    "giftsIncomeType": "Gifts",
+    "loansIncomeType": "Loans",
+    "salaryIncomeType": "Salary",
+    "othersIncomeType": "Others",
+
+    "billsExpenseType": "Bills",
+    "foodExpenseType": "Food",
+    "healthExpenseType": "Health",
+    "homeExpenseType": "Home",
+    "personalExpenseType": "Personal",
+    "recreationExpenseType": "Recreation",
+    "transportsExpenseType": "Transports",
+    "othersExpenseType": "Others"
 }

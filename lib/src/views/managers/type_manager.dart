@@ -118,6 +118,7 @@ class _TypeManagerState extends State<TypeManager> {
                         future: getAttributes(
                           Isar.getInstance()!,
                           _attributeType.single,
+                          context: context,
                         ),
                         builder: (context, snapshot) {
                           attributes = snapshot.hasData ? snapshot.data! : [];

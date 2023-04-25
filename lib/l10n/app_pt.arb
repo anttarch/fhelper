@@ -112,5 +112,24 @@
             }
         }
     },
-    "totalValueHistoryCard": "O total d{day} é {value}"
+    "totalValueHistoryCard": "O total d{day} é {value}",
+
+
+    "mainBankAccountAccount": "Banco",
+    "walletAccount": "Carteira",
+
+    "benefitsIncomeType": "Benefícios",
+    "giftsIncomeType": "Presentes",
+    "loansIncomeType": "Empréstimos",
+    "salaryIncomeType": "Salário",
+    "othersIncomeType": "Outros",
+
+    "billsExpenseType": "Contas",
+    "foodExpenseType": "Alimentação",
+    "healthExpenseType": "Saúde",
+    "homeExpenseType": "Domicíliar",
+    "personalExpenseType": "Pessoal",
+    "recreationExpenseType": "Recreativa",
+    "transportsExpenseType": "Transportes",
+    "othersExpenseType": "Outros"
   }

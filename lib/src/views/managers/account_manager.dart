@@ -80,6 +80,7 @@ class _AccountManagerState extends State<AccountManager> {
                       future: getAttributes(
                         Isar.getInstance()!,
                         AttributeType.account,
+                        context: context,
                       ),
                       builder: (context, snapshot) {
                         attributes = snapshot.hasData ? snapshot.data! : [];

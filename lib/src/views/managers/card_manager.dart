@@ -263,7 +263,7 @@ class _CardManagerState extends State<CardManager> {
                 ),
                 IconButton(
                   onPressed: () async {
-                    final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[selectedIndex].accountId);
+                    final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[selectedIndex].accountId, context: context);
                     if (mounted) {
                       await showCardForm(context: context, editMode: true, card: cards[selectedIndex], cardAttribute: attribute)
                           .then((_) => setState(() => selectedIndex = -1));

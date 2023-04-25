@@ -42,7 +42,7 @@
     - [x] Add confirmation for deletion
 
 ## Internationalization (l10n)
-- [ ] Enable internationalization to default attributes
+- [x] Enable internationalization to default attributes
 
 ## Critical bugs
 - [x] Refactor transfer description to avoid visual bugs

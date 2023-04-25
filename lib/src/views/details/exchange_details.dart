@@ -111,7 +111,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                           Visibility(
                             visible: widget.item.eType != EType.transfer && isCardBill == false,
                             child: FutureBuilder(
-                              future: getAttributeFromId(Isar.getInstance()!, widget.item.typeId),
+                              future: getAttributeFromId(Isar.getInstance()!, widget.item.typeId, context: context),
                               builder: (context, snapshot) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),
@@ -163,7 +163,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                               ],
                             ),
                           FutureBuilder(
-                            future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId),
+                            future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId, context: context),
                             builder: (context, snapshot) {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20),
@@ -177,7 +177,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                           ),
                           if (widget.item.eType == EType.transfer)
                             FutureBuilder(
-                              future: getAttributeFromId(Isar.getInstance()!, widget.item.accountIdEnd!),
+                              future: getAttributeFromId(Isar.getInstance()!, widget.item.accountIdEnd!, context: context),
                               builder: (context, snapshot) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),

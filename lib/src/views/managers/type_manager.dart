@@ -40,6 +40,10 @@ class _TypeManagerState extends State<TypeManager> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
+        if (selectedIndex > -1) {
+          setState(() => selectedIndex = -1);
+          return Future<bool>.value(false);
+        }
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         return Future<bool>.value(true);
       },

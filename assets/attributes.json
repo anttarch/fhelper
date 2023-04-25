@@ -1,17 +1,81 @@
 [
     {
         "id": 0,
-        "name": "Gift Card",
-        "type": 1
-    },
-    {
-        "id": 2,
-        "name": "Wallet",
+        "name": "Main bank account",
         "type": 0
     },
     {
         "id": 1,
-        "name": "Bill",
+        "name": "Wallet",
+        "type": 0
+    },
+
+
+    {
+        "id": 2,
+        "name": "Benefits",
+        "type": 1
+    },
+    {
+        "id": 3,
+        "name": "Gifts",
+        "type": 1
+    },
+    {
+        "id": 4,
+        "name": "Loans",
+        "type": 1
+    },
+    {
+        "id": 5,
+        "name": "Salary",
+        "type": 1
+    },
+    {
+        "id": 6,
+        "name": "Others",
+        "type": 1
+    },
+
+
+    {
+        "id": 7,
+        "name": "Bills",
         "type": 2
-    }
+    },
+    {
+        "id": 8,
+        "name": "Food",
+        "type": 2
+    },
+    {
+        "id": 9,
+        "name": "Health",
+        "type": 2
+    },
+    {
+        "id": 10,
+        "name": "Home",
+        "type": 2
+    },
+    {
+        "id": 11,
+        "name": "Personal",
+        "type": 2
+    },
+    {
+        "id": 12,
+        "name": "Recreation",
+        "type": 2
+    },
+    {
+        "id": 13,
+        "name": "Transports",
+        "type": 2
+    },
+    {
+        "id": 14,
+        "name": "Others",
+        "type": 2
+    }    
 ]

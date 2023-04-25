@@ -51,7 +51,7 @@
 
 
 ## Other
-- [ ] Add default attributes
+- [x] Add default attributes
 - [x] Dispose TextControllers
 
 # TODO - 1.2.x

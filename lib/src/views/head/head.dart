@@ -111,7 +111,7 @@ class _HeadViewState extends State<HeadView> {
           Icons.add,
           semanticLabel: _pageIndex == 0 ? null : AppLocalizations.of(context)!.addTransactionFAB,
         ),
-        isExtended: _pageIndex == 0,
+        isExtended: _pageIndex == null || _pageIndex == 0,
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _pageIndex ?? 0,

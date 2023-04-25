@@ -148,7 +148,10 @@ Future<double> getSumValue(
 
 // TODO: remove installments sum
 // TODO: add time specification
-Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? attributeType) async {
+/// `time` map
+/// 0 -> today
+/// 1 -> all
+Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? attributeType, {int time = 0}) async {
   double value = 0;
 
   if (propertyId == -1) {
@@ -157,14 +160,67 @@ Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? 
     if (attributeType != null) {
       switch (attributeType) {
         case AttributeType.account:
-          // Normal exchanges
-          value = await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().not().eTypeEqualTo(EType.transfer).valueProperty().sum();
-          // Transfers from account
-          value -= await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().eTypeEqualTo(EType.transfer).valueProperty().sum();
-          // Transfers to account
-          value += await isar.exchanges.where().filter().accountIdEndEqualTo(propertyId).valueProperty().sum();
+          if (time == 0) {
+            // Normal exchanges
+            value = await isar.exchanges
+                .where()
+                .filter()
+                .accountIdEqualTo(propertyId)
+                .and()
+                .not()
+                .eTypeEqualTo(EType.transfer)
+                .dateBetween(
+                  DateTime(
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day,
+                  ),
+                  DateTime.now(),
+                )
+                .valueProperty()
+                .sum();
+            // Transfers from account
+            value -= await isar.exchanges
+                .where()
+                .filter()
+                .accountIdEqualTo(propertyId)
+                .and()
+                .eTypeEqualTo(EType.transfer)
+                .dateBetween(
+                  DateTime(
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day,
+                  ),
+                  DateTime.now(),
+                )
+                .valueProperty()
+                .sum();
+            // Transfers to account
+            value += await isar.exchanges
+                .where()
+                .filter()
+                .accountIdEndEqualTo(propertyId)
+                .dateBetween(
+                  DateTime(
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day,
+                  ),
+                  DateTime.now(),
+                )
+                .valueProperty()
+                .sum();
+          } else {
+            // Normal exchanges
+            value = await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().not().eTypeEqualTo(EType.transfer).valueProperty().sum();
+            // Transfers from account
+            value -= await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().eTypeEqualTo(EType.transfer).valueProperty().sum();
+            // Transfers to account
+            value += await isar.exchanges.where().filter().accountIdEndEqualTo(propertyId).valueProperty().sum();
+          }
           // CardBills associated
-          value += await getCardBillSumByAccount(isar, propertyId);
+          value += await getCardBillSumByAccount(isar, propertyId, time: time);
 
           return value;
         default:

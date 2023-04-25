@@ -168,7 +168,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                         color: Theme.of(context).colorScheme.secondaryContainer,
                         margin: const EdgeInsets.only(top: 10),
                         child: FutureBuilder(
-                          future: getSumValueByAttribute(Isar.getInstance()!, widget.attribute.id, widget.attribute.type),
+                          future: getSumValueByAttribute(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, time: _time.index),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.done) {
                               final double value = snapshot.hasData ? snapshot.data! : 0;

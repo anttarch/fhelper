@@ -231,7 +231,10 @@ Future<List<Exchange>> getCardBillsAsExchanges(
   return cardBillExchange;
 }
 
-Future<double> getCardBillSumByAccount(Isar isar, int accountId) async {
+/// `time` map
+/// 0 -> today
+/// 1 -> all
+Future<double> getCardBillSumByAccount(Isar isar, int accountId, {int time = 0}) async {
   double value = 0;
 
   if (accountId == -1) {
@@ -239,7 +242,24 @@ Future<double> getCardBillSumByAccount(Isar isar, int accountId) async {
   } else {
     final List<fhelper.Card> cards = await isar.cards.filter().accountIdEqualTo(accountId).findAll();
     for (final card in cards) {
-      final List<CardBill> cardBills = await isar.cardBills.filter().cardIdEqualTo(card.id).dateLessThan(DateTime.now()).findAll();
+      List<CardBill> cardBills = [];
+      if (time == 0) {
+        cardBills = await isar.cardBills
+            .filter()
+            .cardIdEqualTo(card.id)
+            .confirmedEqualTo(true)
+            .dateBetween(
+              DateTime(
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day,
+              ),
+              DateTime.now(),
+            )
+            .findAll();
+      } else {
+        cardBills = await isar.cardBills.filter().cardIdEqualTo(card.id).confirmedEqualTo(true).findAll();
+      }
       if (cardBills.isNotEmpty) {
         double installmentValue = 0;
         for (final cardBill in cardBills) {

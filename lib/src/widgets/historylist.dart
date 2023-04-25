@@ -80,7 +80,8 @@ class HistoryList extends StatelessWidget {
                   title: Text(
                     items[index].eType != EType.transfer
                         ? items[index].description
-                        : AppLocalizations.of(context)!.transferDescription(items[index].description.split(' ')[0], items[index].description.split(' ')[1]),
+                        : AppLocalizations.of(context)!
+                            .transferDescription(items[index].description.split('#/spt#/')[0], items[index].description.split('#/spt#/')[1]),
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   subtitle: Text(

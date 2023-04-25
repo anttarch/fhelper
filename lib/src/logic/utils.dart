@@ -18,6 +18,8 @@ Future<Exchange?> getLatest(Isar isar, {int? attributeId, AttributeType? attribu
               .where()
               .filter()
               .accountIdEqualTo(attributeId)
+              .or()
+              .accountIdEndEqualTo(attributeId)
               .not()
               .eTypeEqualTo(EType.installment)
               .sortByDateDesc()

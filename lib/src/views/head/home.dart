@@ -13,6 +13,30 @@ import 'package:isar/isar.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
+  Icon? _getLeadingIcon(Exchange exchange) {
+    if (exchange.installments != null) {
+      return const Icon(Icons.credit_card);
+    } else if (exchange.eType == EType.transfer) {
+      return const Icon(Icons.swap_horiz);
+    } else if (exchange.id == -1) {
+      return const Icon(Icons.receipt_long);
+    }
+    return null;
+  }
+
+  Color _getColor(BuildContext context, Exchange? exchange) {
+    if (exchange != null) {
+      Color valueColor = Color(exchange.value.isNegative ? 0xffbd1c1c : 0xff199225).harmonizeWith(Theme.of(context).colorScheme.primary);
+      if (exchange.installments != null) {
+        valueColor = Theme.of(context).colorScheme.inverseSurface;
+      } else if (exchange.eType == EType.transfer) {
+        valueColor = Theme.of(context).colorScheme.tertiary;
+      }
+      return valueColor;
+    }
+    return Theme.of(context).colorScheme.inverseSurface;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -51,13 +75,18 @@ class HomePage extends StatelessWidget {
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      if (exchange != null && (exchange.installments != null || exchange.id == -1))
+                                      if (exchange != null && (exchange.installments != null || exchange.id == -1 || exchange.eType == EType.transfer))
                                         Padding(
                                           padding: const EdgeInsets.only(right: 5),
-                                          child: Icon(exchange.id == -1 ? Icons.receipt_long : Icons.credit_card),
+                                          child: _getLeadingIcon(exchange),
                                         ),
                                       Text(
-                                        exchange != null ? exchange.description : 'Placeholder',
+                                        exchange != null
+                                            ? exchange.eType == EType.transfer
+                                                ? AppLocalizations.of(context)!
+                                                    .transferDescription(exchange.description.split('#/spt#/')[0], exchange.description.split('#/spt#/')[1])
+                                                : exchange.description
+                                            : 'Placeholder',
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context).textTheme.bodyLarge!.apply(
                                               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -73,15 +102,7 @@ class HomePage extends StatelessWidget {
                                     ),
                                     textAlign: TextAlign.start,
                                     style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                          color: Color(
-                                            exchange != null
-                                                ? exchange.value.isNegative
-                                                    ? 0xffbd1c1c
-                                                    : 0xff199225
-                                                : 0xff000000,
-                                          ).harmonizeWith(
-                                            Theme.of(context).colorScheme.primary,
-                                          ),
+                                          color: _getColor(context, exchange),
                                         ),
                                   ),
                                 ],

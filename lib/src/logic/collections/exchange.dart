@@ -102,10 +102,8 @@ Future<double> getSumValue(
         ),
         DateTime.now(),
       )
-      .not()
-      .eTypeGreaterThan(EType.transfer)
-      .not()
-      .installmentsIsNotNull()
+      .eTypeLessThan(EType.transfer)
+      .installmentsIsNull()
       .valueProperty()
       .sum();
 
@@ -116,10 +114,8 @@ Future<double> getSumValue(
         DateTime.now().subtract(Duration(days: weekday)),
         DateTime.now(),
       )
-      .not()
-      .eTypeGreaterThan(EType.transfer)
-      .not()
-      .installmentsIsNotNull()
+      .eTypeLessThan(EType.transfer)
+      .installmentsIsNull()
       .valueProperty()
       .sum();
 
@@ -130,10 +126,8 @@ Future<double> getSumValue(
         DateTime(DateTime.now().year, DateTime.now().month),
         DateTime.now(),
       )
-      .not()
-      .eTypeGreaterThan(EType.transfer)
-      .not()
-      .installmentsIsNotNull()
+      .eTypeLessThan(EType.transfer)
+      .installmentsIsNull()
       .valueProperty()
       .sum();
 
@@ -147,7 +141,6 @@ Future<double> getSumValue(
 }
 
 // TODO: remove installments sum
-// TODO: add time specification
 /// `time` map
 /// 0 -> today
 /// 1 -> all
@@ -166,9 +159,8 @@ Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? 
                 .where()
                 .filter()
                 .accountIdEqualTo(propertyId)
-                .and()
-                .not()
-                .eTypeEqualTo(EType.transfer)
+                .eTypeLessThan(EType.transfer)
+                .installmentsIsNull()
                 .dateBetween(
                   DateTime(
                     DateTime.now().year,
@@ -213,7 +205,7 @@ Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? 
                 .sum();
           } else {
             // Normal exchanges
-            value = await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().not().eTypeEqualTo(EType.transfer).valueProperty().sum();
+            value = await isar.exchanges.where().filter().accountIdEqualTo(propertyId).eTypeLessThan(EType.transfer).installmentsIsNull().valueProperty().sum();
             // Transfers from account
             value -= await isar.exchanges.where().filter().accountIdEqualTo(propertyId).and().eTypeEqualTo(EType.transfer).valueProperty().sum();
             // Transfers to account

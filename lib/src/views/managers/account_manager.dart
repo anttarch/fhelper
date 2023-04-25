@@ -53,14 +53,19 @@ class _AccountManagerState extends State<AccountManager> {
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
               ),
-              actions: selectedIndex > -1
-                  ? [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: IconButton(onPressed: () => setState(() => selectedIndex = -1), icon: const Icon(Icons.deselect)),
-                      )
-                    ]
-                  : null,
+              actions: [
+                if (selectedIndex > -1)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: IconButton(
+                      onPressed: () => setState(() => selectedIndex = -1),
+                      icon: Icon(
+                        Icons.deselect,
+                        semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deselectIconButton : null,
+                      ),
+                    ),
+                  )
+              ],
             ),
             SliverToBoxAdapter(
               child: Material(
@@ -157,7 +162,10 @@ class _AccountManagerState extends State<AccountManager> {
             _controller.clear();
             setState(() => selectedIndex = -1);
           }),
-          label: Text(AppLocalizations.of(context)!.account(1)),
+          label: Text(
+            AppLocalizations.of(context)!.account(1),
+            semanticsLabel: AppLocalizations.of(context)!.addAccountFAB,
+          ),
           icon: const Icon(Icons.add),
           elevation: selectedIndex > -1 ? 0 : null,
         ),
@@ -177,7 +185,10 @@ class _AccountManagerState extends State<AccountManager> {
                       ),
                     ),
                   ),
-                  icon: const Icon(Icons.info),
+                  icon: Icon(
+                    Icons.info,
+                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.infoIconButton(attributes[selectedIndex].name) : null,
+                  ),
                 ),
                 IconButton(
                   onPressed: () async {
@@ -258,7 +269,10 @@ class _AccountManagerState extends State<AccountManager> {
                       },
                     );
                   },
-                  icon: const Icon(Icons.delete),
+                  icon: Icon(
+                    Icons.delete,
+                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deleteIconButton(attributes[selectedIndex].name) : null,
+                  ),
                 ),
                 IconButton(
                   onPressed: () async {
@@ -276,7 +290,10 @@ class _AccountManagerState extends State<AccountManager> {
                       setState(() => selectedIndex = -1);
                     });
                   },
-                  icon: const Icon(Icons.edit),
+                  icon: Icon(
+                    Icons.edit,
+                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.editIconButton(attributes[selectedIndex].name) : null,
+                  ),
                 ),
               ],
             ),

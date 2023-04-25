@@ -35,37 +35,45 @@ class _HistoryPageState extends State<HistoryPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-          child: Text(
-            AppLocalizations.of(context)!.showOnly,
-            textAlign: TextAlign.start,
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SegmentedButton(
-            segments: [
-              ButtonSegment(
-                value: Time.today,
-                label: Text(AppLocalizations.of(context)!.today),
+        Semantics(
+          container: true,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                child: Text(
+                  AppLocalizations.of(context)!.showOnly,
+                  textAlign: TextAlign.start,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
               ),
-              ButtonSegment(
-                value: Time.week,
-                label: Text(AppLocalizations.of(context)!.week),
-              ),
-              ButtonSegment(
-                value: Time.month,
-                label: Text(AppLocalizations.of(context)!.month),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SegmentedButton(
+                  segments: [
+                    ButtonSegment(
+                      value: Time.today,
+                      label: Text(AppLocalizations.of(context)!.today),
+                    ),
+                    ButtonSegment(
+                      value: Time.week,
+                      label: Text(AppLocalizations.of(context)!.week),
+                    ),
+                    ButtonSegment(
+                      value: Time.month,
+                      label: Text(AppLocalizations.of(context)!.month),
+                    ),
+                  ],
+                  selected: {_time},
+                  onSelectionChanged: (p0) {
+                    setState(() {
+                      _time = p0.single;
+                    });
+                  },
+                ),
               ),
             ],
-            selected: {_time},
-            onSelectionChanged: (p0) {
-              setState(() {
-                _time = p0.single;
-              });
-            },
           ),
         ),
         StreamBuilder(
@@ -117,45 +125,53 @@ class _HistoryPageState extends State<HistoryPage> {
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!.dateSelector(_indexMap[_time]!),
-                                      textAlign: TextAlign.start,
-                                      style: Theme.of(context).textTheme.titleLarge!.apply(
-                                            color: Theme.of(context).colorScheme.onTertiaryContainer,
-                                          ),
-                                    ),
-                                    DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.surface,
-                                        borderRadius: BorderRadius.circular(12),
+                                Semantics(
+                                  label: AppLocalizations.of(context)!.totalValueHistoryCard(
+                                    AppLocalizations.of(context)!.dateSelector(_indexMap[_time]!),
+                                    snapshot.hasData ? snapshot.data!.values.first.first : 0,
+                                  ),
+                                  readOnly: true,
+                                  excludeSemantics: true,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)!.dateSelector(_indexMap[_time]!),
+                                        textAlign: TextAlign.start,
+                                        style: Theme.of(context).textTheme.titleLarge!.apply(
+                                              color: Theme.of(context).colorScheme.onTertiaryContainer,
+                                            ),
                                       ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        child: Text(
-                                          NumberFormat.simpleCurrency(
-                                            locale: Localizations.localeOf(context).languageCode,
-                                          ).format(
-                                            snapshot.hasData ? snapshot.data!.values.first.first : 0,
-                                          ),
-                                          textAlign: TextAlign.start,
-                                          style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                color: Color(
-                                                  snapshot.hasData
-                                                      ? snapshot.data!.values.first.first.isNegative
-                                                          ? 0xffbd1c1c
-                                                          : 0xff199225
-                                                      : 0xff000000,
-                                                ).harmonizeWith(
-                                                  Theme.of(context).colorScheme.primary,
+                                      DecoratedBox(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).colorScheme.surface,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          child: Text(
+                                            NumberFormat.simpleCurrency(
+                                              locale: Localizations.localeOf(context).languageCode,
+                                            ).format(
+                                              snapshot.hasData ? snapshot.data!.values.first.first : 0,
+                                            ),
+                                            textAlign: TextAlign.start,
+                                            style: Theme.of(context).textTheme.titleLarge!.apply(
+                                                  color: Color(
+                                                    snapshot.hasData
+                                                        ? snapshot.data!.values.first.first.isNegative
+                                                            ? 0xffbd1c1c
+                                                            : 0xff199225
+                                                        : 0xff000000,
+                                                  ).harmonizeWith(
+                                                    Theme.of(context).colorScheme.primary,
+                                                  ),
                                                 ),
-                                              ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 if (cardsValues.isNotEmpty)
                                   Column(

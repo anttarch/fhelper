@@ -137,44 +137,51 @@ class HomePage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)!.today,
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context).textTheme.titleLarge!.apply(
-                                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                    ),
+                          Semantics(
+                            label: AppLocalizations.of(context)!.totalValueHistoryCard(AppLocalizations.of(context)!.today, snapshot.data ?? 0),
+                            container: true,
+                            readOnly: true,
+                            child: ExcludeSemantics(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)!.today,
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context).textTheme.titleLarge!.apply(
+                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                        ),
+                                  ),
+                                  if (snapshot.hasData)
+                                    DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.surface,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        child: Text(
+                                          NumberFormat.simpleCurrency(
+                                            locale: Localizations.localeOf(context).languageCode,
+                                          ).format(snapshot.data),
+                                          textAlign: TextAlign.start,
+                                          style: Theme.of(context).textTheme.titleLarge!.apply(
+                                                color: Color(
+                                                  snapshot.data!.isNegative ? 0xffbd1c1c : 0xff199225,
+                                                ).harmonizeWith(
+                                                  Theme.of(context).colorScheme.primary,
+                                                ),
+                                              ),
+                                        ),
+                                      ),
+                                    )
+                                  else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting)
+                                    const CircularProgressIndicator.adaptive()
+                                  else
+                                    const Text('OOPS')
+                                ],
                               ),
-                              if (snapshot.hasData)
-                                DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.surface,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    child: Text(
-                                      NumberFormat.simpleCurrency(
-                                        locale: Localizations.localeOf(context).languageCode,
-                                      ).format(snapshot.data),
-                                      textAlign: TextAlign.start,
-                                      style: Theme.of(context).textTheme.titleLarge!.apply(
-                                            color: Color(
-                                              snapshot.data!.isNegative ? 0xffbd1c1c : 0xff199225,
-                                            ).harmonizeWith(
-                                              Theme.of(context).colorScheme.primary,
-                                            ),
-                                          ),
-                                    ),
-                                  ),
-                                )
-                              else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting)
-                                const CircularProgressIndicator.adaptive()
-                              else
-                                const Text('OOPS')
-                            ],
+                            ),
                           ),
                           FilledButton.icon(
                             onPressed: () => Navigator.push(
@@ -184,7 +191,10 @@ class HomePage extends StatelessWidget {
                               ),
                             ),
                             icon: const Icon(Icons.add),
-                            label: Text(AppLocalizations.of(context)!.add),
+                            label: Text(
+                              AppLocalizations.of(context)!.add,
+                              semanticsLabel: AppLocalizations.of(context)!.addTransactionFAB,
+                            ),
                           ),
                         ],
                       ),
@@ -232,22 +242,25 @@ class HomePage extends StatelessWidget {
                             );
                           },
                         ),
-                        FutureBuilder(
-                          future: getAttributes(Isar.getInstance()!, AttributeType.account),
-                          builder: (context, snapshot) {
-                            return FilledButton.tonalIcon(
-                              onPressed: Isar.getInstance()!.exchanges.countSync() > 0 && snapshot.hasData && snapshot.data!.length > 1
-                                  ? () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute<TransferView>(
-                                          builder: (context) => const TransferView(),
-                                        ),
-                                      )
-                                  : null,
-                              icon: const Icon(Icons.swap_horiz),
-                              label: Text(AppLocalizations.of(context)!.transfer),
-                            );
-                          },
+                        Semantics(
+                          button: true,
+                          child: FutureBuilder(
+                            future: getAttributes(Isar.getInstance()!, AttributeType.account),
+                            builder: (context, snapshot) {
+                              return FilledButton.tonalIcon(
+                                onPressed: Isar.getInstance()!.exchanges.countSync() > 0 && snapshot.hasData && snapshot.data!.length > 1
+                                    ? () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute<TransferView>(
+                                            builder: (context) => const TransferView(),
+                                          ),
+                                        )
+                                    : null,
+                                icon: const Icon(Icons.swap_horiz),
+                                label: Text(AppLocalizations.of(context)!.transfer),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),

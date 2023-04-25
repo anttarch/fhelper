@@ -1,4 +1,3 @@
-import 'package:accessibility_tools/accessibility_tools.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart';
@@ -58,7 +57,7 @@ class MyApp extends StatelessWidget {
             colorScheme: darkDynamic ?? const ColorScheme.dark(),
             useMaterial3: true,
           ),
-          home: const AccessibilityTools(child: HeadView()),
+          home: const HeadView(),
         );
       },
     );

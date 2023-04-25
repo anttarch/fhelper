@@ -103,8 +103,14 @@ class _HeadViewState extends State<HeadView> {
             builder: (context) => const AddView(),
           ),
         ),
-        label: Text(AppLocalizations.of(context)!.add),
-        icon: const Icon(Icons.add),
+        label: Text(
+          AppLocalizations.of(context)!.add,
+          semanticsLabel: AppLocalizations.of(context)!.addTransactionFAB,
+        ),
+        icon: Icon(
+          Icons.add,
+          semanticLabel: _pageIndex == 0 ? null : AppLocalizations.of(context)!.addTransactionFAB,
+        ),
         isExtended: _pageIndex == 0,
       ),
       bottomNavigationBar: NavigationBar(

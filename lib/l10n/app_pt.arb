@@ -80,5 +80,37 @@
     "undo": "Desfazer",
     "usedDescriptor": "Em uso:",
     "week": "Semana",
-    "yesterday": "Ontem"
+    "yesterday": "Ontem",
+
+
+    "addAccountFAB": "Adicionar conta",
+    "addCardFAB": "Adicionar cartão",
+    "addTransactionFAB": "Adicionar transaction",
+    "addTypeFAB": "Adicionar categoria",
+    "deleteIconButton": "Excluir {name}",
+    "@deleteIconButton": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "deselectIconButton": "Deselecionar",
+    "editIconButton": "Editar {name}",
+    "@editIconButton": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "infoIconButton": "Mostrar {name} detalhes",
+    "@infoIconButton": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "totalValueHistoryCard": "O total d{day} é {value}"
   }

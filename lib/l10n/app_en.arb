@@ -169,5 +169,48 @@
     "undo": "Undo",
     "usedDescriptor": "Used:",
     "week": "Week",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+
+
+    "addAccountFAB": "Add account",
+    "addCardFAB": "Add card",
+    "addTransactionFAB": "Add transaction",
+    "addTypeFAB": "Add type",
+    "deleteIconButton": "Delete {name}",
+    "@deleteIconButton": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "deselectIconButton": "Deselect",
+    "editIconButton": "Edit {name}",
+    "@editIconButton": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "infoIconButton": "Show {name} details",
+    "@infoIconButton": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "totalValueHistoryCard": "{day}'s total is {value}",
+    "@totalValueHistoryCard": {
+        "placeholders": {
+            "day": {
+                "type": "String"
+            },
+            "value": {
+                "type": "double",
+                "format": "simpleCurrency"
+            }
+        }
+    }
 }

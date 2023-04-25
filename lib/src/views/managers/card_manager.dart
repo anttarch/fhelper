@@ -47,14 +47,19 @@ class _CardManagerState extends State<CardManager> {
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
               ),
-              actions: selectedIndex > -1
-                  ? [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: IconButton(onPressed: () => setState(() => selectedIndex = -1), icon: const Icon(Icons.deselect)),
-                      )
-                    ]
-                  : null,
+              actions: [
+                if (selectedIndex > -1)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: IconButton(
+                      onPressed: () => setState(() => selectedIndex = -1),
+                      icon: Icon(
+                        Icons.deselect,
+                        semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deselectIconButton : null,
+                      ),
+                    ),
+                  )
+              ],
             ),
             SliverToBoxAdapter(
               child: Material(
@@ -140,7 +145,10 @@ class _CardManagerState extends State<CardManager> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () => showCardForm(context: context).then((_) => setState(() => selectedIndex = -1)),
-          label: Text(AppLocalizations.of(context)!.card(1)),
+          label: Text(
+            AppLocalizations.of(context)!.card(1),
+            semanticsLabel: AppLocalizations.of(context)!.addCardFAB,
+          ),
           icon: const Icon(Icons.add),
           elevation: selectedIndex > -1 ? 0 : null,
         ),
@@ -160,7 +168,10 @@ class _CardManagerState extends State<CardManager> {
                       ),
                     ),
                   ),
-                  icon: const Icon(Icons.info),
+                  icon: Icon(
+                    Icons.info,
+                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.infoIconButton(cards[selectedIndex].name) : null,
+                  ),
                 ),
                 IconButton(
                   onPressed: () async {
@@ -241,7 +252,10 @@ class _CardManagerState extends State<CardManager> {
                       },
                     );
                   },
-                  icon: const Icon(Icons.delete),
+                  icon: Icon(
+                    Icons.delete,
+                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deleteIconButton(cards[selectedIndex].name) : null,
+                  ),
                 ),
                 IconButton(
                   onPressed: () async {
@@ -251,7 +265,10 @@ class _CardManagerState extends State<CardManager> {
                           .then((_) => setState(() => selectedIndex = -1));
                     }
                   },
-                  icon: const Icon(Icons.edit),
+                  icon: Icon(
+                    Icons.edit,
+                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.editIconButton(cards[selectedIndex].name) : null,
+                  ),
                 ),
               ],
             ),

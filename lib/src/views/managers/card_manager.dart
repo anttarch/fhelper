@@ -245,7 +245,16 @@ class _CardManagerState extends State<CardManager> {
                                   onPressed: () async {
                                     await isar.writeTxn(() async {
                                       await isar.cards.put(backup);
-                                    }).then((_) => setState(() => selectedIndex = backupIndex));
+                                    }).then((_) {
+                                      if (!cards.contains(backup)) {
+                                        if (cards.length + 1 == backupIndex) {
+                                          cards.add(backup);
+                                        } else if (backupIndex < cards.length + 1) {
+                                          cards.insert(backupIndex, backup);
+                                        }
+                                      }
+                                      setState(() => selectedIndex = backupIndex);
+                                    });
                                   },
                                 ),
                                 behavior: SnackBarBehavior.floating,

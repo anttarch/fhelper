@@ -256,7 +256,7 @@ class _TypeManagerState extends State<TypeManager> {
                                   FilledButton.tonal(
                                     onPressed: () async {
                                       final backupIndex = selectedIndex;
-                                      final backup = await isar.attributes.get(attributes[selectedIndex].id);
+                                      final backup = await getAttributeFromId(isar, attributes[selectedIndex].id, context: context);
                                       await isar.writeTxn(() async {
                                         await isar.attributes.delete(attributes[selectedIndex].id);
                                       }).then((_) {
@@ -272,7 +272,16 @@ class _TypeManagerState extends State<TypeManager> {
                                               onPressed: () async {
                                                 await isar.writeTxn(() async {
                                                   await isar.attributes.put(backup);
-                                                }).then((_) => setState(() => selectedIndex = backupIndex));
+                                                }).then((_) {
+                                                  if (!attributes.contains(backup)) {
+                                                    if (attributes.length + 1 == backupIndex) {
+                                                      attributes.add(backup);
+                                                    } else if (backupIndex < attributes.length + 1) {
+                                                      attributes.insert(backupIndex, backup);
+                                                    }
+                                                  }
+                                                  setState(() => selectedIndex = backupIndex);
+                                                });
                                               },
                                             ),
                                             behavior: SnackBarBehavior.floating,

@@ -89,8 +89,10 @@ class _TransferViewState extends State<TransferView> {
                                       return InputField(
                                         label: AppLocalizations.of(context)!.from,
                                         readOnly: true,
-                                        placeholder: displayText[0],
-                                        suffix: NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(sum.data ?? 0),
+                                        placeholder: displayText[0] ?? AppLocalizations.of(context)!.select,
+                                        suffix: displayText[0] != null
+                                            ? NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(sum.data)
+                                            : null,
                                         suffixStyle: TextStyle(
                                           color: Color(
                                             sum.hasData && sum.data! < 0 ? 0xffbd1c1c : 0xff199225,
@@ -99,7 +101,7 @@ class _TransferViewState extends State<TransferView> {
                                           ),
                                         ),
                                         validator: (value) {
-                                          if (value!.isEmpty) {
+                                          if (value!.isEmpty || displayText[0] == null) {
                                             return AppLocalizations.of(context)!.emptyField;
                                           }
                                           return null;
@@ -191,9 +193,9 @@ class _TransferViewState extends State<TransferView> {
                                     label: AppLocalizations.of(context)!.to,
                                     locked: _accountId == -1,
                                     readOnly: true,
-                                    placeholder: displayText[1],
+                                    placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
                                     validator: (value) {
-                                      if (value!.isEmpty) {
+                                      if (value!.isEmpty || displayText[1] == null) {
                                         return AppLocalizations.of(context)!.emptyField;
                                       }
                                       return null;
@@ -327,8 +329,8 @@ class _TransferViewState extends State<TransferView> {
                           }).then((_) => Navigator.pop(context));
                         }
                       },
-                      icon: const Icon(Icons.add),
-                      label: Text(AppLocalizations.of(context)!.add),
+                      icon: const Icon(Icons.swap_horiz),
+                      label: Text(AppLocalizations.of(context)!.transfer),
                     ),
                   )
                 ],

@@ -186,17 +186,17 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                       elevation: 0,
                       color: Theme.of(context).colorScheme.secondaryContainer,
                       margin: const EdgeInsets.only(top: 10),
-                      child: FutureBuilder(
-                        future: getSumValueByAttribute(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, time: _time.index),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done) {
-                            final double value = snapshot.hasData ? snapshot.data! : 0;
-                            return Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            FutureBuilder(
+                              future: getSumValueByAttribute(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, time: _time.index),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.done) {
+                                  final double value = snapshot.hasData ? snapshot.data! : 0;
+                                  return Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
                                       Icon(
@@ -238,66 +238,65 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                         ],
                                       )
                                     ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 10),
-                                        child: Text(
-                                          AppLocalizations.of(context)!.showOnly,
-                                          textAlign: TextAlign.start,
-                                          style: Theme.of(context).textTheme.labelMedium!.apply(
-                                                color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                              ),
+                                  );
+                                }
+                                if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
+                                  return SizedBox(
+                                    height: MediaQuery.sizeOf(context).longestSide / 11,
+                                    width: MediaQuery.sizeOf(context).width,
+                                    child: const Center(
+                                      child: CircularProgressIndicator.adaptive(),
+                                    ),
+                                  );
+                                }
+                                return const Text('OOPS');
+                              },
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.showOnly,
+                                    textAlign: TextAlign.start,
+                                    style: Theme.of(context).textTheme.labelMedium!.apply(
+                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
                                         ),
-                                      ),
-                                      SegmentedButton(
-                                        segments: [
-                                          ButtonSegment(
-                                            value: Period.today,
-                                            label: Text(AppLocalizations.of(context)!.today),
-                                          ),
-                                          ButtonSegment(
-                                            value: Period.allTime,
-                                            label: Text(AppLocalizations.of(context)!.all),
-                                          ),
-                                        ],
-                                        selected: {_time},
-                                        showSelectedIcon: false,
-                                        onSelectionChanged: (p0) {
-                                          setState(() {
-                                            _time = p0.single;
-                                          });
-                                        },
-                                        style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                            (Set<MaterialState> states) {
-                                              if (states.contains(MaterialState.selected)) {
-                                                return Theme.of(context).colorScheme.tertiaryContainer;
-                                              }
-                                              return Theme.of(context).colorScheme.surface;
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                ],
-                              ),
-                            );
-                          }
-                          if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
-                            return SizedBox(
-                              height: (MediaQuery.sizeOf(context).height / 5.4) + 32,
-                              width: MediaQuery.sizeOf(context).width,
-                              child: const Center(
-                                child: CircularProgressIndicator.adaptive(),
-                              ),
-                            );
-                          }
-                          return const Text('OOPS');
-                        },
+                                ),
+                                SegmentedButton(
+                                  segments: [
+                                    ButtonSegment(
+                                      value: Period.today,
+                                      label: Text(AppLocalizations.of(context)!.today),
+                                    ),
+                                    ButtonSegment(
+                                      value: Period.allTime,
+                                      label: Text(AppLocalizations.of(context)!.all),
+                                    ),
+                                  ],
+                                  selected: {_time},
+                                  onSelectionChanged: (p0) {
+                                    setState(() {
+                                      _time = p0.single;
+                                    });
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        if (states.contains(MaterialState.selected)) {
+                                          return Theme.of(context).colorScheme.tertiaryContainer;
+                                        }
+                                        return Theme.of(context).colorScheme.surface;
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

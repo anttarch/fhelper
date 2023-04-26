@@ -288,7 +288,7 @@ class _TypeManagerState extends State<TypeManager> {
                           );
                         } else {
                           final backupIndex = selectedIndex;
-                          final backup = await isar.attributes.get(attributes[selectedIndex].id);
+                          final backup = await getAttributeFromId(isar, attributes[selectedIndex].id, context: context);
                           await isar.writeTxn(() async {
                             await isar.attributes.delete(attributes[selectedIndex].id);
                           }).then((_) => setState(() => selectedIndex = -1));

@@ -44,6 +44,7 @@
     "limit": "Limite",
     "month": "Mês",
     "name": "Nome",
+    "none": "Nenhum",
     "paymentDue": "Vencimento da Fatura",
     "perInstallmentValue": "Valor da parcela",
     "price": "Preço",

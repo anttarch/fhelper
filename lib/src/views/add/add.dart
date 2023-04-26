@@ -215,9 +215,9 @@ class _AddViewState extends State<AddView> {
                             child: InputField(
                               label: AppLocalizations.of(context)!.type(1),
                               readOnly: true,
-                              placeholder: displayText[1],
+                              placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
                               validator: (value) {
-                                if (value!.isEmpty) {
+                                if (value!.isEmpty || displayText[1] == null) {
                                   return AppLocalizations.of(context)!.emptyField;
                                 }
                                 return null;
@@ -294,13 +294,7 @@ class _AddViewState extends State<AddView> {
                                   child: InputField(
                                     label: AppLocalizations.of(context)!.card(1),
                                     readOnly: true,
-                                    placeholder: displayText[3],
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return AppLocalizations.of(context)!.emptyField;
-                                      }
-                                      return null;
-                                    },
+                                    placeholder: displayText[3] ?? AppLocalizations.of(context)!.none,
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
@@ -491,9 +485,9 @@ class _AddViewState extends State<AddView> {
                               label: AppLocalizations.of(context)!.account(1),
                               locked: _accountFieldLock,
                               readOnly: true,
-                              placeholder: displayText[2],
+                              placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
                               validator: (value) {
-                                if (value!.isEmpty) {
+                                if (value!.isEmpty || displayText[2] == null) {
                                   return AppLocalizations.of(context)!.emptyField;
                                 }
                                 return null;

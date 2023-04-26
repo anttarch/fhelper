@@ -106,6 +106,7 @@
     "limit": "Limit",
     "month": "Month",
     "name": "Name",
+    "none": "None",
     "paymentDue": "Payment Due",
     "perInstallmentValue": "Per-installment value",
     "price": "Price",

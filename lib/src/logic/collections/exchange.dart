@@ -299,7 +299,7 @@ Future<int> getAttributeUsage(Isar isar, int attributeId, AttributeType attribut
                   DateTime.now(),
                 )
                 .count();
-            return (accountCount / todayExchanges).round();
+            return ((accountCount / todayExchanges) * 100).round();
           }
         default:
           return 0;

@@ -55,60 +55,130 @@ class _CardDetailsViewState extends State<CardDetailsView> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxHeight: (MediaQuery.sizeOf(context).longestSide / 7) + 32,
-                      maxWidth: MediaQuery.sizeOf(context).width - 40,
-                    ),
-                    child: Card(
-                      elevation: 0,
-                      color: Theme.of(context).colorScheme.tertiaryContainer,
-                      margin: const EdgeInsets.only(top: 10),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: MediaQuery.sizeOf(context).width - 118 - MediaQuery.sizeOf(context).longestSide / 12,
+                  Card(
+                    elevation: 0,
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                    margin: const EdgeInsets.only(top: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              FutureBuilder(
+                                future: getAvailableLimit(Isar.getInstance()!, widget.card),
+                                builder: (context, snapshot) {
+                                  final double value = snapshot.hasData ? snapshot.data! : 0;
+                                  return Center(
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Text(
+                                          '${(((widget.card.limit - value) / widget.card.limit) * 100).round()}%',
+                                          style: Theme.of(context).textTheme.headlineSmall!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                        ),
+                                        SizedBox(
+                                          height: MediaQuery.sizeOf(context).longestSide / 11 + Theme.of(context).textTheme.headlineSmall!.fontSize!,
+                                          width: MediaQuery.sizeOf(context).longestSide / 11 + Theme.of(context).textTheme.headlineSmall!.fontSize!,
+                                          child: CircularProgressIndicator(
+                                            value: (widget.card.limit - value) / widget.card.limit,
+                                            backgroundColor: Theme.of(context).colorScheme.surface,
+                                            strokeWidth: 15,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  FutureBuilder(
-                                    future: Isar.getInstance()!
-                                        .cardBills
-                                        .where()
-                                        .filter()
-                                        .cardIdEqualTo(widget.card.id)
-                                        .sortByDateDesc()
-                                        .findFirst()
-                                        .then((value) async {
-                                      double cardBillValue = 0;
-                                      if (value != null) {
-                                        for (final installmentId in value.installmentIdList) {
-                                          final installment = await Isar.getInstance()!.exchanges.get(installmentId);
-                                          if (installment != null) {
-                                            cardBillValue -= installment.value;
-                                          }
-                                        }
+                              FutureBuilder(
+                                future: Isar.getInstance()!
+                                    .cardBills
+                                    .where()
+                                    .filter()
+                                    .cardIdEqualTo(widget.card.id)
+                                    .sortByDateDesc()
+                                    .findFirst()
+                                    .then((value) async {
+                                  double cardBillValue = 0;
+                                  if (value != null) {
+                                    for (final installmentId in value.installmentIdList) {
+                                      final installment = await Isar.getInstance()!.exchanges.get(installmentId);
+                                      if (installment != null) {
+                                        cardBillValue -= installment.value;
                                       }
-                                      return cardBillValue;
-                                    }),
-                                    builder: (context, snapshot) {
-                                      final double value = snapshot.hasData ? snapshot.data! : 0;
-                                      return Row(
+                                    }
+                                  }
+                                  return cardBillValue;
+                                }),
+                                builder: (context, snapshot) {
+                                  final double value = snapshot.hasData ? snapshot.data! : 0;
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          AppLocalizations.of(context)!.billDescriptor,
+                                          style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                          overflow: TextOverflow.fade,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 15),
+                                      DecoratedBox(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).colorScheme.surface,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          child: Text(
+                                            NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
+                                            style: Theme.of(context).textTheme.titleLarge!.apply(
+                                                  color: Color(
+                                                    value.isNegative ? 0xffbd1c1c : 0xff199225,
+                                                  ).harmonizeWith(
+                                                    Theme.of(context).colorScheme.primary,
+                                                  ),
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Divider(
+                                  height: 16,
+                                  thickness: 2,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              FutureBuilder(
+                                future: getAvailableLimit(Isar.getInstance()!, widget.card),
+                                builder: (context, snapshot) {
+                                  final double value = snapshot.hasData ? snapshot.data! : 0;
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Flexible(
-                                            child: Text(
-                                              AppLocalizations.of(context)!.billDescriptor,
-                                              style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
-                                              overflow: TextOverflow.fade,
-                                            ),
+                                          Text(
+                                            AppLocalizations.of(context)!.usedDescriptor,
+                                            style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
                                           ),
                                           const SizedBox(width: 15),
                                           DecoratedBox(
@@ -119,11 +189,10 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                             child: Padding(
                                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                               child: Text(
-                                                NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(1500),
+                                                NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
+                                                    .format(widget.card.limit - value),
                                                 style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                      color: Color(
-                                                        value.isNegative ? 0xffbd1c1c : 0xff199225,
-                                                      ).harmonizeWith(
+                                                      color: const Color(0xffbd1c1c).harmonizeWith(
                                                         Theme.of(context).colorScheme.primary,
                                                       ),
                                                     ),
@@ -131,120 +200,44 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                             ),
                                           ),
                                         ],
-                                      );
-                                    },
-                                  ),
-                                  Divider(
-                                    height: 16,
-                                    thickness: 2,
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
-                                  FutureBuilder(
-                                    future: getAvailableLimit(Isar.getInstance()!, widget.card),
-                                    builder: (context, snapshot) {
-                                      final double value = snapshot.hasData ? snapshot.data! : 0;
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                AppLocalizations.of(context)!.usedDescriptor,
-                                                style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
-                                              ),
-                                              const SizedBox(width: 15),
-                                              DecoratedBox(
-                                                decoration: BoxDecoration(
-                                                  color: Theme.of(context).colorScheme.surface,
-                                                  borderRadius: BorderRadius.circular(12),
-                                                ),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                  child: Text(
-                                                    NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
-                                                        .format(widget.card.limit - value),
-                                                    style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                          color: const Color(0xffbd1c1c).harmonizeWith(
-                                                            Theme.of(context).colorScheme.primary,
-                                                          ),
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 5),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!.availableDescriptor,
-                                                  style:
-                                                      Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
-                                                ),
-                                                const SizedBox(width: 15),
-                                                DecoratedBox(
-                                                  decoration: BoxDecoration(
-                                                    color: Theme.of(context).colorScheme.surface,
-                                                    borderRadius: BorderRadius.circular(12),
-                                                  ),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                    child: Text(
-                                                      NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
-                                                      style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                            color: const Color(0xff199225).harmonizeWith(
-                                                              Theme.of(context).colorScheme.primary,
-                                                            ),
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            VerticalDivider(
-                              width: 2,
-                              thickness: 2,
-                              color: Theme.of(context).colorScheme.onTertiaryContainer,
-                            ),
-                            FutureBuilder(
-                              future: getAvailableLimit(Isar.getInstance()!, widget.card),
-                              builder: (context, snapshot) {
-                                final double value = snapshot.hasData ? snapshot.data! : 0;
-                                return Center(
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Text(
-                                        '${(((widget.card.limit - value) / widget.card.limit) * 100).round()}%',
-                                        style: Theme.of(context).textTheme.headlineSmall!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
                                       ),
-                                      SizedBox(
-                                        height: MediaQuery.sizeOf(context).longestSide / 11,
-                                        width: MediaQuery.sizeOf(context).longestSide / 11,
-                                        child: CircularProgressIndicator(
-                                          value: (widget.card.limit - value) / widget.card.limit,
-                                          backgroundColor: Theme.of(context).colorScheme.surface,
-                                          strokeWidth: 15,
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 5),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!.availableDescriptor,
+                                              style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                            ),
+                                            const SizedBox(width: 15),
+                                            DecoratedBox(
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context).colorScheme.surface,
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                child: Text(
+                                                  NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
+                                                  style: Theme.of(context).textTheme.titleLarge!.apply(
+                                                        color: const Color(0xff199225).harmonizeWith(
+                                                          Theme.of(context).colorScheme.primary,
+                                                        ),
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),

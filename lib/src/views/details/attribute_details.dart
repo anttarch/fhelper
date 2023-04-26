@@ -182,131 +182,122 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                   ),
                   Visibility(
                     visible: widget.attribute.type == AttributeType.account,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: (MediaQuery.sizeOf(context).longestSide / 8) + 32,
-                      ),
-                      child: Card(
-                        elevation: 0,
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        margin: const EdgeInsets.only(top: 10),
-                        child: FutureBuilder(
-                          future: getSumValueByAttribute(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, time: _time.index),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
-                              final double value = snapshot.hasData ? snapshot.data! : 0;
-                              return Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Icon(
-                                      _getTrendingIcon(value),
-                                      size: MediaQuery.sizeOf(context).longestSide / 8,
-                                      color: Color(
-                                        value.isNegative ? 0xffbd1c1c : 0xff199225,
-                                      ).harmonizeWith(
-                                        Theme.of(context).colorScheme.primary,
-                                      ),
-                                    ),
-                                    Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              _getTimeString(),
-                                              style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onSecondaryContainer),
-                                            ),
-                                            const SizedBox(width: 15),
-                                            DecoratedBox(
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context).colorScheme.surface,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                child: Text(
-                                                  NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
-                                                  style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                        color: Color(
-                                                          value.isNegative ? 0xffbd1c1c : 0xff199225,
-                                                        ).harmonizeWith(
-                                                          Theme.of(context).colorScheme.primary,
-                                                        ),
-                                                      ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                    child: Card(
+                      elevation: 0,
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      margin: const EdgeInsets.only(top: 10),
+                      child: FutureBuilder(
+                        future: getSumValueByAttribute(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, time: _time.index),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.done) {
+                            final double value = snapshot.hasData ? snapshot.data! : 0;
+                            return Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Icon(
+                                        _getTrendingIcon(value),
+                                        size: MediaQuery.sizeOf(context).longestSide / 11,
+                                        color: Color(
+                                          value.isNegative ? 0xffbd1c1c : 0xff199225,
+                                        ).harmonizeWith(
+                                          Theme.of(context).colorScheme.primary,
                                         ),
-                                        const Spacer(),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                AppLocalizations.of(context)!.showOnly,
-                                                textAlign: TextAlign.start,
-                                                style: Theme.of(context).textTheme.labelMedium!.apply(
-                                                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                                                    ),
-                                              ),
-                                              SizedBox(
-                                                width: MediaQuery.sizeOf(context).width - (MediaQuery.sizeOf(context).longestSide / 8) - 92,
-                                                child: SegmentedButton(
-                                                  segments: [
-                                                    ButtonSegment(
-                                                      value: Period.today,
-                                                      label: Text(AppLocalizations.of(context)!.today),
-                                                    ),
-                                                    ButtonSegment(
-                                                      value: Period.allTime,
-                                                      label: Text(AppLocalizations.of(context)!.all),
-                                                    ),
-                                                  ],
-                                                  selected: {_time},
-                                                  showSelectedIcon: false,
-                                                  onSelectionChanged: (p0) {
-                                                    setState(() {
-                                                      _time = p0.single;
-                                                    });
-                                                  },
-                                                  style: ButtonStyle(
-                                                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                                      (Set<MaterialState> states) {
-                                                        if (states.contains(MaterialState.selected)) {
-                                                          return Theme.of(context).colorScheme.tertiaryContainer;
-                                                        }
-                                                        return Theme.of(context).colorScheme.surface;
-                                                      },
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                      ),
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            _getTimeString(),
+                                            style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onSecondaryContainer),
                                           ),
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                            if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
-                              return SizedBox(
-                                height: (MediaQuery.sizeOf(context).height / 8) + 32,
-                                width: MediaQuery.sizeOf(context).width,
-                                child: const Center(
-                                  child: CircularProgressIndicator.adaptive(),
-                                ),
-                              );
-                            }
-                            return const Text('OOPS');
-                          },
-                        ),
+                                          const SizedBox(width: 15),
+                                          DecoratedBox(
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context).colorScheme.surface,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              child: Text(
+                                                NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
+                                                style: Theme.of(context).textTheme.titleLarge!.apply(
+                                                      color: Color(
+                                                        value.isNegative ? 0xffbd1c1c : 0xff199225,
+                                                      ).harmonizeWith(
+                                                        Theme.of(context).colorScheme.primary,
+                                                      ),
+                                                    ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 10),
+                                        child: Text(
+                                          AppLocalizations.of(context)!.showOnly,
+                                          textAlign: TextAlign.start,
+                                          style: Theme.of(context).textTheme.labelMedium!.apply(
+                                                color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                              ),
+                                        ),
+                                      ),
+                                      SegmentedButton(
+                                        segments: [
+                                          ButtonSegment(
+                                            value: Period.today,
+                                            label: Text(AppLocalizations.of(context)!.today),
+                                          ),
+                                          ButtonSegment(
+                                            value: Period.allTime,
+                                            label: Text(AppLocalizations.of(context)!.all),
+                                          ),
+                                        ],
+                                        selected: {_time},
+                                        showSelectedIcon: false,
+                                        onSelectionChanged: (p0) {
+                                          setState(() {
+                                            _time = p0.single;
+                                          });
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                            (Set<MaterialState> states) {
+                                              if (states.contains(MaterialState.selected)) {
+                                                return Theme.of(context).colorScheme.tertiaryContainer;
+                                              }
+                                              return Theme.of(context).colorScheme.surface;
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
+                            return SizedBox(
+                              height: (MediaQuery.sizeOf(context).height / 5.4) + 32,
+                              width: MediaQuery.sizeOf(context).width,
+                              child: const Center(
+                                child: CircularProgressIndicator.adaptive(),
+                              ),
+                            );
+                          }
+                          return const Text('OOPS');
+                        },
                       ),
                     ),
                   ),

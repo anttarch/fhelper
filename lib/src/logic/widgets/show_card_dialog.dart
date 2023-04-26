@@ -154,9 +154,9 @@ Future<void> showCardForm({
                             child: InputField(
                               label: AppLocalizations.of(context)!.statementClosing,
                               readOnly: true,
-                              placeholder: displayText[0],
+                              placeholder: displayText[0] ?? AppLocalizations.of(context)!.select,
                               validator: (value) {
-                                if (value!.isEmpty) {
+                                if (value!.isEmpty || displayText[0] == null) {
                                   return AppLocalizations.of(context)!.emptyField;
                                 }
                                 return null;
@@ -207,9 +207,9 @@ Future<void> showCardForm({
                             child: InputField(
                               label: AppLocalizations.of(context)!.paymentDue,
                               readOnly: true,
-                              placeholder: displayText[1],
+                              placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
                               validator: (value) {
-                                if (value!.isEmpty) {
+                                if (value!.isEmpty || displayText[1] == null) {
                                   return AppLocalizations.of(context)!.emptyField;
                                 }
                                 return null;
@@ -287,9 +287,9 @@ Future<void> showCardForm({
                                 child: InputField(
                                   label: AppLocalizations.of(context)!.account(1),
                                   readOnly: true,
-                                  placeholder: displayText[2],
+                                  placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
                                   validator: (value) {
-                                    if (value!.isEmpty) {
+                                    if (value!.isEmpty || displayText[2] == null) {
                                       return AppLocalizations.of(context)!.emptyField;
                                     }
                                     return null;

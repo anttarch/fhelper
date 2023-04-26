@@ -4,6 +4,7 @@ import 'package:fhelper/src/logic/collections/card.dart';
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/views/head/head.dart';
+import 'package:flex_seed_scheme/flex_seed_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -38,6 +39,30 @@ class MyApp extends StatelessWidget {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
+        final lightTheme = SeedColorScheme.fromSeeds(
+          primaryKey: lightDynamic?.primary ?? const ColorScheme.light().primary,
+          secondaryKey: lightDynamic?.secondary ?? const ColorScheme.light().secondary,
+          tertiaryKey: lightDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+          tones: FlexTones.vivid(Brightness.light),
+        );
+        final lightThemeHc = SeedColorScheme.fromSeeds(
+          primaryKey: lightDynamic?.primary ?? const ColorScheme.light().primary,
+          secondaryKey: lightDynamic?.secondary ?? const ColorScheme.light().secondary,
+          tertiaryKey: lightDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+          tones: FlexTones.highContrast(Brightness.light),
+        );
+        final darkTheme = SeedColorScheme.fromSeeds(
+          primaryKey: darkDynamic?.primary ?? const ColorScheme.light().primary,
+          secondaryKey: darkDynamic?.secondary ?? const ColorScheme.light().secondary,
+          tertiaryKey: darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+          tones: FlexTones.vivid(Brightness.dark),
+        );
+        final darkThemeHc = SeedColorScheme.fromSeeds(
+          primaryKey: darkDynamic?.primary ?? const ColorScheme.light().primary,
+          secondaryKey: darkDynamic?.secondary ?? const ColorScheme.light().secondary,
+          tertiaryKey: darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+          tones: FlexTones.ultraContrast(Brightness.dark),
+        );
         return MaterialApp(
           title: 'Flutter Demo',
           localizationsDelegates: const [
@@ -49,12 +74,20 @@ class MyApp extends StatelessWidget {
             Locale('en', 'US'),
             Locale('pt', 'BR'),
           ],
-          theme: ThemeData(
-            colorScheme: lightDynamic ?? const ColorScheme.light(),
+          theme: ThemeData.from(
+            colorScheme: lightTheme,
             useMaterial3: true,
           ),
-          darkTheme: ThemeData(
-            colorScheme: darkDynamic ?? const ColorScheme.dark(),
+          darkTheme: ThemeData.from(
+            colorScheme: darkTheme,
+            useMaterial3: true,
+          ),
+          highContrastTheme: ThemeData(
+            colorScheme: lightThemeHc,
+            useMaterial3: true,
+          ),
+          highContrastDarkTheme: ThemeData(
+            colorScheme: darkThemeHc,
             useMaterial3: true,
           ),
           home: const HeadView(),

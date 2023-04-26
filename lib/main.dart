@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
           tones: FlexTones.ultraContrast(Brightness.dark),
         );
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'FHelper',
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

@@ -13,10 +13,10 @@ class SettingsPage extends StatelessWidget {
     final List<String> elements = [
       AppLocalizations.of(context)!.account(-1),
       AppLocalizations.of(context)!.card(-1),
-      AppLocalizations.of(context)!.theme,
+      //AppLocalizations.of(context)!.theme,
       AppLocalizations.of(context)!.type(-1),
-      AppLocalizations.of(context)!.privacy,
-      AppLocalizations.of(context)!.security,
+      //AppLocalizations.of(context)!.privacy,
+      //AppLocalizations.of(context)!.security,
     ];
     final List<VoidCallback> callbacks = [
       // Accounts
@@ -34,7 +34,7 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
       // Theme
-      () {},
+      //() {},
       // Types
       () => Navigator.push(
             context,
@@ -43,9 +43,9 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
       // Privacy
-      () {},
+      //() {},
       // Security
-      () {},
+      //() {},
     ];
     return Card(
       elevation: 0,

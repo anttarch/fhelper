@@ -277,10 +277,7 @@ Future<void> showCardForm({
                             ),
                           ),
                           FutureBuilder(
-                            future: getAttributes(
-                              Isar.getInstance()!,
-                              AttributeType.account,
-                            ),
+                            future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context),
                             builder: (context, snapshot) {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 15, bottom: 15),

@@ -1,7 +1,9 @@
 import 'package:async/async.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/views/details/card_details.dart';
 import 'package:fhelper/src/widgets/historylist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -217,6 +219,21 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   ),
                                                 ),
                                               ),
+                                              onTap: () async {
+                                                final Isar isar = Isar.getInstance()!;
+                                                final int cardId = cardsValues.values.elementAt(index).last.toInt();
+                                                final fhelper.Card? card = await isar.cards.get(cardId);
+                                                if (mounted) {
+                                                  await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute<CardDetailsView>(
+                                                      builder: (context) => CardDetailsView(
+                                                        card: card!,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              },
                                               trailing: IconButton.filled(
                                                 onPressed: () => showDialog<void>(
                                                   context: context,

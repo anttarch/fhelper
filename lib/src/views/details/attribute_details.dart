@@ -314,9 +314,12 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                           ),
                         ),
                       ),
-                      Text(
-                        AppLocalizations.of(context)!.statistics,
-                        style: Theme.of(context).textTheme.titleLarge,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(
+                          AppLocalizations.of(context)!.statistics,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 10),

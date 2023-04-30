@@ -86,7 +86,7 @@ class _AccountManagerState extends State<AccountManager> {
                         attributes = snapshot.hasData ? snapshot.data! : [];
                         return Card(
                           elevation: 0,
-                          margin: const EdgeInsets.symmetric(horizontal: 22),
+                          margin: const EdgeInsets.fromLTRB(22, 12, 22, 0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                             side: BorderSide(

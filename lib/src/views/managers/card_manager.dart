@@ -76,7 +76,7 @@ class _CardManagerState extends State<CardManager> {
                         cards = snapshot.hasData ? snapshot.data! : [];
                         return Card(
                           elevation: 0,
-                          margin: const EdgeInsets.fromLTRB(22, 15, 22, 0),
+                          margin: const EdgeInsets.fromLTRB(22, 12, 22, 0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                             side: BorderSide(

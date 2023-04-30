@@ -41,7 +41,7 @@ class _HistoryPageState extends State<HistoryPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                 child: Text(
                   AppLocalizations.of(context)!.showOnly,
                   textAlign: TextAlign.start,

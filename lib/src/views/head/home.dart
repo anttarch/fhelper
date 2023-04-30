@@ -55,6 +55,7 @@ class HomePage extends StatelessWidget {
                     visible: exchange != null || exchange != null && exchange.eType == EType.transfer,
                     child: Card(
                       elevation: 4,
+                      margin: const EdgeInsets.only(top: 12),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
@@ -132,6 +133,7 @@ class HomePage extends StatelessWidget {
                   return Card(
                     elevation: 0,
                     color: Theme.of(context).colorScheme.secondaryContainer,
+                    margin: const EdgeInsets.only(top: 10),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -212,6 +214,7 @@ class HomePage extends StatelessWidget {
                     ),
                     borderRadius: const BorderRadius.all(Radius.circular(12)),
                   ),
+                  margin: const EdgeInsets.only(top: 10),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(

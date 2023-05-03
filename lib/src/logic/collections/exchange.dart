@@ -111,7 +111,7 @@ Future<double> getSumValue(
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: weekday)),
+        DateTime.now().subtract(Duration(days: weekday - 1)),
         DateTime.now(),
       )
       .eTypeLessThan(EType.transfer)
@@ -355,7 +355,7 @@ Future<List<Exchange>> getExchanges(
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: weekday)),
+        DateTime.now().subtract(Duration(days: weekday - 1)),
         DateTime.now(),
       )
       .not()

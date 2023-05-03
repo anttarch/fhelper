@@ -91,7 +91,7 @@ Future<Map<String, List<double>>> getPendingCardBills(
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: weekday)),
+        DateTime.now().subtract(Duration(days: weekday - 1)),
         DateTime.now(),
       )
       .and()
@@ -174,7 +174,7 @@ Future<List<Exchange>> getCardBillsAsExchanges(
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: weekday)),
+        DateTime.now().subtract(Duration(days: weekday - 1)),
         DateTime.now(),
       )
       .and()

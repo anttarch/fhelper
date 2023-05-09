@@ -13,13 +13,13 @@ import 'package:isar/isar.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  Icon? _getLeadingIcon(Exchange exchange) {
+  Icon? _getLeadingIcon(Exchange exchange, Color iconColor) {
     if (exchange.installments != null) {
-      return const Icon(Icons.credit_card);
+      return Icon(Icons.credit_card, color: iconColor);
     } else if (exchange.eType == EType.transfer) {
-      return const Icon(Icons.swap_horiz);
+      return Icon(Icons.swap_horiz, color: iconColor);
     } else if (exchange.id == -1) {
-      return const Icon(Icons.receipt_long);
+      return Icon(Icons.receipt_long, color: iconColor);
     }
     return null;
   }
@@ -79,7 +79,7 @@ class HomePage extends StatelessWidget {
                                       if (exchange != null && (exchange.installments != null || exchange.id == -1 || exchange.eType == EType.transfer))
                                         Padding(
                                           padding: const EdgeInsets.only(right: 5),
-                                          child: _getLeadingIcon(exchange),
+                                          child: _getLeadingIcon(exchange, Theme.of(context).colorScheme.inverseSurface),
                                         ),
                                       Text(
                                         exchange != null

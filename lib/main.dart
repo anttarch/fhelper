@@ -56,12 +56,14 @@ class MyApp extends StatelessWidget {
           secondaryKey: darkDynamic?.secondary ?? const ColorScheme.light().secondary,
           tertiaryKey: darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
           tones: FlexTones.vivid(Brightness.dark),
+          brightness: Brightness.dark,
         );
         final darkThemeHc = SeedColorScheme.fromSeeds(
           primaryKey: darkDynamic?.primary ?? const ColorScheme.light().primary,
           secondaryKey: darkDynamic?.secondary ?? const ColorScheme.light().secondary,
           tertiaryKey: darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
           tones: FlexTones.ultraContrast(Brightness.dark),
+          brightness: Brightness.dark,
         );
         return MaterialApp(
           title: 'FHelper',
@@ -82,11 +84,11 @@ class MyApp extends StatelessWidget {
             colorScheme: darkTheme,
             useMaterial3: true,
           ),
-          highContrastTheme: ThemeData(
+          highContrastTheme: ThemeData.from(
             colorScheme: lightThemeHc,
             useMaterial3: true,
           ),
-          highContrastDarkTheme: ThemeData(
+          highContrastDarkTheme: ThemeData.from(
             colorScheme: darkThemeHc,
             useMaterial3: true,
           ),

@@ -48,7 +48,6 @@ class _CardManagerState extends State<CardManager> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
                   selectedIndex > -1 ? AppLocalizations.of(context)!.select : AppLocalizations.of(context)!.card(-1),
-                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
               ),
               actions: [

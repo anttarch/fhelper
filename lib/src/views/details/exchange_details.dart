@@ -56,7 +56,6 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
                         isCardBill ? widget.item.description : AppLocalizations.of(context)!.details,
-                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
                   ),

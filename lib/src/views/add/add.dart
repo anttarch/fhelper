@@ -81,7 +81,6 @@ class _AddViewState extends State<AddView> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
                   AppLocalizations.of(context)!.add,
-                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
               ),
             ),

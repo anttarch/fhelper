@@ -67,23 +67,20 @@ class _HeadViewState extends State<HeadView> {
     ];
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.medium(
-            backgroundColor: Theme.of(context).colorScheme.surface,
+          SliverAppBar.large(
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
                 headline[_pageIndex ?? 0],
-                style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
           ),
           SliverToBoxAdapter(
             child: ExpandablePageView(
               controller: _pageCtrl,
-              minHeight: MediaQuery.sizeOf(context).height - 216 - MediaQuery.paddingOf(context).bottom,
+              minHeight: MediaQuery.sizeOf(context).height - 256 - MediaQuery.paddingOf(context).bottom,
               children: const [
                 HomePage(),
                 HistoryPage(),

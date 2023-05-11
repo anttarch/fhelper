@@ -45,7 +45,6 @@ class _CardDetailsViewState extends State<CardDetailsView> {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
                 widget.card.name,
-                style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
           ),

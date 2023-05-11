@@ -59,7 +59,6 @@ class _TransferViewState extends State<TransferView> {
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
                         AppLocalizations.of(context)!.transfer,
-                        style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),
                   ),

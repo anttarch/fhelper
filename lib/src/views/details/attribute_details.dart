@@ -73,7 +73,6 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
                 widget.attribute.name,
-                style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
           ),

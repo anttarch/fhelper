@@ -54,31 +54,27 @@ int getWeekday(BuildContext context) {
   // this switch convers the ISO8601 weekday format to local
   switch (firstDayOfWeek) {
     case 0:
-      {
-        final Map<int, int> iso8601toSunday = {
-          1: 2,
-          2: 3,
-          3: 4,
-          4: 5,
-          5: 6,
-          6: 7,
-          7: 1,
-        };
-        return iso8601toSunday.entries.where((e) => e.key == weekday).single.value;
-      }
+      final Map<int, int> iso8601toSunday = {
+        1: 2,
+        2: 3,
+        3: 4,
+        4: 5,
+        5: 6,
+        6: 7,
+        7: 1,
+      };
+      return iso8601toSunday.entries.where((e) => e.key == weekday).single.value;
     case 6:
-      {
-        final Map<int, int> iso8601toSaturday = {
-          1: 3,
-          2: 4,
-          3: 5,
-          4: 6,
-          5: 7,
-          6: 1,
-          7: 2,
-        };
-        return iso8601toSaturday.entries.where((e) => e.key == weekday).single.value;
-      }
+      final Map<int, int> iso8601toSaturday = {
+        1: 3,
+        2: 4,
+        3: 5,
+        4: 6,
+        5: 7,
+        6: 1,
+        7: 2,
+      };
+      return iso8601toSaturday.entries.where((e) => e.key == weekday).single.value;
     default:
       return weekday;
   }

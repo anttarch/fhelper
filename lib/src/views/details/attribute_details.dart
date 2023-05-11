@@ -54,14 +54,8 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
     return Icons.trending_up;
   }
 
-  String _getTimeString() {
-    switch (_time) {
-      case Period.allTime:
-        return AppLocalizations.of(context)!.totalDescription;
-      default:
-        return AppLocalizations.of(context)!.todayDescription;
-    }
-  }
+  String _getTimeString() =>
+      switch (_time) { Period.allTime => AppLocalizations.of(context)!.totalDescription, _ => AppLocalizations.of(context)!.todayDescription };
 
   @override
   Widget build(BuildContext context) {

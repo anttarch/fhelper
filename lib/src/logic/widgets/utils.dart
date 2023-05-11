@@ -12,11 +12,9 @@ ShapeBorder? getShapeBorder(int index, int finalIndex) {
   }
   switch (index) {
     case 0:
-      {
-        return const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-        );
-      }
+      return const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      );
     default:
       return null;
   }

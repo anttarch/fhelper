@@ -12,43 +12,30 @@ Future<Exchange?> getLatest(Isar isar, {int? attributeId, AttributeType? attribu
   if (attributeId != null) {
     switch (attributeType) {
       case AttributeType.account:
-        {
-          latestExchange = await Isar.getInstance()!
-              .exchanges
-              .where()
-              .filter()
-              .accountIdEqualTo(attributeId)
-              .or()
-              .accountIdEndEqualTo(attributeId)
-              .not()
-              .eTypeEqualTo(EType.installment)
-              .sortByDateDesc()
-              .findFirst();
-          final List<CardBill> cardBills = [];
-          final cardsIds = await isar.cards.where().filter().accountIdEqualTo(attributeId).idProperty().findAll();
-          for (final id in cardsIds) {
-            final cardBill = await isar.cardBills.filter().cardIdEqualTo(id).confirmedEqualTo(true).findAll();
-            cardBills.addAll(cardBill);
-          }
-          if (cardBills.isNotEmpty) {
-            cardBills.sort((a, b) => b.date.compareTo(a.date));
-            latestPaidCardBill = cardBills.first;
-          }
+        latestExchange = await Isar.getInstance()!
+            .exchanges
+            .where()
+            .filter()
+            .accountIdEqualTo(attributeId)
+            .or()
+            .accountIdEndEqualTo(attributeId)
+            .not()
+            .eTypeEqualTo(EType.installment)
+            .sortByDateDesc()
+            .findFirst();
+        final List<CardBill> cardBills = [];
+        final cardsIds = await isar.cards.where().filter().accountIdEqualTo(attributeId).idProperty().findAll();
+        for (final id in cardsIds) {
+          final cardBill = await isar.cardBills.filter().cardIdEqualTo(id).confirmedEqualTo(true).findAll();
+          cardBills.addAll(cardBill);
         }
-        break;
+        if (cardBills.isNotEmpty) {
+          cardBills.sort((a, b) => b.date.compareTo(a.date));
+          latestPaidCardBill = cardBills.first;
+        }
       default:
-        {
-          latestExchange = await Isar.getInstance()!
-              .exchanges
-              .where()
-              .filter()
-              .typeIdEqualTo(attributeId)
-              .not()
-              .eTypeEqualTo(EType.installment)
-              .sortByDateDesc()
-              .findFirst();
-        }
-        break;
+        latestExchange =
+            await Isar.getInstance()!.exchanges.where().filter().typeIdEqualTo(attributeId).not().eTypeEqualTo(EType.installment).sortByDateDesc().findFirst();
     }
   } else {
     latestExchange = await Isar.getInstance()!.exchanges.where().filter().not().eTypeEqualTo(EType.installment).sortByDateDesc().findFirst();

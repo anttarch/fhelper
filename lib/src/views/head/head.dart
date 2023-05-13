@@ -1,9 +1,10 @@
+import 'package:animations/animations.dart';
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/head/history.dart';
 import 'package:fhelper/src/views/head/home.dart';
 import 'package:fhelper/src/views/head/settings.dart';
-import 'package:fhelper/src/widgets/expandable_page_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HeadView extends StatefulWidget {
@@ -15,6 +16,16 @@ class HeadView extends StatefulWidget {
 
 class _HeadViewState extends State<HeadView> {
   final PageController _pageCtrl = PageController();
+  final ScrollController _scrollCtrl = ScrollController();
+  final List<Widget> pages = [
+    const HomePage(),
+    const HistoryPage(),
+    const SettingsPage(),
+  ];
+
+  int _pageIndex = 0;
+  bool displayNavigationBar = true;
+
   static String _getHomeString(BuildContext context) {
     final int hour = TimeOfDay.now().hour;
     switch (hour) {
@@ -29,7 +40,18 @@ class _HeadViewState extends State<HeadView> {
     }
   }
 
-  int? _pageIndex;
+  @override
+  void initState() {
+    super.initState();
+    _scrollCtrl.addListener(() {
+      final userScrollDirection = _scrollCtrl.position.userScrollDirection;
+      if (userScrollDirection == ScrollDirection.reverse && displayNavigationBar == true) {
+        setState(() => displayNavigationBar = false);
+      } else if (userScrollDirection == ScrollDirection.forward && displayNavigationBar == false) {
+        setState(() => displayNavigationBar = true);
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -47,27 +69,32 @@ class _HeadViewState extends State<HeadView> {
 
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollCtrl,
         slivers: [
           SliverAppBar.large(
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
-                headline[_pageIndex ?? 0],
+                headline[_pageIndex],
               ),
             ),
           ),
           SliverToBoxAdapter(
-            child: ExpandablePageView(
-              controller: _pageCtrl,
-              minHeight: MediaQuery.sizeOf(context).height - 256 - MediaQuery.paddingOf(context).bottom,
-              children: const [
-                HomePage(),
-                HistoryPage(),
-                SettingsPage(),
-              ],
-              onPageChanged: (page) => setState(() {
-                _pageIndex = page;
-              }),
+            child: PageTransitionSwitcher(
+              transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+                return FadeThroughTransition(
+                  animation: primaryAnimation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                );
+              },
+              layoutBuilder: (entries) {
+                return Stack(
+                  alignment: Alignment.topCenter,
+                  children: entries,
+                );
+              },
+              child: pages[_pageIndex],
             ),
           ),
         ],
@@ -87,31 +114,36 @@ class _HeadViewState extends State<HeadView> {
           Icons.add,
           semanticLabel: _pageIndex == 0 ? null : AppLocalizations.of(context)!.addTransactionFAB,
         ),
-        isExtended: _pageIndex == null || _pageIndex == 0,
+        isExtended: _pageIndex == 0,
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _pageIndex ?? 0,
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.home),
-            label: AppLocalizations.of(context)!.home,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.history),
-            label: AppLocalizations.of(context)!.history,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings),
-            label: AppLocalizations.of(context)!.settings,
-          ),
-        ],
-        onDestinationSelected: (dest) {
-          _pageCtrl.animateToPage(
-            dest,
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeIn,
-          );
-        },
+      bottomNavigationBar: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        height: displayNavigationBar ? 80 + MediaQuery.paddingOf(context).bottom : 0,
+        child: NavigationBar(
+          selectedIndex: _pageIndex,
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.home),
+              label: AppLocalizations.of(context)!.home,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.history),
+              label: AppLocalizations.of(context)!.history,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.settings),
+              label: AppLocalizations.of(context)!.settings,
+            ),
+          ],
+          onDestinationSelected: (dest) {
+            setState(() => _pageIndex = dest);
+            _scrollCtrl.animateTo(
+              0,
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeInOut,
+            );
+          },
+        ),
       ),
     );
   }

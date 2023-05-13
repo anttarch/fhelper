@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
@@ -98,10 +99,11 @@ class _AccountManagerState extends State<AccountManager> {
                             padding: EdgeInsets.zero,
                             itemCount: attributes.length,
                             itemBuilder: (context, index) {
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  ListTile(
+                              return OpenContainer(
+                                closedElevation: 0,
+                                transitionDuration: const Duration(milliseconds: 250),
+                                closedBuilder: (context, action) {
+                                  return ListTile(
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                                     shape: wid_utils.getShapeBorder(index, attributes.length - 1),
                                     tileColor: selectedIndex == index ? Theme.of(context).colorScheme.surfaceVariant : null,
@@ -123,14 +125,7 @@ class _AccountManagerState extends State<AccountManager> {
                                           });
                                         }
                                       } else {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute<AttributeDetailsView>(
-                                            builder: (context) => AttributeDetailsView(
-                                              attribute: attributes[index],
-                                            ),
-                                          ),
-                                        );
+                                        action();
                                       }
                                     },
                                     onLongPress: () {
@@ -138,8 +133,13 @@ class _AccountManagerState extends State<AccountManager> {
                                         selectedIndex = index;
                                       });
                                     },
-                                  ),
-                                ],
+                                  );
+                                },
+                                openBuilder: (context, action) {
+                                  return AttributeDetailsView(
+                                    attribute: attributes[index],
+                                  );
+                                },
                               );
                             },
                             separatorBuilder: (_, __) => Divider(

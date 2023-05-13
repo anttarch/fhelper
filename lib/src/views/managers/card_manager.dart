@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
@@ -88,9 +89,11 @@ class _CardManagerState extends State<CardManager> {
                             padding: EdgeInsets.zero,
                             itemCount: cards.length,
                             itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  ListTile(
+                              return OpenContainer(
+                                closedElevation: 0,
+                                transitionDuration: const Duration(milliseconds: 250),
+                                closedBuilder: (context, action) {
+                                  return ListTile(
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                                     shape: wid_utils.getShapeBorder(index, cards.length - 1),
                                     tileColor: selectedIndex == index ? Theme.of(context).colorScheme.surfaceVariant : null,
@@ -112,14 +115,7 @@ class _CardManagerState extends State<CardManager> {
                                           });
                                         }
                                       } else {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute<CardDetailsView>(
-                                            builder: (context) => CardDetailsView(
-                                              card: cards[index],
-                                            ),
-                                          ),
-                                        );
+                                        action();
                                       }
                                     },
                                     onLongPress: () {
@@ -127,8 +123,13 @@ class _CardManagerState extends State<CardManager> {
                                         selectedIndex = index;
                                       });
                                     },
-                                  ),
-                                ],
+                                  );
+                                },
+                                openBuilder: (context, action) {
+                                  return CardDetailsView(
+                                    card: cards[index],
+                                  );
+                                },
                               );
                             },
                             separatorBuilder: (_, __) => Divider(

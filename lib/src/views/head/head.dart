@@ -4,7 +4,6 @@ import 'package:fhelper/src/views/head/history.dart';
 import 'package:fhelper/src/views/head/home.dart';
 import 'package:fhelper/src/views/head/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HeadView extends StatefulWidget {
@@ -15,7 +14,6 @@ class HeadView extends StatefulWidget {
 }
 
 class _HeadViewState extends State<HeadView> {
-  final PageController _pageCtrl = PageController();
   final ScrollController _scrollCtrl = ScrollController();
   final List<Widget> pages = [
     const HomePage(),
@@ -41,21 +39,8 @@ class _HeadViewState extends State<HeadView> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _scrollCtrl.addListener(() {
-      final userScrollDirection = _scrollCtrl.position.userScrollDirection;
-      if (userScrollDirection == ScrollDirection.reverse && displayNavigationBar == true) {
-        setState(() => displayNavigationBar = false);
-      } else if (userScrollDirection == ScrollDirection.forward && displayNavigationBar == false) {
-        setState(() => displayNavigationBar = true);
-      }
-    });
-  }
-
-  @override
   void dispose() {
-    _pageCtrl.dispose();
+    _scrollCtrl.dispose();
     super.dispose();
   }
 
@@ -116,34 +101,30 @@ class _HeadViewState extends State<HeadView> {
         ),
         isExtended: _pageIndex == 0,
       ),
-      bottomNavigationBar: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        height: displayNavigationBar ? 80 + MediaQuery.paddingOf(context).bottom : 0,
-        child: NavigationBar(
-          selectedIndex: _pageIndex,
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.home),
-              label: AppLocalizations.of(context)!.home,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.history),
-              label: AppLocalizations.of(context)!.history,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.settings),
-              label: AppLocalizations.of(context)!.settings,
-            ),
-          ],
-          onDestinationSelected: (dest) {
-            setState(() => _pageIndex = dest);
-            _scrollCtrl.animateTo(
-              0,
-              duration: const Duration(milliseconds: 150),
-              curve: Curves.easeInOut,
-            );
-          },
-        ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _pageIndex,
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Icons.home),
+            label: AppLocalizations.of(context)!.home,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.history),
+            label: AppLocalizations.of(context)!.history,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.settings),
+            label: AppLocalizations.of(context)!.settings,
+          ),
+        ],
+        onDestinationSelected: (dest) {
+          setState(() => _pageIndex = dest);
+          _scrollCtrl.animateTo(
+            0,
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeInOut,
+          );
+        },
       ),
     );
   }

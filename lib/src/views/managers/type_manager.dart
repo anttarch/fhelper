@@ -139,6 +139,8 @@ class _TypeManagerState extends State<TypeManager> {
                               itemBuilder: (context, index) {
                                 return OpenContainer(
                                   closedElevation: 0,
+                                  closedColor: Colors.transparent,
+                                  openElevation: 0,
                                   transitionDuration: const Duration(milliseconds: 250),
                                   closedBuilder: (context, action) {
                                     return ListTile(

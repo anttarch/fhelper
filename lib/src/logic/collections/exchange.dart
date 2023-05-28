@@ -47,6 +47,7 @@ int getWeekday(BuildContext context) {
   final MaterialLocalizations localizations = MaterialLocalizations.of(context);
   // 0 = sunday ... 6 = saturday
   final int firstDayOfWeek = localizations.firstDayOfWeekIndex;
+  print(firstDayOfWeek);
 
   // 1 = monday ... 7 = sunday
   final int weekday = DateTime.now().weekday;
@@ -86,18 +87,12 @@ Future<double> getSumValue(
   int time = 0,
 }) async {
   final int weekday = getWeekday(context);
+  final DateTime now = DateTime.now();
 
   final double today = await isar.exchanges
       .where()
       .filter()
-      .dateBetween(
-        DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-        ),
-        DateTime.now(),
-      )
+      .dateBetween(DateTime(now.year, now.month, now.day), now)
       .eTypeLessThan(EType.transfer)
       .installmentsIsNull()
       .valueProperty()
@@ -107,8 +102,8 @@ Future<double> getSumValue(
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: weekday - 1)),
-        DateTime.now(),
+        DateTime(now.year, now.month, now.day).subtract(Duration(days: weekday - 1)),
+        now,
       )
       .eTypeLessThan(EType.transfer)
       .installmentsIsNull()
@@ -118,10 +113,7 @@ Future<double> getSumValue(
   final double month = await isar.exchanges
       .where()
       .filter()
-      .dateBetween(
-        DateTime(DateTime.now().year, DateTime.now().month),
-        DateTime.now(),
-      )
+      .dateBetween(DateTime(now.year, now.month), now)
       .eTypeLessThan(EType.transfer)
       .installmentsIsNull()
       .valueProperty()
@@ -330,18 +322,12 @@ Future<List<Exchange>> getExchanges(
   int time = 0,
 }) async {
   final int weekday = getWeekday(context);
+  final DateTime now = DateTime.now();
 
   final List<Exchange> today = await isar.exchanges
       .where()
       .filter()
-      .dateBetween(
-        DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-        ),
-        DateTime.now(),
-      )
+      .dateBetween(DateTime(now.year, now.month, now.day), now)
       .not()
       .eTypeEqualTo(EType.installment)
       .sortByDateDesc()
@@ -351,25 +337,16 @@ Future<List<Exchange>> getExchanges(
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: weekday - 1)),
-        DateTime.now(),
+        DateTime(now.year, now.month, now.day).subtract(Duration(days: weekday - 1)),
+        now,
       )
       .not()
       .eTypeEqualTo(EType.installment)
       .sortByDateDesc()
       .findAll();
 
-  final List<Exchange> month = await isar.exchanges
-      .where()
-      .filter()
-      .dateBetween(
-        DateTime(DateTime.now().year, DateTime.now().month),
-        DateTime.now(),
-      )
-      .not()
-      .eTypeEqualTo(EType.installment)
-      .sortByDateDesc()
-      .findAll();
+  final List<Exchange> month =
+      await isar.exchanges.where().filter().dateBetween(DateTime(now.year, now.month), now).not().eTypeEqualTo(EType.installment).sortByDateDesc().findAll();
 
   final Map<int, List<Exchange>> timeTable = {
     0: today,

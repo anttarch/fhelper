@@ -70,29 +70,17 @@ Future<Map<String, List<double>>> getPendingCardBills(
   int time = 0,
 }) async {
   final int weekday = getWeekday(context);
+  final DateTime now = DateTime.now();
 
-  final List<CardBill?> today = await isar.cardBills
-      .where()
-      .filter()
-      .dateBetween(
-        DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-        ),
-        DateTime.now(),
-      )
-      .and()
-      .confirmedEqualTo(false)
-      .sortByDateDesc()
-      .findAll();
+  final List<CardBill?> today =
+      await isar.cardBills.where().filter().dateBetween(DateTime(now.year, now.month, now.day), now).and().confirmedEqualTo(false).sortByDateDesc().findAll();
 
   final List<CardBill?> week = await isar.cardBills
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: weekday - 1)),
-        DateTime.now(),
+        DateTime(now.year, now.month, now.day).subtract(Duration(days: weekday - 1)),
+        now,
       )
       .and()
       .confirmedEqualTo(false)
@@ -103,8 +91,8 @@ Future<Map<String, List<double>>> getPendingCardBills(
       .where()
       .filter()
       .dateBetween(
-        DateTime(DateTime.now().year, DateTime.now().month),
-        DateTime(DateTime.now().year, DateTime.now().month + 1),
+        DateTime(now.year, now.month),
+        DateTime(now.year, now.month + 1),
       )
       .and()
       .confirmedEqualTo(false)
@@ -153,46 +141,25 @@ Future<List<Exchange>> getCardBillsAsExchanges(
   int time = 0,
 }) async {
   final int weekday = getWeekday(context);
+  final DateTime now = DateTime.now();
 
-  final List<CardBill?> today = await isar.cardBills
-      .where()
-      .filter()
-      .dateBetween(
-        DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-        ),
-        DateTime.now(),
-      )
-      .and()
-      .confirmedEqualTo(true)
-      .sortByDateDesc()
-      .findAll();
+  final List<CardBill?> today =
+      await isar.cardBills.where().filter().dateBetween(DateTime(now.year, now.month, now.day), now).and().confirmedEqualTo(true).sortByDateDesc().findAll();
 
   final List<CardBill?> week = await isar.cardBills
       .where()
       .filter()
       .dateBetween(
-        DateTime.now().subtract(Duration(days: weekday - 1)),
-        DateTime.now(),
+        DateTime(now.year, now.month, now.day).subtract(Duration(days: weekday - 1)),
+        now,
       )
       .and()
       .confirmedEqualTo(true)
       .sortByDateDesc()
       .findAll();
 
-  final List<CardBill?> month = await isar.cardBills
-      .where()
-      .filter()
-      .dateBetween(
-        DateTime(DateTime.now().year, DateTime.now().month),
-        DateTime.now(),
-      )
-      .and()
-      .confirmedEqualTo(true)
-      .sortByDateDesc()
-      .findAll();
+  final List<CardBill?> month =
+      await isar.cardBills.where().filter().dateBetween(DateTime(now.year, now.month), now).and().confirmedEqualTo(true).sortByDateDesc().findAll();
 
   final Map<int, List<CardBill?>> timeTable = {
     0: today,

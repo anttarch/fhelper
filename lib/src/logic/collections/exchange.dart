@@ -47,7 +47,6 @@ int getWeekday(BuildContext context) {
   final MaterialLocalizations localizations = MaterialLocalizations.of(context);
   // 0 = sunday ... 6 = saturday
   final int firstDayOfWeek = localizations.firstDayOfWeekIndex;
-  print(firstDayOfWeek);
 
   // 1 = monday ... 7 = sunday
   final int weekday = DateTime.now().weekday;

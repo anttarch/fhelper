@@ -260,29 +260,28 @@ Future<List<Exchange>> getCardBillInstallments(Isar isar, int cardBillId) async 
 }
 
 Future<void> processInstallments(Isar isar, Exchange exchange) async {
-  int installments = exchange.installments!;
   final fhelper.Card card = (await fhelper.getCardFromId(isar, exchange.cardId))!;
   int start = 0;
 
   // Check if exchange should be processed on the same month
   if (exchange.date.day > card.statementClosure || card.paymentDue < card.statementClosure) {
     start = 1;
-    installments += 1;
   }
 
   await isar.writeTxn(() async {
     // loop between the installments required
-    for (int i = start; i < installments; i++) {
+    for (int i = start; i < exchange.installments! + start; i++) {
       final int billMonth = exchange.date.month + i;
       final CardBill? cardBill = await _getCardBill(isar, DateTime(exchange.date.year, billMonth), exchange.cardId!);
       final Exchange installment = Exchange(
         accountId: exchange.accountId,
         cardId: exchange.cardId,
-        description: start == 1 ? '$i/$installments#/spt#/${exchange.description}' : '${i + 1}/$installments#/spt#/${exchange.description}',
+        description:
+            start == 1 ? '$i/${exchange.installments!}#/spt#/${exchange.description}' : '${i++}/${exchange.installments!}#/spt#/${exchange.description}',
         date: exchange.date,
         eType: EType.installment,
         typeId: exchange.typeId,
-        value: installments == 1 ? exchange.value : exchange.installmentValue!,
+        value: exchange.installments! == 1 ? exchange.value : exchange.installmentValue!,
         installments: exchange.id,
       );
       final installmentId = await isar.exchanges.put(installment);

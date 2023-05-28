@@ -114,7 +114,7 @@ Future<Map<String, List<double>>> getPendingCardBills(
       for (final id in bill.installmentIdList) {
         final Exchange? installment = await isar.exchanges.get(id);
         if (installment != null) {
-          value -= installment.value;
+          value += installment.value;
         }
       }
       nameValue.addAll({
@@ -277,7 +277,7 @@ Future<void> processInstallments(Isar isar, Exchange exchange) async {
         accountId: exchange.accountId,
         cardId: exchange.cardId,
         description:
-            start == 1 ? '$i/${exchange.installments!}#/spt#/${exchange.description}' : '${i++}/${exchange.installments!}#/spt#/${exchange.description}',
+            start == 1 ? '$i/${exchange.installments!}#/spt#/${exchange.description}' : '${i + 1}/${exchange.installments!}#/spt#/${exchange.description}',
         date: exchange.date,
         eType: EType.installment,
         typeId: exchange.typeId,

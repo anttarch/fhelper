@@ -208,13 +208,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                 ),
                                                 textAlign: TextAlign.start,
                                                 style: TextStyle(
-                                                  color: Color(
-                                                    snapshot.hasData
-                                                        ? cardsValues.values.elementAt(index).first.isNegative
-                                                            ? 0xffbd1c1c
-                                                            : 0xff199225
-                                                        : 0xff000000,
-                                                  ).harmonizeWith(
+                                                  color: const Color(0xffbd1c1c).harmonizeWith(
                                                     Theme.of(context).colorScheme.primary,
                                                   ),
                                                 ),

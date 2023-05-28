@@ -285,7 +285,7 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                     subtitle: Text(
                                       NumberFormat.simpleCurrency(
                                         locale: Localizations.localeOf(context).languageCode,
-                                      ).format(-installments[index].value),
+                                      ).format(installments[index].value),
                                       style: TextStyle(
                                         color: const Color(0xffbd1c1c).harmonizeWith(
                                           Theme.of(context).colorScheme.primary,

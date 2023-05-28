@@ -592,7 +592,7 @@ class _AddViewState extends State<AddView> {
                         installments: _cardIndex > -1 ? _installments + 1 : null,
                         installmentValue: _cardIndex > -1
                             ? _installments > 0
-                                ? double.parse(installmentValue) / 100
+                                ? -double.parse(installmentValue) / 100
                                 : null
                             : null,
                       );

@@ -1,6 +1,6 @@
 # TODO - 1.1.0+1 bugfix
 - [x] Fix week display
-- [ ] Fix transfer's l10n strings
+- [x] Fix transfer's l10n strings
 
 # TODO - 1.2.x
 

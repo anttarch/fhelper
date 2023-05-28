@@ -74,6 +74,7 @@ class _TransferViewState extends State<TransferView> {
                               future: getAttributes(
                                 Isar.getInstance()!,
                                 AttributeType.account,
+                                context: context,
                               ),
                               builder: (context, snapshot) {
                                 return Padding(
@@ -184,6 +185,7 @@ class _TransferViewState extends State<TransferView> {
                               future: getAttributes(
                                 Isar.getInstance()!,
                                 AttributeType.account,
+                                context: context,
                               ),
                               builder: (context, snapshot) {
                                 return Padding(

@@ -93,7 +93,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                               ).format(widget.item.value),
                               readOnly: true,
                               textColor: Color(
-                                widget.item.eType == EType.expense ? 0xffbd1c1c : 0xff199225,
+                                widget.item.eType == EType.expense || widget.item.eType == EType.installment ? 0xffbd1c1c : 0xff199225,
                               ).harmonizeWith(
                                 Theme.of(context).colorScheme.primary,
                               ),
@@ -150,15 +150,16 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                     readOnly: true,
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: InputField(
-                                    label: AppLocalizations.of(context)!.perInstallmentValue,
-                                    placeholder:
-                                        NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(widget.item.installmentValue),
-                                    readOnly: true,
+                                if (widget.item.installmentValue != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: InputField(
+                                      label: AppLocalizations.of(context)!.perInstallmentValue,
+                                      placeholder: NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
+                                          .format(widget.item.installmentValue),
+                                      readOnly: true,
+                                    ),
                                   ),
-                                ),
                               ],
                             ),
                           FutureBuilder(

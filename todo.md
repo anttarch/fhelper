@@ -1,7 +1,7 @@
 # TODO - 1.1.1
 
 ## General UI
-- [ ] Fix padding issues
+- [x] Fix some padding issues
 
 ## Cards Management
 - [ ] Show next bill information on CardDetailsView (at least value)

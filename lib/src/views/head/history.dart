@@ -430,6 +430,7 @@ class _HistoryPageState extends State<HistoryPage> {
             );
           },
         ),
+        const SizedBox(height: 15),
       ],
     );
   }

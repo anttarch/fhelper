@@ -87,6 +87,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                           children: [
                             Card(
                               elevation: 4,
+                              margin: const EdgeInsets.only(top: 10),
                               child: Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Column(

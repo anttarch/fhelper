@@ -1,6 +1,14 @@
-# TODO - 1.1.0+1 bugfix
-- [x] Fix week display
-- [x] Fix transfer's l10n strings
+# TODO - 1.1.1
+
+## General UI
+- [ ] Fix padding issues
+
+## Cards Management
+- [ ] Show next bill information on CardDetailsView (at least value)
+
+## Features
+- [ ] Add sub-accounts
+- [ ] Add sub-categories
 
 # TODO - 1.2.x
 
@@ -30,9 +38,6 @@
     - Results in migration from accounts intended for deletion, it needs to handle transfers and cards, as well as the general exchange
     - Right now (1.1.0), the default (and only) behavior is leaving this transactions on a kind of "limbo" where they have no account associated
     (this allows for recovery, once this feature is implemented)
-
-## Cards Management
-- [ ] Show next bill information on CardDetailsView (at least value)
 
 ## Other
 - [ ] Make textfield open datepicker, bottom sheet, etc (maybe it's possible?)

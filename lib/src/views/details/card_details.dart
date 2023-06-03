@@ -2,6 +2,8 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/functions/card_bill.dart';
+import 'package:fhelper/src/views/details/card_history.dart';
 import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -18,6 +20,7 @@ class CardDetailsView extends StatefulWidget {
 
 class _CardDetailsViewState extends State<CardDetailsView> {
   late final CardBill? cardbill;
+  bool notFirstBill = true;
 
   @override
   void initState() {
@@ -33,6 +36,8 @@ class _CardDetailsViewState extends State<CardDetailsView> {
         )
         .sortByDateDesc()
         .findFirstSync();
+    final billCount = Isar.getInstance()!.cardBills.where().filter().cardIdEqualTo(widget.card.id).countSync();
+    notFirstBill = billCount > 1;
   }
 
   @override
@@ -94,20 +99,13 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                 },
                               ),
                               FutureBuilder(
-                                future: Isar.getInstance()!
-                                    .cardBills
-                                    .where()
-                                    .filter()
-                                    .cardIdEqualTo(widget.card.id)
-                                    .sortByDateDesc()
-                                    .findFirst()
-                                    .then((value) async {
+                                future: Future<double>(() async {
                                   double cardBillValue = 0;
-                                  if (value != null) {
-                                    for (final installmentId in value.installmentIdList) {
+                                  if (cardbill != null) {
+                                    for (final installmentId in cardbill!.installmentIdList) {
                                       final installment = await Isar.getInstance()!.exchanges.get(installmentId);
                                       if (installment != null) {
-                                        cardBillValue -= installment.value;
+                                        cardBillValue += installment.value;
                                       }
                                     }
                                   }
@@ -240,6 +238,108 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                       ),
                     ),
                   ),
+                  if (notFirstBill)
+                    Card(
+                      elevation: 0,
+                      margin: const EdgeInsets.only(top: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
+                      child: FutureBuilder(
+                        future: getCardBillsFromCard(Isar.getInstance()!, widget.card.id, BillPeriod.next, findOne: true).then((value) async {
+                          double cardBillValue = 0;
+                          if (value.isNotEmpty) {
+                            final CardBill nextBill = value.first;
+                            for (final installmentId in nextBill.installmentIdList) {
+                              final installment = await Isar.getInstance()!.exchanges.get(installmentId);
+                              if (installment != null) {
+                                cardBillValue += installment.value;
+                              }
+                            }
+                          }
+                          return cardBillValue;
+                        }),
+                        builder: (context, snapshot) {
+                          final nextBillValue = snapshot.data ?? 0;
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (nextBillValue != 0)
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.secondaryContainer,
+                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!.nextBillDescriptor,
+                                              style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onSecondaryContainer),
+                                            ),
+                                            const SizedBox(width: 15),
+                                            DecoratedBox(
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context).colorScheme.surface,
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                child: Text(
+                                                  NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(nextBillValue),
+                                                  style: Theme.of(context).textTheme.titleLarge!.apply(
+                                                        color: const Color(0xffbd1c1c).harmonizeWith(
+                                                          Theme.of(context).colorScheme.primary,
+                                                        ),
+                                                      ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const Divider(
+                                      height: 0,
+                                    ),
+                                  ],
+                                ),
+                              ListTile(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: nextBillValue != 0 ? const BorderRadius.vertical(bottom: Radius.circular(12)) : BorderRadius.circular(12),
+                                ),
+                                title: Text(
+                                  AppLocalizations.of(context)!.seeHistory,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                trailing: Icon(
+                                  Icons.arrow_right,
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                ),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute<CardHistory>(
+                                    builder: (context) => CardHistory(
+                                      card: widget.card,
+                                      cardBill: cardbill,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   if (cardbill != null)
                     FutureBuilder(
                       future: getCardBillInstallments(Isar.getInstance()!, cardbill!.id),
@@ -269,7 +369,7 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                 ),
                                 borderRadius: const BorderRadius.all(Radius.circular(12)),
                               ),
-                              child: ListView.builder(
+                              child: ListView.separated(
                                 shrinkWrap: true,
                                 padding: EdgeInsets.zero,
                                 physics: const NeverScrollableScrollPhysics(),
@@ -315,6 +415,11 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                     ),
                                   );
                                 },
+                                separatorBuilder: (_, __) => Divider(
+                                  height: 2,
+                                  thickness: 1.5,
+                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                ),
                               ),
                             ),
                           ],

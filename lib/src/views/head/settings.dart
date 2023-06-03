@@ -62,22 +62,18 @@ class SettingsPage extends StatelessWidget {
         padding: EdgeInsets.zero,
         itemCount: elements.length,
         itemBuilder: (context, index) {
-          return Column(
-            children: [
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                shape: wid_utils.getShapeBorder(index, elements.length - 1),
-                title: Text(
-                  elements[index],
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                trailing: Icon(
-                  Icons.arrow_right,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                onTap: callbacks[index],
-              ),
-            ],
+          return ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+            shape: wid_utils.getShapeBorder(index, elements.length - 1),
+            title: Text(
+              elements[index],
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            trailing: Icon(
+              Icons.arrow_right,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            onTap: callbacks[index],
           );
         },
         separatorBuilder: (_, __) => Divider(

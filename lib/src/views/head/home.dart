@@ -62,7 +62,7 @@ class HomePage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              AppLocalizations.of(context)!.latest,
+                              AppLocalizations.of(context)!.latestDescriptor,
                               textAlign: TextAlign.start,
                               style: Theme.of(context).textTheme.titleLarge!.apply(
                                     color: Theme.of(context).colorScheme.onSurface,

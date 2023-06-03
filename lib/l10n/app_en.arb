@@ -34,6 +34,14 @@
             }
         }
     },
+    "cardHistory": "{name}'s history",
+    "@cardHistory": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
     "clear": "Clear",
     "confirm": "Confirm",
     "confirmPayQuestion": "Confirm pay?",
@@ -101,12 +109,16 @@
     "invalidName": "Invalid name",
     "invalidValue": "Invalid value",
     "irreversibleAction": "This action is irreversible",
-    "latest": "Latest:",
+    "latest": "Latest",
+    "latestDescriptor": "Latest:",
     "latestBill": "Latest bill",
     "limit": "Limit",
     "month": "Month",
     "name": "Name",
+    "next": "Next",
+    "nextBillDescriptor": "Next bill:",
     "none": "None",
+    "past": "Past",
     "paymentDue": "Payment Due",
     "perInstallmentValue": "Per-installment value",
     "price": "Price",
@@ -117,6 +129,7 @@
     "relatedTransactionsDescription": "Related transactions:",
     "save": "Save",
     "security": "Security",
+    "seeHistory": "See history",
     "select": "Select",
     "selectAccount": "Select Account",
     "selectCard": "Select Card",

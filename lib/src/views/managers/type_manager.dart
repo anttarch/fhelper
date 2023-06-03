@@ -18,15 +18,15 @@ class TypeManager extends StatefulWidget {
 class _TypeManagerState extends State<TypeManager> {
   final TextEditingController _controller = TextEditingController();
   Set<AttributeType> _attributeType = {AttributeType.incomeType};
-  List<Attribute> attributes = [];
-  int selectedIndex = -1;
+  Map<Attribute, List<Attribute>> attributes = {};
+  (int parentIndex, int childIndex) selectedIndex = (-1, -1);
 
-  Widget _selectedIndicator(int index) {
+  Widget _selectedIndicator(int parentIndex, int childIndex) {
     return Radio(
-      value: index,
+      value: (parentIndex, childIndex),
       groupValue: selectedIndex,
       onChanged: (value) => setState(() {
-        selectedIndex = value!;
+        selectedIndex = (parentIndex, childIndex);
       }),
     );
   }
@@ -41,8 +41,8 @@ class _TypeManagerState extends State<TypeManager> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        if (selectedIndex > -1) {
-          setState(() => selectedIndex = -1);
+        if (selectedIndex.$2 > -1) {
+          setState(() => selectedIndex = (-1, -1));
           return Future<bool>.value(false);
         }
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -67,18 +67,18 @@ class _TypeManagerState extends State<TypeManager> {
                 title: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    selectedIndex > -1 ? AppLocalizations.of(context)!.select : AppLocalizations.of(context)!.type(-1),
+                    selectedIndex.$2 > -1 ? AppLocalizations.of(context)!.select : AppLocalizations.of(context)!.type(-1),
                   ),
                 ),
                 actions: [
-                  if (selectedIndex > -1)
+                  if (selectedIndex.$2 > -1)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: IconButton(
-                        onPressed: () => setState(() => selectedIndex = -1),
+                        onPressed: () => setState(() => selectedIndex = (-1, -1)),
                         icon: Icon(
                           Icons.deselect,
-                          semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deselectIconButton : null,
+                          semanticLabel: selectedIndex.$2 > -1 ? AppLocalizations.of(context)!.deselectIconButton : null,
                         ),
                       ),
                     )
@@ -103,7 +103,7 @@ class _TypeManagerState extends State<TypeManager> {
                     onSelectionChanged: (p0) {
                       setState(() {
                         _attributeType = p0;
-                        selectedIndex = -1;
+                        selectedIndex = (-1, -1);
                       });
                     },
                   ),
@@ -121,72 +121,98 @@ class _TypeManagerState extends State<TypeManager> {
                           context: context,
                         ),
                         builder: (context, snapshot) {
-                          attributes = snapshot.hasData ? snapshot.data! : [];
-                          return Card(
-                            elevation: 0,
-                            margin: const EdgeInsets.fromLTRB(22, 15, 22, 0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(
-                                color: Theme.of(context).colorScheme.outlineVariant,
-                              ),
-                            ),
-                            child: ListView.separated(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              padding: EdgeInsets.zero,
-                              itemCount: attributes.length,
-                              itemBuilder: (context, index) {
-                                return OpenContainer(
-                                  closedElevation: 0,
-                                  closedColor: Colors.transparent,
-                                  openElevation: 0,
-                                  transitionDuration: const Duration(milliseconds: 250),
-                                  closedBuilder: (context, action) {
-                                    return ListTile(
-                                      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                                      shape: wid_utils.getShapeBorder(index, attributes.length - 1),
-                                      tileColor: selectedIndex == index ? Theme.of(context).colorScheme.surfaceVariant : null,
-                                      title: Text(
-                                        attributes[index].name,
-                                        style: Theme.of(context).textTheme.bodyLarge,
+                          attributes = snapshot.hasData ? snapshot.data! : {};
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.zero,
+                            itemCount: attributes.length,
+                            itemBuilder: (context, parentIndex) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 15),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      attributes.keys.toList()[parentIndex].name,
+                                      style: Theme.of(context).textTheme.titleLarge,
+                                    ),
+                                    Card(
+                                      elevation: 0,
+                                      margin: const EdgeInsets.only(top: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        side: BorderSide(
+                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                        ),
                                       ),
-                                      trailing: selectedIndex == -1
-                                          ? Icon(
-                                              Icons.arrow_right,
-                                              color: Theme.of(context).colorScheme.onSurface,
-                                            )
-                                          : _selectedIndicator(index),
-                                      onTap: () {
-                                        if (selectedIndex > -1) {
-                                          if (selectedIndex != index) {
-                                            setState(() {
-                                              selectedIndex = index;
-                                            });
-                                          }
-                                        } else {
-                                          action();
-                                        }
-                                      },
-                                      onLongPress: () {
-                                        setState(() {
-                                          selectedIndex = index;
-                                        });
-                                      },
-                                    );
-                                  },
-                                  openBuilder: (context, action) {
-                                    return AttributeDetailsView(
-                                      attribute: attributes[index],
-                                    );
-                                  },
-                                );
-                              },
-                              separatorBuilder: (_, __) => Divider(
-                                height: 2,
-                                thickness: 1.5,
-                                color: Theme.of(context).colorScheme.outlineVariant,
-                              ),
+                                      child: ListView.separated(
+                                        shrinkWrap: true,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        padding: EdgeInsets.zero,
+                                        itemCount: attributes.values.toList()[parentIndex].length,
+                                        itemBuilder: (context, childIndex) {
+                                          return OpenContainer(
+                                            closedElevation: 0,
+                                            closedColor: Colors.transparent,
+                                            openElevation: 0,
+                                            transitionDuration: const Duration(milliseconds: 250),
+                                            closedBuilder: (context, action) {
+                                              return ListTile(
+                                                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                                shape: wid_utils.getShapeBorder(childIndex, attributes.values.toList()[parentIndex].length - 1),
+                                                tileColor: selectedIndex == (parentIndex, childIndex) ? Theme.of(context).colorScheme.surfaceVariant : null,
+                                                title: Text(
+                                                  attributes.values.toList()[parentIndex][childIndex].name,
+                                                  style: Theme.of(context).textTheme.bodyLarge,
+                                                ),
+                                                trailing: selectedIndex.$2 == -1
+                                                    ? Icon(
+                                                        Icons.arrow_right,
+                                                        color: Theme.of(context).colorScheme.onSurface,
+                                                      )
+                                                    : _selectedIndicator(parentIndex, childIndex),
+                                                onTap: () {
+                                                  if (selectedIndex.$2 > -1) {
+                                                    if (selectedIndex != (parentIndex, childIndex)) {
+                                                      setState(() {
+                                                        selectedIndex = (parentIndex, childIndex);
+                                                      });
+                                                    }
+                                                  } else {
+                                                    action();
+                                                  }
+                                                },
+                                                onLongPress: () {
+                                                  setState(() {
+                                                    selectedIndex = (parentIndex, childIndex);
+                                                  });
+                                                },
+                                              );
+                                            },
+                                            openBuilder: (context, action) {
+                                              return AttributeDetailsView(
+                                                attribute: attributes.values.toList()[parentIndex][childIndex],
+                                              );
+                                            },
+                                          );
+                                        },
+                                        separatorBuilder: (_, __) => Divider(
+                                          height: 2,
+                                          thickness: 1.5,
+                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            separatorBuilder: (_, __) => Divider(
+                              height: 2,
+                              thickness: 1.5,
+                              color: Theme.of(context).colorScheme.outlineVariant,
                             ),
                           );
                         },
@@ -201,23 +227,24 @@ class _TypeManagerState extends State<TypeManager> {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () => showAttributeDialog<void>(
             context: context,
+            attributeRole: AttributeRole.child,
             attributeType: _attributeType.single,
             controller: _controller,
           ).then((_) {
             _controller.clear();
-            setState(() => selectedIndex = -1);
+            setState(() => selectedIndex = (-1, -1));
           }),
           label: Text(
             AppLocalizations.of(context)!.type(1),
             semanticsLabel: AppLocalizations.of(context)!.addTypeFAB,
           ),
           icon: const Icon(Icons.add),
-          elevation: selectedIndex > -1 ? 0 : null,
+          elevation: selectedIndex.$2 > -1 ? 0 : null,
         ),
-        floatingActionButtonLocation: selectedIndex > -1 ? FloatingActionButtonLocation.endContained : null,
+        floatingActionButtonLocation: selectedIndex.$2 > -1 ? FloatingActionButtonLocation.endContained : null,
         bottomNavigationBar: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          height: selectedIndex > -1 ? 80 + MediaQuery.paddingOf(context).bottom : 0,
+          height: selectedIndex.$2 > -1 ? 80 + MediaQuery.paddingOf(context).bottom : 0,
           child: BottomAppBar(
             child: Row(
               children: [
@@ -226,18 +253,24 @@ class _TypeManagerState extends State<TypeManager> {
                     context,
                     MaterialPageRoute<AttributeDetailsView>(
                       builder: (context) => AttributeDetailsView(
-                        attribute: attributes[selectedIndex],
+                        attribute: attributes.values.toList()[selectedIndex.$1][selectedIndex.$2],
                       ),
                     ),
                   ),
                   icon: Icon(
                     Icons.info,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.infoIconButton(attributes[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex.$2 > -1
+                        ? AppLocalizations.of(context)!.infoIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        : null,
                   ),
                 ),
                 IconButton(
                   onPressed: () async {
-                    await checkForAttributeDependencies(Isar.getInstance()!, attributes[selectedIndex].id, _attributeType.single).then(
+                    await checkForAttributeDependencies(
+                      Isar.getInstance()!,
+                      attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id,
+                      _attributeType.single,
+                    ).then(
                       (value) async {
                         final Isar isar = Isar.getInstance()!;
                         if (value > 0) {
@@ -258,11 +291,12 @@ class _TypeManagerState extends State<TypeManager> {
                                   FilledButton.tonal(
                                     onPressed: () async {
                                       final backupIndex = selectedIndex;
-                                      final backup = await getAttributeFromId(isar, attributes[selectedIndex].id, context: context);
+                                      final backup =
+                                          await getAttributeFromId(isar, attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id, context: context);
                                       await isar.writeTxn(() async {
-                                        await isar.attributes.delete(attributes[selectedIndex].id);
+                                        await isar.attributes.delete(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id);
                                       }).then((_) {
-                                        setState(() => selectedIndex = -1);
+                                        setState(() => selectedIndex = (-1, -1));
                                         Navigator.pop(context);
                                       });
                                       if (mounted) {
@@ -275,11 +309,14 @@ class _TypeManagerState extends State<TypeManager> {
                                                 await isar.writeTxn(() async {
                                                   await isar.attributes.put(backup);
                                                 }).then((_) {
-                                                  if (!attributes.contains(backup)) {
-                                                    if (attributes.length + 1 == backupIndex) {
-                                                      attributes.add(backup);
-                                                    } else if (backupIndex < attributes.length + 1) {
-                                                      attributes.insert(backupIndex, backup);
+                                                  if (backup.role == AttributeRole.child) {
+                                                    final list = attributes.values.toList()[backupIndex.$1];
+                                                    if (!list.contains(backup)) {
+                                                      if (list.length + 1 == backupIndex.$2) {
+                                                        attributes.values.toList()[backupIndex.$1].add(backup);
+                                                      } else if (backupIndex.$2 < list.length + 1) {
+                                                        attributes.values.toList()[backupIndex.$1].insert(backupIndex.$2, backup);
+                                                      }
                                                     }
                                                   }
                                                   setState(() => selectedIndex = backupIndex);
@@ -299,10 +336,10 @@ class _TypeManagerState extends State<TypeManager> {
                           );
                         } else {
                           final backupIndex = selectedIndex;
-                          final backup = await getAttributeFromId(isar, attributes[selectedIndex].id, context: context);
+                          final backup = await getAttributeFromId(isar, attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id, context: context);
                           await isar.writeTxn(() async {
-                            await isar.attributes.delete(attributes[selectedIndex].id);
-                          }).then((_) => setState(() => selectedIndex = -1));
+                            await isar.attributes.delete(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id);
+                          }).then((_) => setState(() => selectedIndex = (-1, -1)));
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -313,11 +350,14 @@ class _TypeManagerState extends State<TypeManager> {
                                     await isar.writeTxn(() async {
                                       await isar.attributes.put(backup);
                                     }).then((_) {
-                                      if (!attributes.contains(backup)) {
-                                        if (attributes.length + 1 == backupIndex) {
-                                          attributes.add(backup);
-                                        } else if (backupIndex < attributes.length + 1) {
-                                          attributes.insert(backupIndex, backup);
+                                      if (backup.role == AttributeRole.child) {
+                                        final list = attributes.values.toList()[backupIndex.$1];
+                                        if (!list.contains(backup)) {
+                                          if (list.length + 1 == backupIndex.$2) {
+                                            attributes.values.toList()[backupIndex.$1].add(backup);
+                                          } else if (backupIndex.$2 < list.length + 1) {
+                                            attributes.values.toList()[backupIndex.$1].insert(backupIndex.$2, backup);
+                                          }
                                         }
                                       }
                                       setState(() => selectedIndex = backupIndex);
@@ -334,28 +374,31 @@ class _TypeManagerState extends State<TypeManager> {
                   },
                   icon: Icon(
                     Icons.delete,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deleteIconButton(attributes[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex.$2 > -1
+                        ? AppLocalizations.of(context)!.deleteIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        : null,
                   ),
                 ),
                 IconButton(
                   onPressed: () async {
                     if (_controller.text.isEmpty) {
-                      _controller.text = attributes[selectedIndex].name;
+                      _controller.text = attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name;
                     }
                     await showAttributeDialog<void>(
                       context: context,
-                      attribute: attributes[selectedIndex],
-                      attributeType: _attributeType.single,
+                      attribute: attributes.values.toList()[selectedIndex.$1][selectedIndex.$2],
                       controller: _controller,
                       editMode: true,
                     ).then((_) {
                       _controller.clear();
-                      setState(() => selectedIndex = -1);
+                      setState(() => selectedIndex = (-1, -1));
                     });
                   },
                   icon: Icon(
                     Icons.edit,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.editIconButton(attributes[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex.$2 > -1
+                        ? AppLocalizations.of(context)!.editIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        : null,
                   ),
                 ),
               ],

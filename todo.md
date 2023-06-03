@@ -8,7 +8,10 @@
 
 ## Features
 - [ ] Add sub-accounts
-- [ ] Add sub-categories
+- [ ] Add sub-types
+  - [x] Type handling (update, delete)
+  - [ ] Type display (WIP)
+  - [ ] Type adding
 
 # TODO - 1.2.x
 

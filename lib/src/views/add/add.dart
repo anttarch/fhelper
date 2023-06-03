@@ -22,8 +22,8 @@ class AddView extends StatefulWidget {
 
 class _AddViewState extends State<AddView> {
   Set<EType> _eType = {EType.income};
-  int _typeId = -1;
-  int _accountId = -1;
+  (int parentIndex, int childIndex) _typeId = (-1, -1);
+  (int parentIndex, int childIndex) _accountId = (-1, -1);
   int _cardIndex = -1;
   int _installments = 0;
   bool _accountFieldLock = false;
@@ -104,8 +104,8 @@ class _AddViewState extends State<AddView> {
                     _formKey.currentState!.reset();
                     setState(() {
                       _eType = p0;
-                      _typeId = -1;
-                      _accountId = -1;
+                      _typeId = (-1, -1);
+                      _accountId = (-1, -1);
                       _cardIndex = -1;
                       displayText[0] = DateTime.now().toString();
                     });
@@ -221,7 +221,7 @@ class _AddViewState extends State<AddView> {
                                 }
                                 return null;
                               },
-                              onTap: () => showModalBottomSheet<void>(
+                              onTap: () => showModalBottomSheet<String?>(
                                 context: context,
                                 constraints: BoxConstraints(
                                   minHeight: MediaQuery.of(context).size.height / 3,
@@ -246,6 +246,7 @@ class _AddViewState extends State<AddView> {
                                                 TextButton.icon(
                                                   onPressed: () => showAttributeDialog<void>(
                                                     context: context,
+                                                    attributeRole: AttributeRole.child,
                                                     attributeType: _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType,
                                                     controller: textController[3],
                                                   ).then((_) => textController[3].clear()),
@@ -257,13 +258,13 @@ class _AddViewState extends State<AddView> {
                                           ),
                                           ListChoice(
                                             groupValue: _typeId,
-                                            onChanged: (value) {
+                                            onChanged: (name, value) {
                                               setState(() {
-                                                _typeId = value!;
+                                                _typeId = value! as (int, int);
                                               });
-                                              Navigator.pop(context);
+                                              Navigator.pop(context, name);
                                             },
-                                            attributeList: snapshot.hasData ? snapshot.data! : null,
+                                            attributeMap: snapshot.data,
                                           )
                                         ],
                                       );
@@ -271,11 +272,7 @@ class _AddViewState extends State<AddView> {
                                   );
                                 },
                               ).then(
-                                (_) => _typeId != -1
-                                    ? setState(
-                                        () => displayText[1] = snapshot.hasData ? snapshot.data![_typeId].name : null,
-                                      )
-                                    : null,
+                                (name) => _typeId != (-1, -1) ? setState(() => displayText[1] = name) : null,
                               ),
                             ),
                           );
@@ -338,9 +335,9 @@ class _AddViewState extends State<AddView> {
                                                 ),
                                                 ListChoice(
                                                   groupValue: _cardIndex,
-                                                  onChanged: (value) async {
+                                                  onChanged: (_, value) async {
                                                     setState(() {
-                                                      _cardIndex = value!;
+                                                      _cardIndex = value! as int;
                                                     });
                                                     await getAvailableLimit(
                                                       Isar.getInstance()!,
@@ -415,9 +412,9 @@ class _AddViewState extends State<AddView> {
                                                   ),
                                                   ListChoice(
                                                     groupValue: _installments,
-                                                    onChanged: (value) {
+                                                    onChanged: (_, value) {
                                                       setState(() {
-                                                        _installments = value!;
+                                                        _installments = value! as int;
                                                       });
                                                       Navigator.pop(context);
                                                     },
@@ -491,7 +488,7 @@ class _AddViewState extends State<AddView> {
                                 }
                                 return null;
                               },
-                              onTap: () => showModalBottomSheet<void>(
+                              onTap: () => showModalBottomSheet<String?>(
                                 context: context,
                                 constraints: BoxConstraints(
                                   minHeight: MediaQuery.of(context).size.height / 3,
@@ -517,6 +514,7 @@ class _AddViewState extends State<AddView> {
                                                   onPressed: () => showAttributeDialog<void>(
                                                     context: context,
                                                     attributeType: AttributeType.account,
+                                                    attributeRole: AttributeRole.child,
                                                     controller: textController[3],
                                                   ).then((_) => textController[3].clear()),
                                                   icon: const Icon(Icons.add),
@@ -527,13 +525,13 @@ class _AddViewState extends State<AddView> {
                                           ),
                                           ListChoice(
                                             groupValue: _accountId,
-                                            onChanged: (value) {
+                                            onChanged: (name, value) {
                                               setState(() {
-                                                _accountId = value!;
+                                                _accountId = value! as (int, int);
                                               });
-                                              Navigator.pop(context);
+                                              Navigator.pop(context, name);
                                             },
-                                            attributeList: snapshot.hasData ? snapshot.data! : [],
+                                            attributeMap: snapshot.data,
                                           ),
                                         ],
                                       );
@@ -541,11 +539,7 @@ class _AddViewState extends State<AddView> {
                                   );
                                 },
                               ).then(
-                                (_) => _accountId != -1
-                                    ? setState(
-                                        () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
-                                      )
-                                    : null,
+                                (name) => _accountId != (-1, -1) ? setState(() => displayText[2] = name) : null,
                               ),
                             ),
                           );
@@ -579,15 +573,17 @@ class _AddViewState extends State<AddView> {
                       final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
                       final String installmentValue = textController[2].text.replaceAll(RegExp('[^0-9]'), '');
                       final Isar isar = Isar.getInstance()!;
+                      final Map<Attribute, List<Attribute>> types =
+                          await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType);
                       final Exchange exchange = Exchange(
                         eType: _eType.single,
                         description: textController[0].text,
                         value: _eType.single == EType.income ? double.parse(value) / 100 : -double.parse(value) / 100,
                         date: DateTime.parse(displayText[0]!),
-                        typeId: (await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType))[_typeId].id,
+                        typeId: types.values.toList()[_typeId.$1][_typeId.$2].id,
                         accountId: _cardIndex > -1
                             ? (await fhelper.getCards(isar))[_cardIndex].accountId
-                            : (await getAttributes(isar, AttributeType.account))[_accountId].id,
+                            : (await getAttributes(isar, AttributeType.account)).values.toList()[_accountId.$1][_accountId.$2].id,
                         cardId: _eType.single == EType.expense && _cardIndex > -1 ? (await fhelper.getCards(isar))[_cardIndex].id : null,
                         installments: _cardIndex > -1 ? _installments + 1 : null,
                         installmentValue: _cardIndex > -1

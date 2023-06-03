@@ -83,7 +83,7 @@ class _AccountManagerState extends State<AccountManager> {
                         context: context,
                       ),
                       builder: (context, snapshot) {
-                        attributes = snapshot.hasData ? snapshot.data! : [];
+                        attributes = snapshot.hasData ? snapshot.data!.values.first : [];
                         return Card(
                           elevation: 0,
                           margin: const EdgeInsets.fromLTRB(22, 12, 22, 0),
@@ -162,6 +162,7 @@ class _AccountManagerState extends State<AccountManager> {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () => showAttributeDialog<void>(
             context: context,
+            attributeRole: AttributeRole.child,
             attributeType: AttributeType.account,
             controller: _controller,
           ).then((_) {
@@ -306,7 +307,6 @@ class _AccountManagerState extends State<AccountManager> {
                     await showAttributeDialog<void>(
                       context: context,
                       attribute: attributes[selectedIndex],
-                      attributeType: AttributeType.account,
                       controller: _controller,
                       editMode: true,
                     ).then((_) {

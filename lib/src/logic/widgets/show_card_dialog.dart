@@ -31,12 +31,12 @@ Future<void> showCardForm({
     // Account,
     null,
   ];
-  int accountId = -1;
+  (int parentIndex, int childIndex) accountId = (-1, -1);
   int pdDate = -1;
   int stcDate = -1;
 
   void cleanForm() {
-    accountId = -1;
+    accountId = (-1, -1);
     stcDate = -1;
     pdDate = -1;
     displayText.fillRange(0, 3, null);
@@ -53,7 +53,7 @@ Future<void> showCardForm({
       statementClosure: stcDate + 1,
       paymentDue: pdDate + 1,
       limit: double.parse(value) / 100,
-      accountId: (await getAttributes(isar, AttributeType.account))[accountId].id,
+      accountId: (await getAttributes(isar, AttributeType.account)).values.toList()[accountId.$1][accountId.$2].id,
     );
     await isar.writeTxn(() async {
       await isar.cards.put(card);
@@ -69,7 +69,7 @@ Future<void> showCardForm({
       statementClosure: stcDate + 1,
       paymentDue: pdDate + 1,
       limit: double.parse(value) / 100,
-      accountId: accountId == -1 ? null : (await getAttributes(isar, AttributeType.account))[accountId].id,
+      accountId: accountId == (-1, -1) ? null : (await getAttributes(isar, AttributeType.account)).values.toList()[accountId.$1][accountId.$2].id,
     );
     await isar.writeTxn(() async {
       await isar.cards.put(newCard);
@@ -180,9 +180,9 @@ Future<void> showCardForm({
                                           ),
                                           ListChoice(
                                             groupValue: stcDate,
-                                            onChanged: (value) {
+                                            onChanged: (_, value) {
                                               setState(() {
-                                                stcDate = value!;
+                                                stcDate = value! as int;
                                               });
                                               Navigator.pop(context);
                                             },
@@ -233,9 +233,9 @@ Future<void> showCardForm({
                                           ),
                                           ListChoice(
                                             groupValue: pdDate,
-                                            onChanged: (value) {
+                                            onChanged: (_, value) {
                                               setState(() {
-                                                pdDate = value!;
+                                                pdDate = value! as int;
                                               });
                                               Navigator.pop(context);
                                             },
@@ -291,14 +291,14 @@ Future<void> showCardForm({
                                     }
                                     return null;
                                   },
-                                  onTap: () => showModalBottomSheet<void>(
+                                  onTap: () => showModalBottomSheet<String?>(
                                     context: context,
                                     constraints: BoxConstraints(
                                       minHeight: MediaQuery.of(context).size.height / 3,
                                     ),
                                     enableDrag: false,
                                     builder: (context) {
-                                      int accountIndex = editMode && snapshot.hasData ? snapshot.data!.indexOf(cardAttribute!) : -1;
+                                      int accountIndex = editMode && snapshot.hasData ? snapshot.data!.keys.toList().indexOf(cardAttribute!) : -1;
                                       return StatefulBuilder(
                                         builder: (context, setState) {
                                           return Column(
@@ -318,6 +318,7 @@ Future<void> showCardForm({
                                                       onPressed: () => showAttributeDialog<void>(
                                                         context: context,
                                                         attributeType: AttributeType.account,
+                                                        attributeRole: AttributeRole.child,
                                                         controller: controller[2],
                                                       ).then((_) => controller[2].clear()),
                                                       icon: const Icon(Icons.add),
@@ -328,16 +329,16 @@ Future<void> showCardForm({
                                               ),
                                               ListChoice(
                                                 groupValue: editMode ? accountIndex : accountId,
-                                                onChanged: (value) {
+                                                onChanged: (name, value) {
                                                   setState(() {
                                                     if (editMode) {
-                                                      accountIndex = value!;
+                                                      accountIndex = value! as int;
                                                     }
-                                                    accountId = value!;
+                                                    accountId = value! as (int, int);
                                                   });
-                                                  Navigator.pop(context);
+                                                  Navigator.pop(context, name);
                                                 },
-                                                attributeList: snapshot.hasData ? snapshot.data! : [],
+                                                attributeMap: snapshot.data,
                                               )
                                             ],
                                           );
@@ -345,11 +346,7 @@ Future<void> showCardForm({
                                       );
                                     },
                                   ).then(
-                                    (_) => accountId != -1
-                                        ? setState(
-                                            () => displayText[2] = snapshot.hasData ? snapshot.data![accountId].name : null,
-                                          )
-                                        : null,
+                                    (name) => accountId != (-1, -1) ? setState(() => displayText[2] = name) : null,
                                   ),
                                 ),
                               );

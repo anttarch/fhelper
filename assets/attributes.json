@@ -1,12 +1,14 @@
 [
     {
         "id": 0,
-        "name": "Main bank account",
+        "name": "$bankString",
+        "role": 0,
         "type": 0
     },
     {
         "id": 1,
-        "name": "Wallet",
+        "name": "$othersString",
+        "role": 0,
         "type": 0
     },
 
@@ -14,26 +16,34 @@
     {
         "id": 2,
         "name": "Benefits",
+        "role": 0,
         "type": 1
     },
     {
         "id": 3,
         "name": "Gifts",
+        "role": 0,
         "type": 1
     },
     {
         "id": 4,
         "name": "Loans",
+        "parentId": 2,
+        "role": 1,
         "type": 1
     },
     {
         "id": 5,
         "name": "Salary",
+        "parentId": 2,
+        "role": 1,
         "type": 1
     },
     {
         "id": 6,
         "name": "Others",
+        "parentId": 3,
+        "role": 1,
         "type": 1
     },
 
@@ -41,41 +51,49 @@
     {
         "id": 7,
         "name": "Bills",
+        "role": 0,
         "type": 2
     },
     {
         "id": 8,
         "name": "Food",
+        "role": 0,
         "type": 2
     },
     {
         "id": 9,
         "name": "Health",
+        "role": 0,
         "type": 2
     },
     {
         "id": 10,
         "name": "Home",
+        "role": 0,
         "type": 2
     },
     {
         "id": 11,
         "name": "Personal",
+        "role": 0,
         "type": 2
     },
     {
         "id": 12,
         "name": "Recreation",
+        "role": 0,
         "type": 2
     },
     {
         "id": 13,
         "name": "Transports",
+        "role": 0,
         "type": 2
     },
     {
         "id": 14,
         "name": "Others",
+        "role": 0,
         "type": 2
     }    
 ]

@@ -7,12 +7,14 @@ import 'package:isar/isar.dart';
 
 Future<T?> showAttributeDialog<T>({
   required BuildContext context,
-  required AttributeType attributeType,
+  AttributeRole? attributeRole,
+  AttributeType? attributeType,
   required TextEditingController controller,
   Attribute? attribute,
   bool editMode = false,
 }) {
   assert(editMode ? attribute != null : attribute == null);
+  assert(editMode ? attributeType == null && attributeRole == null : attributeType != null && attributeRole != null);
   return showDialog<T>(
     context: context,
     useSafeArea: false,
@@ -56,12 +58,15 @@ Future<T?> showAttributeDialog<T>({
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
                       final Isar isar = Isar.getInstance()!;
-                      Attribute attr = Attribute(
-                        name: controller.text,
-                        type: attributeType,
-                      );
+                      late Attribute attr;
                       if (editMode) {
                         attr = attribute!.copyWith(name: controller.text);
+                      } else {
+                        attr = Attribute(
+                          name: controller.text,
+                          role: attributeRole!,
+                          type: attributeType!,
+                        );
                       }
                       await isar.writeTxn(() async {
                         await isar.attributes.put(attr);
@@ -89,12 +94,15 @@ Future<T?> showAttributeDialog<T>({
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
                           final Isar isar = Isar.getInstance()!;
-                          Attribute attr = Attribute(
-                            name: controller.text,
-                            type: attributeType,
-                          );
+                          late Attribute attr;
                           if (editMode) {
                             attr = attribute!.copyWith(name: controller.text);
+                          } else {
+                            attr = Attribute(
+                              name: controller.text,
+                              role: attributeRole!,
+                              type: attributeType!,
+                            );
                           }
                           await isar.writeTxn(() async {
                             await isar.attributes.put(attr);

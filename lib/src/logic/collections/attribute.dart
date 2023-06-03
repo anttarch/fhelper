@@ -4,6 +4,11 @@ import 'package:isar/isar.dart';
 
 part 'attribute.g.dart';
 
+enum AttributeRole {
+  parent,
+  child,
+}
+
 enum AttributeType {
   account,
   incomeType,
@@ -16,22 +21,31 @@ class Attribute {
   const Attribute({
     this.id = Isar.autoIncrement,
     required this.name,
+    this.parentId,
+    required this.role,
     required this.type,
-  });
+  }) : assert(role == AttributeRole.child ? parentId != null : parentId == null, 'This child needs a parent');
 
   final Id id;
   final String name;
+  final int? parentId;
+  @enumerated
+  final AttributeRole role;
   @enumerated
   final AttributeType type;
 
   Attribute copyWith({
     Id? id,
     String? name,
+    int? parentId,
+    AttributeRole? role,
     AttributeType? type,
   }) {
     return Attribute(
       id: id ?? this.id,
       name: name ?? this.name,
+      parentId: parentId ?? this.parentId,
+      role: role ?? this.role,
       type: type ?? this.type,
     );
   }
@@ -42,16 +56,18 @@ class Attribute {
       return true;
     }
 
-    return other.id == id && other.name == name && other.type == type;
+    return other.id == id && other.name == name && other.parentId == parentId && other.role == role && other.type == type;
   }
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ type.hashCode;
+  int get hashCode => id.hashCode ^ name.hashCode ^ parentId.hashCode ^ role.hashCode ^ type.hashCode;
 }
 
-Future<List<Attribute>> getAttributes(Isar isar, AttributeType type, {BuildContext? context}) async {
+Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType type, {BuildContext? context}) async {
   final List<Attribute> attributes = await isar.attributes.where().filter().typeEqualTo(type).findAll();
+  final Map<Attribute, List<Attribute>> attributeMap = {};
   if (attributes.isNotEmpty && context != null) {
+    // Handles l10n
     for (final attribute in attributes) {
       if (attribute.id >= 0 && attribute.id <= 14 && context.mounted) {
         final index = attributes.indexOf(attribute);
@@ -61,8 +77,20 @@ Future<List<Attribute>> getAttributes(Isar isar, AttributeType type, {BuildConte
         attributes.replaceRange(index, index + 1, [newAttribute]);
       }
     }
+    // Handle roles
+    for (final attr in attributes) {
+      if (attr.role == AttributeRole.parent) {
+        attributeMap.addAll({attr: []});
+      } else {
+        final parent = attributeMap.keys.singleWhere((element) => element.id == attr.parentId);
+        attributeMap.update(parent, (value) {
+          final List<Attribute> list = [...value, attr]..sort((a, b) => a.name.compareTo(b.name));
+          return value = list;
+        });
+      }
+    }
   }
-  return attributes;
+  return attributeMap;
 }
 
 Future<Attribute?> getAttributeFromId(Isar isar, int id, {BuildContext? context}) async {

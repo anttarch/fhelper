@@ -17,8 +17,8 @@ class TransferView extends StatefulWidget {
 }
 
 class _TransferViewState extends State<TransferView> {
-  int _accountId = -1;
-  int _accountIdEnd = -1;
+  (int parentId, int childId) _accountId = (-1, -1);
+  (int parentId, int childId) _accountIdEnd = (-1, -1);
   double _accountFromValue = 0;
   final List<String?> displayText = [
     // Origin
@@ -82,7 +82,7 @@ class _TransferViewState extends State<TransferView> {
                                   child: FutureBuilder(
                                     future: getSumValueByAttribute(
                                       Isar.getInstance()!,
-                                      _accountId != -1 ? snapshot.data![_accountId].id : -1,
+                                      _accountId != (-1, -1) ? snapshot.data!.values.toList()[_accountId.$1][_accountId.$2].id : -1,
                                       AttributeType.account,
                                     ),
                                     builder: (context, sum) {
@@ -106,7 +106,7 @@ class _TransferViewState extends State<TransferView> {
                                           }
                                           return null;
                                         },
-                                        onTap: () => showModalBottomSheet<void>(
+                                        onTap: () => showModalBottomSheet<String?>(
                                           context: context,
                                           constraints: BoxConstraints(
                                             minHeight: MediaQuery.of(context).size.height / 3,
@@ -131,6 +131,7 @@ class _TransferViewState extends State<TransferView> {
                                                           TextButton.icon(
                                                             onPressed: () => showAttributeDialog<void>(
                                                               context: context,
+                                                              attributeRole: AttributeRole.child,
                                                               attributeType: AttributeType.account,
                                                               controller: _controller[1],
                                                             ).then((_) => _controller[1].clear()),
@@ -142,26 +143,26 @@ class _TransferViewState extends State<TransferView> {
                                                     ),
                                                     ListChoice(
                                                       groupValue: _accountId,
-                                                      onChanged: (value) async {
+                                                      onChanged: (name, value) async {
                                                         setState(() {
-                                                          _accountId = value!;
+                                                          _accountId = value! as (int, int);
                                                           if (_accountIdEnd == value) {
-                                                            _accountIdEnd = -1;
+                                                            _accountIdEnd = (-1, -1);
                                                             displayText[1] = null;
                                                           }
                                                         });
                                                         await getSumValueByAttribute(
                                                           Isar.getInstance()!,
-                                                          _accountId != -1 ? snapshot.data![_accountId].id : -1,
+                                                          _accountId != (-1, -1) ? snapshot.data!.values.toList()[_accountId.$1][_accountId.$2].id : -1,
                                                           AttributeType.account,
                                                         ).then((value) {
                                                           setState(() {
                                                             _accountFromValue = value;
                                                           });
-                                                          Navigator.pop(context);
+                                                          Navigator.pop(context, name);
                                                         });
                                                       },
-                                                      attributeList: snapshot.hasData ? snapshot.data! : [],
+                                                      attributeMap: snapshot.data,
                                                     ),
                                                   ],
                                                 );
@@ -169,11 +170,7 @@ class _TransferViewState extends State<TransferView> {
                                             );
                                           },
                                         ).then(
-                                          (_) => _accountId != -1
-                                              ? setState(
-                                                  () => displayText[0] = snapshot.hasData ? snapshot.data![_accountId].name : null,
-                                                )
-                                              : null,
+                                          (name) => _accountId != (-1, -1) ? setState(() => displayText[0] = name) : null,
                                         ),
                                       );
                                     },
@@ -192,7 +189,7 @@ class _TransferViewState extends State<TransferView> {
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
                                     label: AppLocalizations.of(context)!.to,
-                                    locked: _accountId == -1,
+                                    locked: _accountId == (-1, -1),
                                     readOnly: true,
                                     placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
                                     validator: (value) {
@@ -201,7 +198,7 @@ class _TransferViewState extends State<TransferView> {
                                       }
                                       return null;
                                     },
-                                    onTap: () => showModalBottomSheet<void>(
+                                    onTap: () => showModalBottomSheet<String?>(
                                       context: context,
                                       constraints: BoxConstraints(
                                         minHeight: MediaQuery.of(context).size.height / 3,
@@ -226,6 +223,7 @@ class _TransferViewState extends State<TransferView> {
                                                       TextButton.icon(
                                                         onPressed: () => showAttributeDialog<void>(
                                                           context: context,
+                                                          attributeRole: AttributeRole.child,
                                                           attributeType: AttributeType.account,
                                                           controller: _controller[1],
                                                         ).then((_) => _controller[1].clear()),
@@ -237,14 +235,14 @@ class _TransferViewState extends State<TransferView> {
                                                 ),
                                                 ListChoice(
                                                   groupValue: _accountIdEnd,
-                                                  hiddenIndex: _accountId,
-                                                  onChanged: (value) {
+                                                  hiddenIndex: _accountId.$2,
+                                                  onChanged: (name, value) {
                                                     setState(() {
-                                                      _accountIdEnd = value!;
+                                                      _accountIdEnd = value! as (int, int);
                                                     });
-                                                    Navigator.pop(context);
+                                                    Navigator.pop(context, name);
                                                   },
-                                                  attributeList: snapshot.hasData ? snapshot.data! : [],
+                                                  attributeMap: snapshot.data,
                                                 ),
                                               ],
                                             );
@@ -252,11 +250,7 @@ class _TransferViewState extends State<TransferView> {
                                         );
                                       },
                                     ).then(
-                                      (_) => _accountIdEnd != -1
-                                          ? setState(
-                                              () => displayText[1] = snapshot.hasData ? snapshot.data![_accountIdEnd].name : null,
-                                            )
-                                          : null,
+                                      (name) => _accountIdEnd != (-1, -1) ? setState(() => displayText[1] = name) : null,
                                     ),
                                   ),
                                 );
@@ -314,8 +308,8 @@ class _TransferViewState extends State<TransferView> {
                         if (_formKey.currentState!.validate()) {
                           final String value = _controller[0].text.replaceAll(RegExp('[^0-9]'), '');
                           final Isar isar = Isar.getInstance()!;
-                          final Attribute from = (await getAttributes(isar, AttributeType.account))[_accountId];
-                          final Attribute to = (await getAttributes(isar, AttributeType.account))[_accountIdEnd];
+                          final Attribute from = (await getAttributes(isar, AttributeType.account)).values.toList()[_accountId.$1][_accountId.$2];
+                          final Attribute to = (await getAttributes(isar, AttributeType.account)).values.toList()[_accountIdEnd.$1][_accountIdEnd.$2];
                           final Exchange exchange = Exchange(
                             eType: EType.transfer,
                             description: '${from.name}#/spt#/${to.name}',

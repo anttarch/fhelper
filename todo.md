@@ -4,7 +4,7 @@
 - [x] Fix some padding issues
 
 ## Cards Management
-- [ ] Show next bill information on CardDetailsView (at least value)
+- [x] Show next bill information on CardDetailsView (at least value)
 
 ## Features
 - [ ] Add sub-accounts

@@ -1,6 +1,7 @@
 import 'package:fhelper/src/logic/l10n_attributes.dart';
 import 'package:flutter/widgets.dart';
 import 'package:isar/isar.dart';
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 part 'attribute.g.dart';
 
@@ -69,7 +70,7 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType t
   if (attributes.isNotEmpty && context != null) {
     // Handles l10n
     for (final attribute in attributes) {
-      if (attribute.id >= 0 && attribute.id <= 14 && context.mounted) {
+      if (attribute.id >= 0 && attribute.id <= 20 && context.mounted && attribute.name.contains('#/str#/')) {
         final index = attributes.indexOf(attribute);
         final newAttribute = attribute.copyWith(
           name: translatedDefaultAttribute(context, attribute.id),
@@ -82,11 +83,14 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType t
       if (attr.role == AttributeRole.parent) {
         attributeMap.addAll({attr: []});
       } else {
-        final parent = attributeMap.keys.singleWhere((element) => element.id == attr.parentId);
-        attributeMap.update(parent, (value) {
-          final List<Attribute> list = [...value, attr]..sort((a, b) => a.name.compareTo(b.name));
-          return value = list;
-        });
+        final parent = attributeMap.keys.where((element) => element.id == attr.parentId).toList()
+          ..sort((a, b) => unorm.nfd(a.name).compareTo(unorm.nfd(b.name)));
+        for (final element in parent) {
+          attributeMap.update(element, (value) {
+            final List<Attribute> list = [...value, attr]..sort((a, b) => unorm.nfd(a.name).compareTo(unorm.nfd(b.name)));
+            return value = list;
+          });
+        }
       }
     }
   }

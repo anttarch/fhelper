@@ -1,4 +1,4 @@
-# TODO - 1.1.1
+# TODO - 1.2.0
 
 ## General UI
 - [x] Fix some padding issues
@@ -7,13 +7,13 @@
 - [x] Show next bill information on CardDetailsView (at least value)
 
 ## Features
-- [ ] Add sub-accounts
-- [ ] Add sub-types
+- [ ] Add subaccounts
+- [ ] Add subtypes
   - [x] Type handling (update, delete)
-  - [ ] Type display (WIP)
-  - [ ] Type adding
+  - [ ] Type display (WIP) - most of it it's done but depends on subaccounts
+  - [x] Type adding
 
-# TODO - 1.2.x
+# TODO - 1.x.x
 
 ## General UI
 - [ ] Add multi-select

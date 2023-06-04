@@ -170,7 +170,7 @@ class _TransferViewState extends State<TransferView> {
                                             );
                                           },
                                         ).then(
-                                          (name) => _accountId != (-1, -1) ? setState(() => displayText[0] = name) : null,
+                                          (name) => _accountId != (-1, -1) && name != null ? setState(() => displayText[0] = name) : null,
                                         ),
                                       );
                                     },
@@ -250,7 +250,7 @@ class _TransferViewState extends State<TransferView> {
                                         );
                                       },
                                     ).then(
-                                      (name) => _accountIdEnd != (-1, -1) ? setState(() => displayText[1] = name) : null,
+                                      (name) => _accountIdEnd != (-1, -1) && name != null ? setState(() => displayText[1] = name) : null,
                                     ),
                                   ),
                                 );

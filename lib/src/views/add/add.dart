@@ -272,7 +272,7 @@ class _AddViewState extends State<AddView> {
                                   );
                                 },
                               ).then(
-                                (name) => _typeId != (-1, -1) ? setState(() => displayText[1] = name) : null,
+                                (name) => _typeId != (-1, -1) && name != null ? setState(() => displayText[1] = name) : null,
                               ),
                             ),
                           );
@@ -539,7 +539,7 @@ class _AddViewState extends State<AddView> {
                                   );
                                 },
                               ).then(
-                                (name) => _accountId != (-1, -1) ? setState(() => displayText[2] = name) : null,
+                                (name) => _accountId != (-1, -1) && name != null ? setState(() => displayText[2] = name) : null,
                               ),
                             ),
                           );

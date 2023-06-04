@@ -72,6 +72,15 @@
             }
         }
     },
+    "deletePermanentlyQuestion": "Permanently delete?",
+    "deleteContentDescription": "All related data and related {count, plural, =1{subtypes} other{subaccounts}} are also being deleted.",
+    "@deleteContentDescription": {
+        "placeholders": {
+            "count": {
+                "type": "num"
+            }
+        }
+    },
     "dependencyPhrase": "{count, plural, =1{1 dependency was} other{{count} dependencies were}} found",
     "@dependencyPhrase": {
         "placeholders": {
@@ -139,6 +148,8 @@
     "showOnly": "Show only:",
     "statementClosing": "Statement Closing",
     "statistics": "Statistics",
+    "subaccount": "Subaccount",
+    "subtype": "Subtype",
     "theme": "Theme",
     "thisMonth": "This Month",
     "thisWeek": "This Week",
@@ -238,10 +249,23 @@
     "salaryIncomeType": "Salary",
     "othersIncomeType": "Others",
 
-    "billsExpenseType": "Bills",
     "foodExpenseType": "Food",
-    "healthExpenseType": "Health",
+    "marketFOOD": "Market",
+    "streetMarketFOOD": "Street Market",
+    "bakeryFOOD": "Bakery",
+    "restaurantFOOD": "Restaurant",
+
     "homeExpenseType": "Home",
+    "housePaymentHOME": "House payment",
+    "cleaningHOME": "Cleaning services",
+    "waterBillHOME": "Water bill",
+    "electricityBillHOME": "Electricity bill",
+    "propertyTaxHOME": "Property Tax",
+    "internetTVHOME": "Internet/TV",
+
+
+    "billsExpenseType": "Bills",
+    "healthExpenseType": "Health",
     "personalExpenseType": "Personal",
     "recreationExpenseType": "Recreation",
     "transportsExpenseType": "Transports",

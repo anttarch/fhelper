@@ -1,13 +1,13 @@
 [
     {
         "id": 0,
-        "name": "$bankString",
+        "name": "#/str#/bankString",
         "role": 0,
         "type": 0
     },
     {
         "id": 1,
-        "name": "$othersString",
+        "name": "#/str#/othersString",
         "role": 0,
         "type": 0
     },
@@ -15,33 +15,33 @@
 
     {
         "id": 2,
-        "name": "Benefits",
+        "name": "#/str#/benefitsString",
         "role": 0,
         "type": 1
     },
     {
         "id": 3,
-        "name": "Gifts",
+        "name": "#/str#/giftsString",
         "role": 0,
         "type": 1
     },
     {
         "id": 4,
-        "name": "Loans",
+        "name": "#/str#/loansString",
         "parentId": 2,
         "role": 1,
         "type": 1
     },
     {
         "id": 5,
-        "name": "Salary",
+        "name": "#/str#/salaryString",
         "parentId": 2,
         "role": 1,
         "type": 1
     },
     {
         "id": 6,
-        "name": "Others",
+        "name": "#/str#/othersString",
         "parentId": 3,
         "role": 1,
         "type": 1
@@ -50,50 +50,98 @@
 
     {
         "id": 7,
-        "name": "Bills",
+        "name": "#/str#/foodString",
         "role": 0,
         "type": 2
     },
     {
         "id": 8,
-        "name": "Food",
-        "role": 0,
+        "name": "#/str#/marketString",
+        "parentId": 7,
+        "role": 1,
         "type": 2
     },
     {
         "id": 9,
-        "name": "Health",
-        "role": 0,
+        "name": "#/str#/streetMarketString",
+        "parentId": 7,
+        "role": 1,
         "type": 2
     },
     {
         "id": 10,
-        "name": "Home",
-        "role": 0,
+        "name": "#/str#/bakeryString",
+        "parentId": 7,
+        "role": 1,
         "type": 2
     },
     {
         "id": 11,
-        "name": "Personal",
-        "role": 0,
+        "name": "#/str#/restaurantString",
+        "parentId": 7,
+        "role": 1,
         "type": 2
     },
     {
         "id": 12,
-        "name": "Recreation",
-        "role": 0,
+        "name": "#/str#/othersString",
+        "parentId": 7,
+        "role": 1,
         "type": 2
     },
     {
         "id": 13,
-        "name": "Transports",
+        "name": "#/str#/homeString",
         "role": 0,
         "type": 2
     },
     {
         "id": 14,
-        "name": "Others",
-        "role": 0,
+        "name": "#/str#/housePaymentString",
+        "parentId": 13,
+        "role": 1,
         "type": 2
-    }    
+    },
+    {
+        "id": 15,
+        "name": "#/str#/cleaningString",
+        "parentId": 13,
+        "role": 1,
+        "type": 2
+    },
+    {
+        "id": 16,
+        "name": "#/str#/waterBillString",
+        "parentId": 13,
+        "role": 1,
+        "type": 2
+    },
+    {
+        "id": 17,
+        "name": "#/str#/eletricityBillString",
+        "parentId": 13,
+        "role": 1,
+        "type": 2
+    },
+    {
+        "id": 18,
+        "name": "#/str#/propertyTaxString",
+        "parentId": 13,
+        "role": 1,
+        "type": 2
+    },
+    {
+        "id": 19,
+        "name": "#/str#/internetTVString",
+        "parentId": 13,
+        "role": 1,
+        "type": 2
+    },
+    {
+        "id": 20,
+        "name": "#/str#/othersString",
+        "parentId": 13,
+        "role": 1,
+        "type": 2
+    }
 ]

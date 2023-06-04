@@ -346,7 +346,7 @@ Future<void> showCardForm({
                                       );
                                     },
                                   ).then(
-                                    (name) => accountId != (-1, -1) ? setState(() => displayText[2] = name) : null,
+                                    (name) => accountId != (-1, -1) && name != null ? setState(() => displayText[2] = name) : null,
                                   ),
                                 ),
                               );

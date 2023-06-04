@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/utils.dart';
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -77,7 +78,13 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   FutureBuilder(
-                    future: getLatest(Isar.getInstance()!, attributeId: widget.attribute.id, attributeType: widget.attribute.type),
+                    future: getLatest(Isar.getInstance()!, attributeId: widget.attribute.id, attributeType: widget.attribute.type).then((value) async {
+                      if (value != null && value.eType == EType.transfer) {
+                        final transfer = value.copyWith(description: await wid_utils.parseTransferName(context, value));
+                        return transfer;
+                      }
+                      return value;
+                    }),
                     builder: (context, snapshot) {
                       final Exchange? exchange = snapshot.data;
                       return Visibility(
@@ -114,14 +121,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                                   child: _getLeadingIcon(exchange),
                                                 ),
                                               Text(
-                                                exchange != null
-                                                    ? exchange.eType == EType.transfer
-                                                        ? AppLocalizations.of(context)!.transferDescription(
-                                                            exchange.description.split('#/spt#/')[0],
-                                                            exchange.description.split('#/spt#/')[1],
-                                                          )
-                                                        : exchange.description
-                                                    : 'Placeholder',
+                                                exchange != null ? exchange.description : 'Placeholder',
                                                 textAlign: TextAlign.start,
                                                 style: Theme.of(context).textTheme.bodyLarge!.apply(
                                                       color: Theme.of(context).colorScheme.onSurfaceVariant,

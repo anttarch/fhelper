@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
@@ -17,15 +16,15 @@ class AccountManager extends StatefulWidget {
 
 class _AccountManagerState extends State<AccountManager> {
   final TextEditingController _controller = TextEditingController();
-  int selectedIndex = -1;
-  List<Attribute> attributes = [];
+  Map<Attribute, List<Attribute>> attributes = {};
+  (int parentIndex, int childIndex) selectedIndex = (-1, -1);
 
-  Widget _selectedIndicator(int index) {
+  Widget _selectedIndicator(int parentIndex, int childIndex) {
     return Radio(
-      value: index,
+      value: (parentIndex, childIndex),
       groupValue: selectedIndex,
       onChanged: (value) => setState(() {
-        selectedIndex = value!;
+        selectedIndex = (parentIndex, childIndex);
       }),
     );
   }
@@ -40,8 +39,8 @@ class _AccountManagerState extends State<AccountManager> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        if (selectedIndex > -1) {
-          setState(() => selectedIndex = -1);
+        if (selectedIndex.$2 > -1) {
+          setState(() => selectedIndex = (-1, -1));
           return Future<bool>.value(false);
         }
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -54,18 +53,18 @@ class _AccountManagerState extends State<AccountManager> {
               title: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  selectedIndex > -1 ? AppLocalizations.of(context)!.select : AppLocalizations.of(context)!.account(-1),
+                  selectedIndex.$2 > -1 ? AppLocalizations.of(context)!.select : AppLocalizations.of(context)!.account(-1),
                 ),
               ),
               actions: [
-                if (selectedIndex > -1)
+                if (selectedIndex.$2 > -1)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: IconButton(
-                      onPressed: () => setState(() => selectedIndex = -1),
+                      onPressed: () => setState(() => selectedIndex = (-1, -1)),
                       icon: Icon(
                         Icons.deselect,
-                        semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deselectIconButton : null,
+                        semanticLabel: selectedIndex.$2 > -1 ? AppLocalizations.of(context)!.deselectIconButton : null,
                       ),
                     ),
                   )
@@ -83,72 +82,164 @@ class _AccountManagerState extends State<AccountManager> {
                         context: context,
                       ),
                       builder: (context, snapshot) {
-                        attributes = snapshot.hasData ? snapshot.data!.values.first : [];
-                        return Card(
-                          elevation: 0,
-                          margin: const EdgeInsets.fromLTRB(22, 12, 22, 0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.outlineVariant,
-                            ),
-                          ),
-                          child: ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.zero,
-                            itemCount: attributes.length,
-                            itemBuilder: (context, index) {
-                              return OpenContainer(
-                                closedElevation: 0,
-                                closedColor: Colors.transparent,
-                                openElevation: 0,
-                                transitionDuration: const Duration(milliseconds: 250),
-                                closedBuilder: (context, action) {
-                                  return ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                                    shape: wid_utils.getShapeBorder(index, attributes.length - 1),
-                                    tileColor: selectedIndex == index ? Theme.of(context).colorScheme.surfaceVariant : null,
-                                    title: Text(
-                                      attributes[index].name,
-                                      style: Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                    trailing: selectedIndex == -1
-                                        ? Icon(
-                                            Icons.arrow_right,
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                          )
-                                        : _selectedIndicator(index),
-                                    onTap: () {
-                                      if (selectedIndex > -1) {
-                                        if (selectedIndex != index) {
-                                          setState(() {
-                                            selectedIndex = index;
+                        attributes = snapshot.hasData ? snapshot.data! : {};
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemCount: attributes.length,
+                          itemBuilder: (context, parentIndex) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      TextButton.icon(
+                                        onPressed: () async {
+                                          if (_controller.text.isEmpty) {
+                                            _controller.text = attributes.keys.elementAt(parentIndex).name;
+                                          }
+                                          await showAttributeDialog<void>(
+                                            context: context,
+                                            attribute: attributes.keys.elementAt(parentIndex),
+                                            controller: _controller,
+                                            editMode: true,
+                                          ).then((_) {
+                                            _controller.clear();
                                           });
-                                        }
-                                      } else {
-                                        action();
-                                      }
-                                    },
-                                    onLongPress: () {
-                                      setState(() {
-                                        selectedIndex = index;
-                                      });
-                                    },
-                                  );
-                                },
-                                openBuilder: (context, action) {
-                                  return AttributeDetailsView(
-                                    attribute: attributes[index],
-                                  );
-                                },
-                              );
-                            },
-                            separatorBuilder: (_, __) => Divider(
-                              height: 2,
-                              thickness: 1.5,
-                              color: Theme.of(context).colorScheme.outlineVariant,
-                            ),
+                                        },
+                                        icon: const Icon(Icons.edit),
+                                        label: Text(
+                                          attributes.keys.toList()[parentIndex].name,
+                                          style: Theme.of(context).textTheme.titleLarge,
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          IconButton.filledTonal(
+                                            onPressed: () => showAttributeDialog<void>(
+                                              context: context,
+                                              controller: _controller,
+                                              attributeRole: AttributeRole.child,
+                                              attributeType: AttributeType.account,
+                                              parentId: attributes.keys.elementAt(parentIndex).id,
+                                            ).then((_) {
+                                              _controller.clear();
+                                            }),
+                                            icon: const Icon(Icons.add),
+                                          ),
+                                          IconButton.filledTonal(
+                                            onPressed: () async {
+                                              await showDialog<void>(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    icon: const Icon(Icons.delete_forever),
+                                                    title: Text(AppLocalizations.of(context)!.deletePermanentlyQuestion),
+                                                    content: Text(AppLocalizations.of(context)!.deleteContentDescription(1)),
+                                                    actions: [
+                                                      TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context)!.cancel)),
+                                                      FilledButton.tonal(
+                                                        onPressed: () async {
+                                                          final isar = Isar.getInstance()!;
+                                                          await isar.writeTxn(() async {
+                                                            final entry = attributes.entries
+                                                                .singleWhere((element) => element.key == attributes.keys.elementAt(parentIndex));
+                                                            final List<int> idList = [entry.key.id];
+                                                            for (final element in entry.value) {
+                                                              idList.add(element.id);
+                                                            }
+                                                            await isar.attributes.deleteAll(idList);
+                                                          }).then((_) {
+                                                            Navigator.pop(context);
+                                                          });
+                                                        },
+                                                        child: Text(AppLocalizations.of(context)!.delete),
+                                                      )
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            icon: const Icon(Icons.delete_forever),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  Card(
+                                    elevation: 0,
+                                    margin: EdgeInsets.only(top: attributes.values.toList()[parentIndex].isEmpty ? 0 : 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: BorderSide(
+                                        color: Theme.of(context).colorScheme.outlineVariant,
+                                      ),
+                                    ),
+                                    child: ListView.separated(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      padding: EdgeInsets.zero,
+                                      itemCount: attributes.values.toList()[parentIndex].length,
+                                      itemBuilder: (context, childIndex) {
+                                        return ListTile(
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                          shape: wid_utils.getShapeBorder(childIndex, attributes.length - 1),
+                                          tileColor: selectedIndex == (parentIndex, childIndex) ? Theme.of(context).colorScheme.surfaceVariant : null,
+                                          title: Text(
+                                            attributes.values.toList()[parentIndex][childIndex].name,
+                                            style: Theme.of(context).textTheme.bodyLarge,
+                                          ),
+                                          trailing: selectedIndex.$2 == -1
+                                              ? Icon(
+                                                  Icons.arrow_right,
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                )
+                                              : _selectedIndicator(parentIndex, childIndex),
+                                          onTap: () {
+                                            if (selectedIndex.$2 > -1) {
+                                              if (selectedIndex != (parentIndex, childIndex)) {
+                                                setState(() {
+                                                  selectedIndex = (parentIndex, childIndex);
+                                                });
+                                              }
+                                            } else {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute<AttributeDetailsView>(
+                                                  builder: (context) => AttributeDetailsView(
+                                                    attribute: attributes.values.toList()[parentIndex][childIndex],
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          onLongPress: () {
+                                            setState(() {
+                                              selectedIndex = (parentIndex, childIndex);
+                                            });
+                                          },
+                                        );
+                                      },
+                                      separatorBuilder: (_, __) => Divider(
+                                        height: 2,
+                                        thickness: 1.5,
+                                        color: Theme.of(context).colorScheme.outlineVariant,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          separatorBuilder: (_, __) => Divider(
+                            height: 2,
+                            thickness: 1.5,
+                            color: Theme.of(context).colorScheme.outlineVariant,
                           ),
                         );
                       },
@@ -167,19 +258,19 @@ class _AccountManagerState extends State<AccountManager> {
             controller: _controller,
           ).then((_) {
             _controller.clear();
-            setState(() => selectedIndex = -1);
+            setState(() => selectedIndex = (-1, -1));
           }),
           label: Text(
             AppLocalizations.of(context)!.account(1),
             semanticsLabel: AppLocalizations.of(context)!.addAccountFAB,
           ),
           icon: const Icon(Icons.add),
-          elevation: selectedIndex > -1 ? 0 : null,
+          elevation: selectedIndex.$2 > -1 ? 0 : null,
         ),
-        floatingActionButtonLocation: selectedIndex > -1 ? FloatingActionButtonLocation.endContained : null,
+        floatingActionButtonLocation: selectedIndex.$2 > -1 ? FloatingActionButtonLocation.endContained : null,
         bottomNavigationBar: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          height: selectedIndex > -1 ? 80 + MediaQuery.paddingOf(context).bottom : 0,
+          height: selectedIndex.$2 > -1 ? 80 + MediaQuery.paddingOf(context).bottom : 0,
           child: BottomAppBar(
             child: Row(
               children: [
@@ -188,18 +279,24 @@ class _AccountManagerState extends State<AccountManager> {
                     context,
                     MaterialPageRoute<AttributeDetailsView>(
                       builder: (context) => AttributeDetailsView(
-                        attribute: attributes[selectedIndex],
+                        attribute: attributes.values.toList()[selectedIndex.$1][selectedIndex.$2],
                       ),
                     ),
                   ),
                   icon: Icon(
                     Icons.info,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.infoIconButton(attributes[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex.$2 > -1
+                        ? AppLocalizations.of(context)!.infoIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        : null,
                   ),
                 ),
                 IconButton(
                   onPressed: () async {
-                    await checkForAttributeDependencies(Isar.getInstance()!, attributes[selectedIndex].id, AttributeType.account).then(
+                    await checkForAttributeDependencies(
+                      Isar.getInstance()!,
+                      attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id,
+                      AttributeType.account,
+                    ).then(
                       (value) async {
                         final Isar isar = Isar.getInstance()!;
                         if (value > 0) {
@@ -220,11 +317,12 @@ class _AccountManagerState extends State<AccountManager> {
                                   FilledButton.tonal(
                                     onPressed: () async {
                                       final backupIndex = selectedIndex;
-                                      final backup = await getAttributeFromId(isar, attributes[selectedIndex].id, context: context);
+                                      final backup =
+                                          await getAttributeFromId(isar, attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id, context: context);
                                       await isar.writeTxn(() async {
-                                        await isar.attributes.delete(attributes[selectedIndex].id);
+                                        await isar.attributes.delete(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id);
                                       }).then((_) {
-                                        setState(() => selectedIndex = -1);
+                                        setState(() => selectedIndex = (-1, -1));
                                         Navigator.pop(context);
                                       });
                                       if (mounted) {
@@ -237,11 +335,14 @@ class _AccountManagerState extends State<AccountManager> {
                                                 await isar.writeTxn(() async {
                                                   await isar.attributes.put(backup);
                                                 }).then((_) {
-                                                  if (!attributes.contains(backup)) {
-                                                    if (attributes.length + 1 == backupIndex) {
-                                                      attributes.add(backup);
-                                                    } else if (backupIndex < attributes.length + 1) {
-                                                      attributes.insert(backupIndex, backup);
+                                                  if (backup.role == AttributeRole.child) {
+                                                    final list = attributes.values.toList()[backupIndex.$1];
+                                                    if (!list.contains(backup)) {
+                                                      if (list.length + 1 == backupIndex.$2) {
+                                                        attributes.values.toList()[backupIndex.$1].add(backup);
+                                                      } else if (backupIndex.$2 < list.length + 1) {
+                                                        attributes.values.toList()[backupIndex.$1].insert(backupIndex.$2, backup);
+                                                      }
                                                     }
                                                   }
                                                   setState(() => selectedIndex = backupIndex);
@@ -261,10 +362,10 @@ class _AccountManagerState extends State<AccountManager> {
                           );
                         } else {
                           final backupIndex = selectedIndex;
-                          final backup = await getAttributeFromId(isar, attributes[selectedIndex].id, context: context);
+                          final backup = await getAttributeFromId(isar, attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id, context: context);
                           await isar.writeTxn(() async {
-                            await isar.attributes.delete(attributes[selectedIndex].id);
-                          }).then((_) => setState(() => selectedIndex = -1));
+                            await isar.attributes.delete(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id);
+                          }).then((_) => setState(() => selectedIndex = (-1, -1)));
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
@@ -275,11 +376,14 @@ class _AccountManagerState extends State<AccountManager> {
                                     await isar.writeTxn(() async {
                                       await isar.attributes.put(backup);
                                     }).then((_) {
-                                      if (!attributes.contains(backup)) {
-                                        if (attributes.length + 1 == backupIndex) {
-                                          attributes.add(backup);
-                                        } else if (backupIndex < attributes.length + 1) {
-                                          attributes.insert(backupIndex, backup);
+                                      if (backup.role == AttributeRole.child) {
+                                        final list = attributes.values.toList()[backupIndex.$1];
+                                        if (!list.contains(backup)) {
+                                          if (list.length + 1 == backupIndex.$2) {
+                                            attributes.values.toList()[backupIndex.$1].add(backup);
+                                          } else if (backupIndex.$2 < list.length + 1) {
+                                            attributes.values.toList()[backupIndex.$1].insert(backupIndex.$2, backup);
+                                          }
                                         }
                                       }
                                       setState(() => selectedIndex = backupIndex);
@@ -296,27 +400,31 @@ class _AccountManagerState extends State<AccountManager> {
                   },
                   icon: Icon(
                     Icons.delete,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deleteIconButton(attributes[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex.$2 > -1
+                        ? AppLocalizations.of(context)!.deleteIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        : null,
                   ),
                 ),
                 IconButton(
                   onPressed: () async {
                     if (_controller.text.isEmpty) {
-                      _controller.text = attributes[selectedIndex].name;
+                      _controller.text = attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name;
                     }
                     await showAttributeDialog<void>(
                       context: context,
-                      attribute: attributes[selectedIndex],
+                      attribute: attributes.values.toList()[selectedIndex.$1][selectedIndex.$2],
                       controller: _controller,
                       editMode: true,
                     ).then((_) {
                       _controller.clear();
-                      setState(() => selectedIndex = -1);
+                      setState(() => selectedIndex = (-1, -1));
                     });
                   },
                   icon: Icon(
                     Icons.edit,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.editIconButton(attributes[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex.$2 > -1
+                        ? AppLocalizations.of(context)!.editIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        : null,
                   ),
                 ),
               ],

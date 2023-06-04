@@ -1,8 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
+
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
-import 'package:flutter/material.dart';
-import 'package:isar/isar.dart';
 
 part 'exchange.g.dart';
 
@@ -40,6 +42,34 @@ class Exchange {
   @override
   String toString() {
     return 'Exchange(id: $id, accountId: $accountId, accountIdEnd: $accountIdEnd, cardId: $cardId, date: $date, description: $description, eType: $eType, installments: $installments, installmentValue: $installmentValue, typeId: $typeId, value: $value)';
+  }
+
+  Exchange copyWith({
+    Id? id,
+    int? accountId,
+    int? accountIdEnd,
+    int? cardId,
+    DateTime? date,
+    String? description,
+    EType? eType,
+    int? installments,
+    double? installmentValue,
+    int? typeId,
+    double? value,
+  }) {
+    return Exchange(
+      id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
+      accountIdEnd: accountIdEnd ?? this.accountIdEnd,
+      cardId: cardId ?? this.cardId,
+      date: date ?? this.date,
+      description: description ?? this.description,
+      eType: eType ?? this.eType,
+      installments: installments ?? this.installments,
+      installmentValue: installmentValue ?? this.installmentValue,
+      typeId: typeId ?? this.typeId,
+      value: value ?? this.value,
+    );
   }
 }
 

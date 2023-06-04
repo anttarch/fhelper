@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/utils.dart';
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/add/add.dart';
 import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:fhelper/src/views/transfer/transfer.dart';
@@ -48,7 +49,13 @@ class HomePage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               FutureBuilder(
-                future: getLatest(Isar.getInstance()!),
+                future: getLatest(Isar.getInstance()!).then((value) async {
+                  if (value != null && value.eType == EType.transfer) {
+                    final transfer = value.copyWith(description: await wid_utils.parseTransferName(context, value));
+                    return transfer;
+                  }
+                  return value;
+                }),
                 builder: (context, snapshot) {
                   final exchange = snapshot.data;
                   return Visibility(
@@ -82,12 +89,7 @@ class HomePage extends StatelessWidget {
                                           child: _getLeadingIcon(exchange, Theme.of(context).colorScheme.inverseSurface),
                                         ),
                                       Text(
-                                        exchange != null
-                                            ? exchange.eType == EType.transfer
-                                                ? AppLocalizations.of(context)!
-                                                    .transferDescription(exchange.description.split('#/spt#/')[0], exchange.description.split('#/spt#/')[1])
-                                                : exchange.description
-                                            : 'Placeholder',
+                                        exchange != null ? exchange.description : 'Placeholder',
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context).textTheme.bodyLarge!.apply(
                                               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -228,42 +230,42 @@ class HomePage extends StatelessWidget {
                               ),
                         ),
                         FutureBuilder(
-                          future: getAttributes(Isar.getInstance()!, AttributeType.account),
+                          future: Isar.getInstance()!.attributes.filter().typeEqualTo(AttributeType.account).roleEqualTo(AttributeRole.child).count(),
                           builder: (context, snapshot) {
-                            return Visibility(
-                              visible: Isar.getInstance()!.exchanges.countSync() == 0 || snapshot.hasData && snapshot.data!.length == 1,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 5),
-                                child: Text(
-                                  snapshot.hasData && snapshot.data!.length == 1
-                                      ? AppLocalizations.of(context)!.transferAccountRequirement
-                                      : AppLocalizations.of(context)!.transferExchangeRequirement,
-                                  textAlign: TextAlign.start,
-                                  style: Theme.of(context).textTheme.bodyLarge!.apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Visibility(
+                                  visible: Isar.getInstance()!.exchanges.countSync() == 0 || snapshot.hasData && snapshot.data! == 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    child: Text(
+                                      snapshot.hasData && snapshot.data! == 1
+                                          ? AppLocalizations.of(context)!.transferAccountRequirement
+                                          : AppLocalizations.of(context)!.transferExchangeRequirement,
+                                      textAlign: TextAlign.start,
+                                      style: Theme.of(context).textTheme.bodyLarge!.apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                Semantics(
+                                  button: true,
+                                  child: FilledButton.tonalIcon(
+                                    onPressed: Isar.getInstance()!.exchanges.countSync() > 0 && snapshot.hasData && snapshot.data! > 1
+                                        ? () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute<TransferView>(
+                                                builder: (context) => const TransferView(),
+                                              ),
+                                            )
+                                        : null,
+                                    icon: const Icon(Icons.swap_horiz),
+                                    label: Text(AppLocalizations.of(context)!.transfer),
+                                  ),
+                                ),
+                              ],
                             );
                           },
-                        ),
-                        Semantics(
-                          button: true,
-                          child: FutureBuilder(
-                            future: getAttributes(Isar.getInstance()!, AttributeType.account),
-                            builder: (context, snapshot) {
-                              return FilledButton.tonalIcon(
-                                onPressed: Isar.getInstance()!.exchanges.countSync() > 0 && snapshot.hasData && snapshot.data!.length > 1
-                                    ? () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute<TransferView>(
-                                            builder: (context) => const TransferView(),
-                                          ),
-                                        )
-                                    : null,
-                                icon: const Icon(Icons.swap_horiz),
-                                label: Text(AppLocalizations.of(context)!.transfer),
-                              );
-                            },
-                          ),
                         ),
                       ],
                     ),

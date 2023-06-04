@@ -67,15 +67,17 @@ class Attribute {
 Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType type, {BuildContext? context}) async {
   final List<Attribute> attributes = await isar.attributes.where().filter().typeEqualTo(type).findAll();
   final Map<Attribute, List<Attribute>> attributeMap = {};
-  if (attributes.isNotEmpty && context != null) {
+  if (attributes.isNotEmpty) {
     // Handles l10n
-    for (final attribute in attributes) {
-      if (attribute.id >= 0 && attribute.id <= 20 && context.mounted && attribute.name.contains('#/str#/')) {
-        final index = attributes.indexOf(attribute);
-        final newAttribute = attribute.copyWith(
-          name: translatedDefaultAttribute(context, attribute.id),
-        );
-        attributes.replaceRange(index, index + 1, [newAttribute]);
+    if (context != null) {
+      for (final attribute in attributes) {
+        if (attribute.id >= 0 && attribute.id <= 20 && context.mounted && attribute.name.contains('#/str#/')) {
+          final index = attributes.indexOf(attribute);
+          final newAttribute = attribute.copyWith(
+            name: translatedDefaultAttribute(context, attribute.id),
+          );
+          attributes.replaceRange(index, index + 1, [newAttribute]);
+        }
       }
     }
     // Handle roles
@@ -99,7 +101,7 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType t
 
 Future<Attribute?> getAttributeFromId(Isar isar, int id, {BuildContext? context}) async {
   final Attribute? attribute = await isar.attributes.get(id);
-  if (context != null && id >= 0 && id <= 14 && attribute != null && context.mounted) {
+  if (context != null && id >= 0 && id <= 20 && attribute != null && context.mounted && attribute.name.contains('#/str#/')) {
     return attribute.copyWith(name: translatedDefaultAttribute(context, id));
   }
   return attribute;

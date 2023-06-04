@@ -70,12 +70,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                               padding: const EdgeInsets.only(top: 8),
                               child: InputField(
                                 label: AppLocalizations.of(context)!.description,
-                                placeholder: widget.item.eType != EType.transfer
-                                    ? widget.item.eType == EType.installment
-                                        ? widget.item.description.split('#/spt#/')[1]
-                                        : widget.item.description
-                                    : AppLocalizations.of(context)!
-                                        .transferDescription(widget.item.description.split('#/spt#/')[0], widget.item.description.split('#/spt#/')[1]),
+                                placeholder: widget.item.eType == EType.installment ? widget.item.description.split('#/spt#/')[1] : widget.item.description,
                                 suffix: widget.item.eType == EType.installment ? widget.item.description.split('#/spt#/')[0] : null,
                                 suffixStyle: widget.item.eType == EType.installment
                                     ? Theme.of(context).textTheme.bodyMedium!.apply(color: Theme.of(context).colorScheme.tertiary)
@@ -110,7 +105,17 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                           Visibility(
                             visible: widget.item.eType != EType.transfer && isCardBill == false,
                             child: FutureBuilder(
-                              future: getAttributeFromId(Isar.getInstance()!, widget.item.typeId, context: context),
+                              future: getAttributeFromId(Isar.getInstance()!, widget.item.typeId, context: context).then((value) async {
+                                if (value != null) {
+                                  final parent = await getAttributeFromId(Isar.getInstance()!, value.parentId!, context: context);
+                                  if (parent != null) {
+                                    return value.copyWith(name: '${parent.name} - ${value.name}');
+                                  } else if (mounted) {
+                                    return value.copyWith(name: '${AppLocalizations.of(context)!.deleted} - ${value.name}');
+                                  }
+                                }
+                                return value;
+                              }),
                               builder: (context, snapshot) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),
@@ -163,7 +168,17 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                               ],
                             ),
                           FutureBuilder(
-                            future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId, context: context),
+                            future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId, context: context).then((value) async {
+                              if (value != null) {
+                                final parent = await getAttributeFromId(Isar.getInstance()!, value.parentId!, context: context);
+                                if (parent != null) {
+                                  return value.copyWith(name: '${parent.name} - ${value.name}');
+                                } else if (mounted) {
+                                  return value.copyWith(name: '${AppLocalizations.of(context)!.deleted} - ${value.name}');
+                                }
+                              }
+                              return value;
+                            }),
                             builder: (context, snapshot) {
                               return Padding(
                                 padding: const EdgeInsets.only(top: 20),
@@ -177,7 +192,17 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                           ),
                           if (widget.item.eType == EType.transfer)
                             FutureBuilder(
-                              future: getAttributeFromId(Isar.getInstance()!, widget.item.accountIdEnd!, context: context),
+                              future: getAttributeFromId(Isar.getInstance()!, widget.item.accountIdEnd!, context: context).then((value) async {
+                                if (value != null) {
+                                  final parent = await getAttributeFromId(Isar.getInstance()!, value.parentId!, context: context);
+                                  if (parent != null) {
+                                    return value.copyWith(name: '${parent.name} - ${value.name}');
+                                  } else if (mounted) {
+                                    return value.copyWith(name: '${AppLocalizations.of(context)!.deleted} - ${value.name}');
+                                  }
+                                }
+                                return value;
+                              }),
                               builder: (context, snapshot) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),

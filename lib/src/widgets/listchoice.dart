@@ -24,7 +24,7 @@ class ListChoice extends StatelessWidget {
   final Map<Attribute, List<Attribute>>? attributeMap;
   final bool attributeListBehavior;
   final List<fhelper.Card>? cardList;
-  final int? hiddenIndex;
+  final (int, int)? hiddenIndex;
   final Object groupValue;
   final void Function(String? name, Object? value)? onChanged;
   final List<int>? intList;
@@ -39,6 +39,16 @@ class ListChoice extends StatelessWidget {
           padding: EdgeInsets.zero,
           itemCount: attributeMap != null && !attributeListBehavior ? attributeMap!.length : 1,
           itemBuilder: (context, parentIndex) {
+            if (hiddenIndex != null && attributeMap != null) {
+              final parent = attributeMap!.keys.elementAt(hiddenIndex!.$1);
+              attributeMap!.update(parent, (value) {
+                if (value.isNotEmpty) {
+                  final list = value..removeAt(hiddenIndex!.$2);
+                  return value = list;
+                }
+                return value;
+              });
+            }
             return Padding(
               padding: EdgeInsets.symmetric(horizontal: 22, vertical: attributeMap != null && !attributeListBehavior ? 15 : 5),
               child: Column(
@@ -72,9 +82,6 @@ class ListChoice extends StatelessWidget {
                               ? cardList!.length
                               : intList!.length,
                       itemBuilder: (context, childIndex) {
-                        if ((hiddenIndex != null || hiddenIndex != -1) && hiddenIndex == childIndex) {
-                          return const SizedBox.shrink();
-                        }
                         return RadioListTile(
                           value: attributeMap != null && !attributeListBehavior ? (parentIndex, childIndex) : childIndex,
                           groupValue: groupValue,
@@ -120,7 +127,7 @@ class ListChoice extends StatelessWidget {
                         );
                       },
                       separatorBuilder: (_, index) {
-                        if ((hiddenIndex != null || hiddenIndex != -1) && hiddenIndex == index) {
+                        if ((hiddenIndex != null || hiddenIndex != (-1, -1)) && hiddenIndex == (parentIndex, index)) {
                           return const SizedBox.shrink();
                         }
                         return Divider(

@@ -574,7 +574,7 @@ class _AddViewState extends State<AddView> {
                       final String installmentValue = textController[2].text.replaceAll(RegExp('[^0-9]'), '');
                       final Isar isar = Isar.getInstance()!;
                       final Map<Attribute, List<Attribute>> types =
-                          await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType);
+                          await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType, context: context);
                       final Exchange exchange = Exchange(
                         eType: _eType.single,
                         description: textController[0].text,
@@ -583,7 +583,10 @@ class _AddViewState extends State<AddView> {
                         typeId: types.values.toList()[_typeId.$1][_typeId.$2].id,
                         accountId: _cardIndex > -1
                             ? (await fhelper.getCards(isar))[_cardIndex].accountId
-                            : (await getAttributes(isar, AttributeType.account)).values.toList()[_accountId.$1][_accountId.$2].id,
+                            : (await getAttributes(isar, AttributeType.account, context: mounted ? context : null))
+                                .values
+                                .toList()[_accountId.$1][_accountId.$2]
+                                .id,
                         cardId: _eType.single == EType.expense && _cardIndex > -1 ? (await fhelper.getCards(isar))[_cardIndex].id : null,
                         installments: _cardIndex > -1 ? _installments + 1 : null,
                         installmentValue: _cardIndex > -1

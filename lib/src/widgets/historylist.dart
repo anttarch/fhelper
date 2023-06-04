@@ -3,7 +3,6 @@ import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class HistoryList extends StatelessWidget {
@@ -78,10 +77,7 @@ class HistoryList extends StatelessWidget {
                   leading: _getLeadingIcon(items[index]),
                   shape: showTotal ? null : wid_utils.getShapeBorder(index, items.length - 1),
                   title: Text(
-                    items[index].eType != EType.transfer
-                        ? items[index].description
-                        : AppLocalizations.of(context)!
-                            .transferDescription(items[index].description.split('#/spt#/')[0], items[index].description.split('#/spt#/')[1]),
+                    items[index].description,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   subtitle: Text(

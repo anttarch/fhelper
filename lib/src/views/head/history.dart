@@ -3,6 +3,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/card_details.dart';
 import 'package:fhelper/src/widgets/historylist.dart';
 import 'package:flutter/material.dart';
@@ -294,9 +295,15 @@ class _HistoryPageState extends State<HistoryPage> {
                           );
                         return list;
                       }
-                      return value;
                     }
-                    return <Exchange>[];
+                    for (final exchange in value) {
+                      if (exchange.eType == EType.transfer && context.mounted) {
+                        final index = value.indexOf(exchange);
+                        final transfer = exchange.copyWith(description: await wid_utils.parseTransferName(context, exchange));
+                        value.replaceRange(index, index + 1, [transfer]);
+                      }
+                    }
+                    return value;
                   }),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {

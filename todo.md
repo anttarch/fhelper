@@ -8,9 +8,10 @@
 
 ## Features
 - [ ] Add subaccounts
-- [ ] Add subtypes
+  - [x] Basic function
+- [x] Add subtypes
   - [x] Type handling (update, delete)
-  - [ ] Type display (WIP) - most of it it's done but depends on subaccounts
+  - [x] Type display
   - [x] Type adding
 
 # TODO - 1.x.x

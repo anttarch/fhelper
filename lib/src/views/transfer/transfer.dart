@@ -235,7 +235,7 @@ class _TransferViewState extends State<TransferView> {
                                                 ),
                                                 ListChoice(
                                                   groupValue: _accountIdEnd,
-                                                  hiddenIndex: _accountId.$2,
+                                                  hiddenIndex: _accountId,
                                                   onChanged: (name, value) {
                                                     setState(() {
                                                       _accountIdEnd = value! as (int, int);
@@ -312,7 +312,7 @@ class _TransferViewState extends State<TransferView> {
                           final Attribute to = (await getAttributes(isar, AttributeType.account)).values.toList()[_accountIdEnd.$1][_accountIdEnd.$2];
                           final Exchange exchange = Exchange(
                             eType: EType.transfer,
-                            description: '${from.name}#/spt#/${to.name}',
+                            description: '#/str#/#/spt#/#/str#/',
                             value: double.parse(value) / 100,
                             date: DateTime.now(),
                             typeId: -1,

@@ -62,6 +62,7 @@
             }
         }
     },
+    "defaultSubaccounts": "Default subaccounts",
     "delete": "Delete",
     "deleted": "Deleted",
     "deletedSnackBar": "\"{name}\" deleted",
@@ -127,6 +128,7 @@
     "next": "Next",
     "nextBillDescriptor": "Next bill:",
     "none": "None",
+    "noSubaccountWarning": "An account can't be used without a subaccount.",
     "past": "Past",
     "paymentDue": "Payment Due",
     "perInstallmentValue": "Per-installment value",
@@ -240,8 +242,12 @@
     },
 
 
-    "mainBankAccountAccount": "Main bank account",
-    "walletAccount": "Wallet",
+    "mainBankAccount": "Bank",
+    "othersAccount": "Others",
+
+    "checkingSubaccount": "Checking account",
+    "savingsSubaccount": "Savings account",
+    "walletSubaccount": "Wallet",
 
     "benefitsIncomeType": "Benefits",
     "giftsIncomeType": "Gifts",

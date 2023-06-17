@@ -17,6 +17,7 @@
     "date": "Data",
     "dateSelector": "{count, plural, =0{Hoje} =1{Essa semana} other{Esse mês}}",
     "dayOfMonth": "Dia {dayAsNumber} de cada mês",
+    "defaultSubaccounts": "Subcontas padrão",
     "delete": "Excluir",
     "deleted": "Excluído",
     "deletedSnackBar": "\"{name}\" excluído",
@@ -51,6 +52,7 @@
     "next": "Previsto",
     "nextBillDescriptor": "Próxima conta:",
     "none": "Nenhum",
+    "noSubaccountWarning": "Uma conta não pode ser utilizada sem uma subconta.",
     "past": "Anteriores",
     "paymentDue": "Vencimento da Fatura",
     "perInstallmentValue": "Valor da parcela",
@@ -126,8 +128,12 @@
     "totalValueHistoryCard": "O total d{day} é {value}",
 
 
-    "mainBankAccountAccount": "Banco",
-    "walletAccount": "Carteira",
+    "mainBankAccount": "Banco",
+    "othersAccount": "Outros",
+
+    "checkingSubaccount": "Conta corrente",
+    "savingsSubaccount": "Conta poupança",
+    "walletSubaccount": "Carteira",
 
     "benefitsIncomeType": "Benefícios",
     "giftsIncomeType": "Presentes",

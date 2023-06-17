@@ -1,13 +1,15 @@
-# TODO - 1.2.0
+# TODO - Next
 
 ## General UI
 - [x] Fix some padding issues
 
 ## Cards Management
 - [x] Show next bill information on CardDetailsView (at least value)
+- [ ] Ask for an account for payment
+  - [ ] Remove account root dependency
 
 ## Features
-- [ ] Add subaccounts
+- [x] Add subaccounts
   - [x] Basic function
 - [x] Add subtypes
   - [x] Type handling (update, delete)

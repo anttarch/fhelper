@@ -473,7 +473,10 @@ class _AddViewState extends State<AddView> {
                         ),
                       ),
                       FutureBuilder(
-                        future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context),
+                        future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context).then((value) {
+                          value.removeWhere((_, value) => value.isEmpty);
+                          return value;
+                        }),
                         builder: (context, snapshot) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 20),

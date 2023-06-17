@@ -71,11 +71,10 @@ class _TransferViewState extends State<TransferView> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             FutureBuilder(
-                              future: getAttributes(
-                                Isar.getInstance()!,
-                                AttributeType.account,
-                                context: context,
-                              ),
+                              future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context).then((value) {
+                                value.removeWhere((_, value) => value.isEmpty);
+                                return value;
+                              }),
                               builder: (context, snapshot) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),
@@ -179,11 +178,10 @@ class _TransferViewState extends State<TransferView> {
                               },
                             ),
                             FutureBuilder(
-                              future: getAttributes(
-                                Isar.getInstance()!,
-                                AttributeType.account,
-                                context: context,
-                              ),
+                              future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context).then((value) {
+                                value.removeWhere((_, value) => value.isEmpty);
+                                return value;
+                              }),
                               builder: (context, snapshot) {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),

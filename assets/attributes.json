@@ -7,141 +7,161 @@
     },
     {
         "id": 1,
-        "name": "#/str#/othersString",
+        "name": "#/str#/checkingString",
         "parentId": 0,
+        "role": 1,
+        "type": 0
+    },
+    {
+        "id": 2,
+        "name": "#/str#/savingsString",
+        "parentId": 0,
+        "role": 1,
+        "type": 0
+    },
+    {
+        "id": 3,
+        "name": "#/str#/othersString",
+        "role": 0,
+        "type": 0
+    },
+    {
+        "id": 4,
+        "name": "#/str#/walletString",
+        "parentId": 3,
         "role": 1,
         "type": 0
     },
 
 
     {
-        "id": 2,
+        "id": 5,
         "name": "#/str#/benefitsString",
         "role": 0,
         "type": 1
     },
     {
-        "id": 3,
+        "id": 6,
         "name": "#/str#/giftsString",
         "role": 0,
         "type": 1
     },
     {
-        "id": 4,
-        "name": "#/str#/loansString",
-        "parentId": 2,
-        "role": 1,
-        "type": 1
-    },
-    {
-        "id": 5,
-        "name": "#/str#/salaryString",
-        "parentId": 2,
-        "role": 1,
-        "type": 1
-    },
-    {
-        "id": 6,
-        "name": "#/str#/othersString",
-        "parentId": 3,
-        "role": 1,
-        "type": 1
-    },
-
-
-    {
         "id": 7,
+        "name": "#/str#/loansString",
+        "parentId": 5,
+        "role": 1,
+        "type": 1
+    },
+    {
+        "id": 8,
+        "name": "#/str#/salaryString",
+        "parentId": 5,
+        "role": 1,
+        "type": 1
+    },
+    {
+        "id": 9,
+        "name": "#/str#/othersString",
+        "parentId": 6,
+        "role": 1,
+        "type": 1
+    },
+
+
+    {
+        "id": 10,
         "name": "#/str#/foodString",
         "role": 0,
         "type": 2
     },
     {
-        "id": 8,
-        "name": "#/str#/marketString",
-        "parentId": 7,
-        "role": 1,
-        "type": 2
-    },
-    {
-        "id": 9,
-        "name": "#/str#/streetMarketString",
-        "parentId": 7,
-        "role": 1,
-        "type": 2
-    },
-    {
-        "id": 10,
-        "name": "#/str#/bakeryString",
-        "parentId": 7,
-        "role": 1,
-        "type": 2
-    },
-    {
         "id": 11,
-        "name": "#/str#/restaurantString",
-        "parentId": 7,
+        "name": "#/str#/marketString",
+        "parentId": 10,
         "role": 1,
         "type": 2
     },
     {
         "id": 12,
-        "name": "#/str#/othersString",
-        "parentId": 7,
+        "name": "#/str#/streetMarketString",
+        "parentId": 10,
         "role": 1,
         "type": 2
     },
     {
         "id": 13,
-        "name": "#/str#/homeString",
-        "role": 0,
+        "name": "#/str#/bakeryString",
+        "parentId": 10,
+        "role": 1,
         "type": 2
     },
     {
         "id": 14,
-        "name": "#/str#/housePaymentString",
-        "parentId": 13,
+        "name": "#/str#/restaurantString",
+        "parentId": 10,
         "role": 1,
         "type": 2
     },
     {
         "id": 15,
-        "name": "#/str#/cleaningString",
-        "parentId": 13,
+        "name": "#/str#/othersString",
+        "parentId": 10,
         "role": 1,
         "type": 2
     },
     {
         "id": 16,
-        "name": "#/str#/waterBillString",
-        "parentId": 13,
-        "role": 1,
+        "name": "#/str#/homeString",
+        "role": 0,
         "type": 2
     },
     {
         "id": 17,
-        "name": "#/str#/eletricityBillString",
-        "parentId": 13,
+        "name": "#/str#/housePaymentString",
+        "parentId": 16,
         "role": 1,
         "type": 2
     },
     {
         "id": 18,
-        "name": "#/str#/propertyTaxString",
-        "parentId": 13,
+        "name": "#/str#/cleaningString",
+        "parentId": 16,
         "role": 1,
         "type": 2
     },
     {
         "id": 19,
-        "name": "#/str#/internetTVString",
-        "parentId": 13,
+        "name": "#/str#/waterBillString",
+        "parentId": 16,
         "role": 1,
         "type": 2
     },
     {
         "id": 20,
+        "name": "#/str#/eletricityBillString",
+        "parentId": 16,
+        "role": 1,
+        "type": 2
+    },
+    {
+        "id": 21,
+        "name": "#/str#/propertyTaxString",
+        "parentId": 16,
+        "role": 1,
+        "type": 2
+    },
+    {
+        "id": 22,
+        "name": "#/str#/internetTVString",
+        "parentId": 16,
+        "role": 1,
+        "type": 2
+    },
+    {
+        "id": 23,
         "name": "#/str#/othersString",
-        "parentId": 13,
+        "parentId": 16,
         "role": 1,
         "type": 2
     }

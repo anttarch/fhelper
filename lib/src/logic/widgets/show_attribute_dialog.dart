@@ -1,4 +1,5 @@
 import 'package:fhelper/src/logic/collections/attribute.dart';
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,12 @@ Future<T?> showAttributeDialog<T>({
   int groupValue = -1;
   int? parentIndex;
   Set<AttributeRole> role = {AttributeRole.parent};
+
+  final Map<String, bool> defaultSubaccounts = {
+    AppLocalizations.of(context)!.checkingSubaccount: true,
+    AppLocalizations.of(context)!.savingsSubaccount: true,
+  };
+
   return showDialog<T>(
     context: context,
     useSafeArea: false,
@@ -124,7 +131,26 @@ Future<T?> showAttributeDialog<T>({
                                 }
                               }
                               await isar.writeTxn(() async {
-                                await isar.attributes.put(attr);
+                                if (role.single == AttributeRole.parent && attributeType == AttributeType.account) {
+                                  final parentId = await isar.attributes.put(attr);
+                                  final Map<int, String> strBased = {
+                                    0: '#/str#/checkingString',
+                                    1: '#/str#/savingsString',
+                                  };
+                                  defaultSubaccounts.forEach((key, value) async {
+                                    if (value) {
+                                      final subaccount = Attribute(
+                                        name: strBased.values.elementAt(defaultSubaccounts.keys.toList().indexOf(key)),
+                                        parentId: parentId,
+                                        role: AttributeRole.child,
+                                        type: AttributeType.account,
+                                      );
+                                      await isar.attributes.put(subaccount);
+                                    }
+                                  });
+                                } else {
+                                  await isar.attributes.put(attr);
+                                }
                               }).then((_) => Navigator.pop(context));
                             }
                           },
@@ -256,6 +282,89 @@ Future<T?> showAttributeDialog<T>({
                                         );
                                       }
                                     },
+                                  ),
+                                ),
+                              if (!editMode && role.single == AttributeRole.parent && attributeType == AttributeType.account)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 15),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        AppLocalizations.of(context)!.defaultSubaccounts,
+                                        style: Theme.of(context).textTheme.titleLarge,
+                                      ),
+                                      Card(
+                                        elevation: 0,
+                                        margin: const EdgeInsets.only(top: 5),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                          side: BorderSide(
+                                            color: Theme.of(context).colorScheme.outlineVariant,
+                                          ),
+                                        ),
+                                        child: ListView.separated(
+                                          shrinkWrap: true,
+                                          padding: EdgeInsets.zero,
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          itemCount: defaultSubaccounts.length,
+                                          itemBuilder: (context, index) {
+                                            return CheckboxListTile(
+                                              title: Text(defaultSubaccounts.keys.elementAt(index)),
+                                              shape: wid_utils.getShapeBorder(index, defaultSubaccounts.length - 1),
+                                              tileColor: Theme.of(context).colorScheme.background,
+                                              value: defaultSubaccounts.values.elementAt(index),
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  defaultSubaccounts.update(defaultSubaccounts.keys.elementAt(index), (value) => val ?? value);
+                                                });
+                                              },
+                                            );
+                                          },
+                                          separatorBuilder: (_, __) => Divider(
+                                            height: 2,
+                                            thickness: 1.5,
+                                            color: Theme.of(context).colorScheme.outlineVariant,
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: !defaultSubaccounts.containsValue(true),
+                                        child: Card(
+                                          elevation: 0,
+                                          margin: const EdgeInsets.only(top: 15),
+                                          color: Theme.of(context).colorScheme.errorContainer,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                            side: BorderSide(
+                                              color: Theme.of(context).colorScheme.error,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16),
+                                            child: Text.rich(
+                                              TextSpan(
+                                                children: [
+                                                  WidgetSpan(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(right: 5),
+                                                      child: Icon(
+                                                        Icons.warning_amber,
+                                                        color: Theme.of(context).colorScheme.error,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: AppLocalizations.of(context)!.noSubaccountWarning,
+                                                    style: Theme.of(context).textTheme.bodyLarge!.apply(color: Theme.of(context).colorScheme.onErrorContainer),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                             ],

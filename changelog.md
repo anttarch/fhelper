@@ -1,9 +1,12 @@
 # Changelog
 
-## Release 1.1.1
+## Next
 - Fixed some padding issues (2404ecd328f6202bc2573f6c0279e8cc47634819)
 - Fixed wrong bill value display
 - Show next bill value and history in card details (ca1608ff62d3d9e1801cea37780a56de754df70b)
+- Added subtypes and subaccounts (250183aa1f14dd63537456e253bec17f32027f16 and 6f160908a354b23828f63a6953af6641fea166c9) 
+- Fixed l10n rename bug (250183aa1f14dd63537456e253bec17f32027f16)
+- Rework some l10n strings
 
 ## Release v1.1.0+1 (bugfix) (28/05/2023) - **Latest**  
 - Fixed week related actions (250cff726039041d98625182e195f85a94e7e920)

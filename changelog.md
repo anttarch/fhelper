@@ -8,6 +8,8 @@
 - Fixed l10n rename bug (250183aa1f14dd63537456e253bec17f32027f16)
 - Rework some l10n strings
 - Remove account dependency from cards (0d4d4685191442b2a0585876258f656dc1af5277)
+- Fixed an bug related to confirmed card bills (871d97a1a0b8a0f38d3c2279627fdf35ca1a8537)
+- UI tweaks (ab53d40c838058368e7b2f9c4e65febea1452ca1)
 
 ## Release v1.1.0+1 (bugfix) (28/05/2023) - **Latest**  
 - Fixed week related actions (250cff726039041d98625182e195f85a94e7e920)

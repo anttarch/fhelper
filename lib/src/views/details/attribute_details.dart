@@ -112,33 +112,42 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              if (exchange != null && (exchange.installments != null || exchange.id == -1 || exchange.eType == EType.transfer))
-                                                Padding(
-                                                  padding: const EdgeInsets.only(right: 5),
-                                                  child: _getLeadingIcon(exchange),
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                if (exchange != null &&
+                                                    (exchange.installments != null || exchange.id == -1 || exchange.eType == EType.transfer))
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(right: 5),
+                                                    child: _getLeadingIcon(exchange),
+                                                  ),
+                                                Flexible(
+                                                  child: Text(
+                                                    exchange != null ? exchange.description : 'Placeholder',
+                                                    textAlign: TextAlign.start,
+                                                    style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                                        ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
                                                 ),
-                                              Text(
-                                                exchange != null ? exchange.description : 'Placeholder',
-                                                textAlign: TextAlign.start,
-                                                style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                          Text(
-                                            NumberFormat.simpleCurrency(
-                                              locale: Localizations.localeOf(context).languageCode,
-                                            ).format(
-                                              exchange != null ? exchange.value : 0,
+                                              ],
                                             ),
-                                            textAlign: TextAlign.start,
-                                            style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                                  color: _getColor(context, exchange),
-                                                ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 15),
+                                            child: Text(
+                                              NumberFormat.simpleCurrency(
+                                                locale: Localizations.localeOf(context).languageCode,
+                                              ).format(
+                                                exchange != null ? exchange.value : 0,
+                                              ),
+                                              textAlign: TextAlign.start,
+                                              style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                                    color: _getColor(context, exchange),
+                                                  ),
+                                            ),
                                           ),
                                         ],
                                       ),

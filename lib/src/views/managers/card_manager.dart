@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_card_dialog.dart';
@@ -88,48 +87,42 @@ class _CardManagerState extends State<CardManager> {
                             padding: EdgeInsets.zero,
                             itemCount: cards.length,
                             itemBuilder: (context, index) {
-                              return OpenContainer(
-                                closedElevation: 0,
-                                closedColor: Colors.transparent,
-                                openElevation: 0,
-                                transitionDuration: const Duration(milliseconds: 250),
-                                closedBuilder: (context, action) {
-                                  return ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                                    shape: wid_utils.getShapeBorder(index, cards.length - 1),
-                                    tileColor: selectedIndex == index ? Theme.of(context).colorScheme.surfaceVariant : null,
-                                    title: Text(
-                                      cards[index].name,
-                                      style: Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                    trailing: selectedIndex == -1
-                                        ? Icon(
-                                            Icons.arrow_right,
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                          )
-                                        : _selectedIndicator(index),
-                                    onTap: () {
-                                      if (selectedIndex > -1) {
-                                        if (selectedIndex != index) {
-                                          setState(() {
-                                            selectedIndex = index;
-                                          });
-                                        }
-                                      } else {
-                                        action();
-                                      }
-                                    },
-                                    onLongPress: () {
+                              return ListTile(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                shape: wid_utils.getShapeBorder(index, cards.length - 1),
+                                tileColor: selectedIndex == index ? Theme.of(context).colorScheme.surfaceVariant : null,
+                                title: Text(
+                                  cards[index].name,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                trailing: selectedIndex == -1
+                                    ? Icon(
+                                        Icons.arrow_right,
+                                        color: Theme.of(context).colorScheme.onSurface,
+                                      )
+                                    : _selectedIndicator(index),
+                                onTap: () {
+                                  if (selectedIndex > -1) {
+                                    if (selectedIndex != index) {
                                       setState(() {
                                         selectedIndex = index;
                                       });
-                                    },
-                                  );
+                                    }
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute<CardDetailsView>(
+                                        builder: (context) => CardDetailsView(
+                                          card: cards[index],
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 },
-                                openBuilder: (context, action) {
-                                  return CardDetailsView(
-                                    card: cards[index],
-                                  );
+                                onLongPress: () {
+                                  setState(() {
+                                    selectedIndex = index;
+                                  });
                                 },
                               );
                             },

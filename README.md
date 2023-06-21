@@ -1,20 +1,23 @@
-# fhelper
+# FHelper
 
-A new Flutter project.
+This project intents to implement a finance companion built in [Flutter](flutter.dev), utilizing the new [Material Design 3 (Material You)](m3.material.io).
 
+## **FLUTTER VERSION NOTICE**
+- FHelper **will not update from Flutter 3.12 (beta)**.
+   
+An migration to Flutter stable it's in analysis.
+
+Note 1: FHelper will only be updated if it is necessary (security flaw or major bug).  
+Note 2: FHelper will receive pre-release updates (0.0.0-xxxx), but won't voluntarily update to Flutter 3.13.
 ## Getting Started
 
-This project intents to implement a finance companion built in [Flutter](flutter.dev).
+Today (as of 21/6/2023), FHelper is only tested on Flutter beta 3.12 (specfically 3.12.0-1.1.pre), being the recommended version for development (for now).   
+**Any other version will not receive support.**
 
-It utilizes the new [Material Design 3 (Material You)](m3.material.io).
-Since Flutter support for MD3 isn't fully stable (as of 27/5/2023), **it is recommended to use Flutter beta** (tested with 3.11.0-0.1.pre). 
+### - "Why beta? Are you crazy?"
 
-Flutter 3.10 stable still have visual bugs, text clipping and missing features similar with the 3.10 beta.
-Still it has Dart 3 stable support, so code compatibility is, at least, "assured".
-**Try on your on**
+Material You support wasn't available on stable until Flutter 3.10 (released on 10/5/2023).  
+Since this project was created before that, it heavily relies on MD3 support present in beta.
 
-### Dart 3 notice
-
-Flutter 3.11 (beta) comes bundled with Dart 3.1 (3.1.0-63.1.beta).
-Dart beta features at not expected, but
-**Specific features from Dart 3 (stable) are expected to be implemented.**
+That said, even stable versions of FHelper might not be as stable, as the Flutter used is not for production, but 
+even then **stable versions are solid enough for daily driving**.

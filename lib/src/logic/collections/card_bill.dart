@@ -293,6 +293,10 @@ Future<void> processInstallments(Isar isar, Exchange exchange) async {
       final installmentId = await isar.exchanges.put(installment);
       // check for a CardBill
       if (cardBill != null) {
+        if (cardBill.confirmed) {
+          start++;
+          continue;
+        }
         // adds the installment to existing CardBill
         final CardBill bill = cardBill.copyWith(installmentIdList: [...cardBill.installmentIdList, installmentId]);
         await isar.cardBills.put(bill);

@@ -7,6 +7,7 @@
 - Added subtypes and subaccounts (250183aa1f14dd63537456e253bec17f32027f16 and 6f160908a354b23828f63a6953af6641fea166c9) 
 - Fixed l10n rename bug (250183aa1f14dd63537456e253bec17f32027f16)
 - Rework some l10n strings
+- Remove account dependency from cards (0d4d4685191442b2a0585876258f656dc1af5277)
 
 ## Release v1.1.0+1 (bugfix) (28/05/2023) - **Latest**  
 - Fixed week related actions (250cff726039041d98625182e195f85a94e7e920)

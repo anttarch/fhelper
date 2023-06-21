@@ -14,9 +14,9 @@ String? translatedDefaultAttribute(BuildContext context, int defaultAttributeid)
       // MAIN BANK
       0 => AppLocalizations.of(context)!.mainBankAccount,
       1 => AppLocalizations.of(context)!.checkingSubaccount,
+      2 => AppLocalizations.of(context)!.savingsSubaccount,
 
       // OTHERS
-      2 => AppLocalizations.of(context)!.savingsSubaccount,
       3 => AppLocalizations.of(context)!.othersAccount,
       4 => AppLocalizations.of(context)!.walletSubaccount,
 

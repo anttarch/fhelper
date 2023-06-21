@@ -42,9 +42,8 @@ class ListChoice extends StatelessWidget {
             if (hiddenIndex != null && attributeMap != null) {
               final parent = attributeMap!.keys.elementAt(hiddenIndex!.$1);
               attributeMap!.update(parent, (value) {
-                if (value.isNotEmpty) {
-                  final list = value..removeAt(hiddenIndex!.$2);
-                  return value = list;
+                if (value.isNotEmpty && value.length > hiddenIndex!.$2) {
+                  value.removeAt(hiddenIndex!.$2);
                 }
                 return value;
               });

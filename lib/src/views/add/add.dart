@@ -26,7 +26,7 @@ class _AddViewState extends State<AddView> {
   (int parentIndex, int childIndex) _accountId = (-1, -1);
   int _cardIndex = -1;
   int _installments = 0;
-  bool _accountFieldLock = false;
+  //bool _accountFieldLock = false;
   double _availabeLimit = 0;
   final List<String?> displayText = [
     // Date
@@ -357,21 +357,21 @@ class _AddViewState extends State<AddView> {
                                     ).then(
                                       (_) async {
                                         if (_cardIndex != -1) {
-                                          final Attribute? account =
-                                              await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId, context: context);
+                                          // final Attribute? account =
+                                          //     await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId, context: context);
                                           setState(
                                             () {
                                               displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null;
-                                              if (snapshot.hasData) {
-                                                displayText[2] = account!.name;
-                                                _accountFieldLock = true;
-                                              }
+                                              // if (snapshot.hasData) {
+                                              //   displayText[2] = account!.name;
+                                              //   _accountFieldLock = true;
+                                              // }
                                             },
                                           );
-                                        } else if (_accountFieldLock == true) {
+                                        } else {
                                           setState(() {
-                                            _accountFieldLock = false;
-                                            displayText[2] = null;
+                                            //_accountFieldLock = false;
+                                            //displayText[2] = null;
                                             displayText[3] = null;
                                           });
                                         }
@@ -472,82 +472,82 @@ class _AddViewState extends State<AddView> {
                           },
                         ),
                       ),
-                      FutureBuilder(
-                        future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context).then((value) {
-                          value.removeWhere((_, value) => value.isEmpty);
-                          return value;
-                        }),
-                        builder: (context, snapshot) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: InputField(
-                              label: AppLocalizations.of(context)!.account(1),
-                              locked: _accountFieldLock,
-                              readOnly: true,
-                              placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
-                              validator: (value) {
-                                if (value!.isEmpty || displayText[2] == null) {
-                                  return AppLocalizations.of(context)!.emptyField;
-                                }
-                                return null;
-                              },
-                              onTap: () => showModalBottomSheet<String?>(
-                                context: context,
-                                constraints: BoxConstraints(
-                                  minHeight: MediaQuery.of(context).size.height / 3,
-                                ),
-                                enableDrag: false,
-                                builder: (context) {
-                                  return StatefulBuilder(
-                                    builder: (context, setState) {
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!.selectAccount,
-                                                  style: Theme.of(context).textTheme.titleLarge,
-                                                ),
-                                                TextButton.icon(
-                                                  onPressed: () => showAttributeDialog<void>(
-                                                    context: context,
-                                                    attributeType: AttributeType.account,
-                                                    attributeRole: AttributeRole.child,
-                                                    controller: textController[3],
-                                                  ).then((_) => textController[3].clear()),
-                                                  icon: const Icon(Icons.add),
-                                                  label: Text(AppLocalizations.of(context)!.add),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          ListChoice(
-                                            groupValue: _accountId,
-                                            onChanged: (name, value) {
-                                              setState(() {
-                                                _accountId = value! as (int, int);
-                                              });
-                                              Navigator.pop(context, name);
-                                            },
-                                            attributeMap: snapshot.data,
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                      if (_cardIndex == -1)
+                        FutureBuilder(
+                          future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context).then((value) {
+                            value.removeWhere((_, value) => value.isEmpty);
+                            return value;
+                          }),
+                          builder: (context, snapshot) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: InputField(
+                                label: AppLocalizations.of(context)!.account(1),
+                                readOnly: true,
+                                placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
+                                validator: (value) {
+                                  if (value!.isEmpty || displayText[2] == null) {
+                                    return AppLocalizations.of(context)!.emptyField;
+                                  }
+                                  return null;
                                 },
-                              ).then(
-                                (name) => _accountId != (-1, -1) && name != null ? setState(() => displayText[2] = name) : null,
+                                onTap: () => showModalBottomSheet<String?>(
+                                  context: context,
+                                  constraints: BoxConstraints(
+                                    minHeight: MediaQuery.of(context).size.height / 3,
+                                  ),
+                                  enableDrag: false,
+                                  builder: (context) {
+                                    return StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    AppLocalizations.of(context)!.selectAccount,
+                                                    style: Theme.of(context).textTheme.titleLarge,
+                                                  ),
+                                                  TextButton.icon(
+                                                    onPressed: () => showAttributeDialog<void>(
+                                                      context: context,
+                                                      attributeType: AttributeType.account,
+                                                      attributeRole: AttributeRole.child,
+                                                      controller: textController[3],
+                                                    ).then((_) => textController[3].clear()),
+                                                    icon: const Icon(Icons.add),
+                                                    label: Text(AppLocalizations.of(context)!.add),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            ListChoice(
+                                              groupValue: _accountId,
+                                              onChanged: (name, value) {
+                                                setState(() {
+                                                  _accountId = value! as (int, int);
+                                                });
+                                                Navigator.pop(context, name);
+                                              },
+                                              attributeMap: snapshot.data,
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ).then(
+                                  (name) => _accountId != (-1, -1) && name != null ? setState(() => displayText[2] = name) : null,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 ),
@@ -585,7 +585,8 @@ class _AddViewState extends State<AddView> {
                         date: DateTime.parse(displayText[0]!),
                         typeId: types.values.toList()[_typeId.$1][_typeId.$2].id,
                         accountId: _cardIndex > -1
-                            ? (await fhelper.getCards(isar))[_cardIndex].accountId
+                            //? (await fhelper.getCards(isar))[_cardIndex].accountId :
+                            ? -1
                             : (await getAttributes(isar, AttributeType.account, context: mounted ? context : null))
                                 .values
                                 .toList()[_accountId.$1][_accountId.$2]

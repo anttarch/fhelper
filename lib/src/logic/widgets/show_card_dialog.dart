@@ -1,6 +1,4 @@
-import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
-import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +10,7 @@ import 'package:isar/isar.dart';
 Future<void> showCardForm({
   required BuildContext context,
   fhelper.Card? card,
-  Attribute? cardAttribute,
+  //Attribute? cardAttribute,
   bool editMode = false,
 }) {
   assert(editMode ? card != null : card == null);
@@ -29,17 +27,17 @@ Future<void> showCardForm({
     // Payment Due Date,
     null,
     // Account,
-    null,
+    //null,
   ];
-  (int parentIndex, int childIndex) accountId = (-1, -1);
+  //(int parentIndex, int childIndex) accountId = (-1, -1);
   int pdDate = -1;
   int stcDate = -1;
 
   void cleanForm() {
-    accountId = (-1, -1);
+    //accountId = (-1, -1);
     stcDate = -1;
     pdDate = -1;
-    displayText.fillRange(0, 3, null);
+    displayText.fillRange(0, 2, null);
     for (final element in controller) {
       element.clear();
     }
@@ -53,7 +51,7 @@ Future<void> showCardForm({
       statementClosure: stcDate + 1,
       paymentDue: pdDate + 1,
       limit: double.parse(value) / 100,
-      accountId: (await getAttributes(isar, AttributeType.account)).values.toList()[accountId.$1][accountId.$2].id,
+      //accountId: (await getAttributes(isar, AttributeType.account)).values.toList()[accountId.$1][accountId.$2].id,
     );
     await isar.writeTxn(() async {
       await isar.cards.put(card);
@@ -69,7 +67,7 @@ Future<void> showCardForm({
       statementClosure: stcDate + 1,
       paymentDue: pdDate + 1,
       limit: double.parse(value) / 100,
-      accountId: accountId == (-1, -1) ? null : (await getAttributes(isar, AttributeType.account)).values.toList()[accountId.$1][accountId.$2].id,
+      //accountId: accountId == (-1, -1) ? null : (await getAttributes(isar, AttributeType.account)).values.toList()[accountId.$1][accountId.$2].id,
     );
     await isar.writeTxn(() async {
       await isar.cards.put(newCard);
@@ -84,7 +82,7 @@ Future<void> showCardForm({
     pdDate = card.paymentDue - 1;
     displayText[0] = AppLocalizations.of(context)!.dayOfMonth(card.statementClosure);
     displayText[1] = AppLocalizations.of(context)!.dayOfMonth(card.paymentDue);
-    displayText[2] = cardAttribute!.name;
+    //displayText[2] = cardAttribute!.name;
     controller[0].text = card.name;
     controller[1].text = NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(card.limit);
   }
@@ -276,82 +274,82 @@ Future<void> showCardForm({
                               },
                             ),
                           ),
-                          FutureBuilder(
-                            future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context),
-                            builder: (context, snapshot) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 15, bottom: 15),
-                                child: InputField(
-                                  label: AppLocalizations.of(context)!.account(1),
-                                  readOnly: true,
-                                  placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
-                                  validator: (value) {
-                                    if (value!.isEmpty || displayText[2] == null) {
-                                      return AppLocalizations.of(context)!.emptyField;
-                                    }
-                                    return null;
-                                  },
-                                  onTap: () => showModalBottomSheet<String?>(
-                                    context: context,
-                                    constraints: BoxConstraints(
-                                      minHeight: MediaQuery.of(context).size.height / 3,
-                                    ),
-                                    enableDrag: false,
-                                    builder: (context) {
-                                      int accountIndex = editMode && snapshot.hasData ? snapshot.data!.keys.toList().indexOf(cardAttribute!) : -1;
-                                      return StatefulBuilder(
-                                        builder: (context, setState) {
-                                          return Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      AppLocalizations.of(context)!.selectAccount,
-                                                      style: Theme.of(context).textTheme.titleLarge,
-                                                    ),
-                                                    TextButton.icon(
-                                                      onPressed: () => showAttributeDialog<void>(
-                                                        context: context,
-                                                        attributeType: AttributeType.account,
-                                                        attributeRole: AttributeRole.child,
-                                                        controller: controller[2],
-                                                      ).then((_) => controller[2].clear()),
-                                                      icon: const Icon(Icons.add),
-                                                      label: Text(AppLocalizations.of(context)!.add),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              ListChoice(
-                                                groupValue: editMode ? accountIndex : accountId,
-                                                onChanged: (name, value) {
-                                                  setState(() {
-                                                    if (editMode) {
-                                                      accountIndex = value! as int;
-                                                    }
-                                                    accountId = value! as (int, int);
-                                                  });
-                                                  Navigator.pop(context, name);
-                                                },
-                                                attributeMap: snapshot.data,
-                                              )
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ).then(
-                                    (name) => accountId != (-1, -1) && name != null ? setState(() => displayText[2] = name) : null,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                          // FutureBuilder(
+                          //   future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context),
+                          //   builder: (context, snapshot) {
+                          //     return Padding(
+                          //       padding: const EdgeInsets.only(top: 15, bottom: 15),
+                          //       child: InputField(
+                          //         label: AppLocalizations.of(context)!.account(1),
+                          //         readOnly: true,
+                          //         placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
+                          //         validator: (value) {
+                          //           if (value!.isEmpty || displayText[2] == null) {
+                          //             return AppLocalizations.of(context)!.emptyField;
+                          //           }
+                          //           return null;
+                          //         },
+                          //         onTap: () => showModalBottomSheet<String?>(
+                          //           context: context,
+                          //           constraints: BoxConstraints(
+                          //             minHeight: MediaQuery.of(context).size.height / 3,
+                          //           ),
+                          //           enableDrag: false,
+                          //           builder: (context) {
+                          //             int accountIndex = editMode && snapshot.hasData ? snapshot.data!.keys.toList().indexOf(cardAttribute!) : -1;
+                          //             return StatefulBuilder(
+                          //               builder: (context, setState) {
+                          //                 return Column(
+                          //                   crossAxisAlignment: CrossAxisAlignment.start,
+                          //                   mainAxisSize: MainAxisSize.min,
+                          //                   children: [
+                          //                     Padding(
+                          //                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                          //                       child: Row(
+                          //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //                         children: [
+                          //                           Text(
+                          //                             AppLocalizations.of(context)!.selectAccount,
+                          //                             style: Theme.of(context).textTheme.titleLarge,
+                          //                           ),
+                          //                           TextButton.icon(
+                          //                             onPressed: () => showAttributeDialog<void>(
+                          //                               context: context,
+                          //                               attributeType: AttributeType.account,
+                          //                               attributeRole: AttributeRole.child,
+                          //                               controller: controller[2],
+                          //                             ).then((_) => controller[2].clear()),
+                          //                             icon: const Icon(Icons.add),
+                          //                             label: Text(AppLocalizations.of(context)!.add),
+                          //                           ),
+                          //                         ],
+                          //                       ),
+                          //                     ),
+                          //                     ListChoice(
+                          //                       groupValue: editMode ? accountIndex : accountId,
+                          //                       onChanged: (name, value) {
+                          //                         setState(() {
+                          //                           if (editMode) {
+                          //                             accountIndex = value! as int;
+                          //                           }
+                          //                           accountId = value! as (int, int);
+                          //                         });
+                          //                         Navigator.pop(context, name);
+                          //                       },
+                          //                       attributeMap: snapshot.data,
+                          //                     )
+                          //                   ],
+                          //                 );
+                          //               },
+                          //             );
+                          //           },
+                          //         ).then(
+                          //           (name) => accountId != (-1, -1) && name != null ? setState(() => displayText[2] = name) : null,
+                          //         ),
+                          //       ),
+                          //     );
+                          //   },
+                          // ),
                         ],
                       ),
                     ),

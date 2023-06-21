@@ -62,6 +62,11 @@ class Attribute {
 
   @override
   int get hashCode => id.hashCode ^ name.hashCode ^ parentId.hashCode ^ role.hashCode ^ type.hashCode;
+
+  @override
+  String toString() {
+    return 'Attribute(id: $id, name: $name, parentId: $parentId, role: $role, type: $type)';
+  }
 }
 
 Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType type, {BuildContext? context}) async {
@@ -71,7 +76,7 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType t
     // Handles l10n
     if (context != null) {
       for (final attribute in attributes) {
-        if (attribute.id >= 0 && attribute.id <= 20 && context.mounted && attribute.name.contains('#/str#/')) {
+        if (attribute.id >= 0 && attribute.id <= 23 && context.mounted && attribute.name.contains('#/str#/')) {
           final index = attributes.indexOf(attribute);
           final newAttribute = attribute.copyWith(
             name: translatedDefaultAttribute(context, attribute.id),
@@ -101,7 +106,7 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType t
 
 Future<Attribute?> getAttributeFromId(Isar isar, int id, {BuildContext? context}) async {
   final Attribute? attribute = await isar.attributes.get(id);
-  if (context != null && id >= 0 && id <= 20 && attribute != null && context.mounted && attribute.name.contains('#/str#/')) {
+  if (context != null && id >= 0 && id <= 23 && attribute != null && context.mounted && attribute.name.contains('#/str#/')) {
     return attribute.copyWith(name: translatedDefaultAttribute(context, id));
   }
   return attribute;

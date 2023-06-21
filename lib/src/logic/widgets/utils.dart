@@ -30,9 +30,10 @@ Future<String> parseTransferName(BuildContext context, Exchange transfer) async 
   String from = (await getAttributeFromId(Isar.getInstance()!, transfer.accountId))?.name ?? deleted;
   String to = (await getAttributeFromId(Isar.getInstance()!, transfer.accountIdEnd!))?.name ?? deleted;
 
-  if (transfer.accountId >= 0 && transfer.accountId <= 20 && context.mounted && transfer.description.split('#/spt#/')[0] == '#/str#/') {
+  if (transfer.accountId >= 0 && transfer.accountId <= 23 && context.mounted && transfer.description.split('#/spt#/')[0] == '#/str#/') {
     from = translatedDefaultAttribute(context, transfer.accountId)!;
-  } else if (transfer.accountIdEnd! >= 0 && transfer.accountIdEnd! <= 20 && context.mounted && transfer.description.split('#/spt#/')[1] == '#/str#/') {
+  }
+  if (transfer.accountIdEnd! >= 0 && transfer.accountIdEnd! <= 23 && context.mounted && transfer.description.split('#/spt#/')[1] == '#/str#/') {
     to = translatedDefaultAttribute(context, transfer.accountIdEnd!)!;
   }
   if (context.mounted) {

@@ -242,7 +242,7 @@ Future<double> getSumValueByAttribute(Isar isar, int propertyId, AttributeType? 
 
 /// `dependency` map
 /// 0 -> [Exchange]
-/// 1 -> [Card] (Not available for types)
+/// 1 -> [CardBill] (Not available for types)
 Future<int> checkForAttributeDependencies(Isar isar, int propertyId, AttributeType? attributeType, {int dependency = -1}) async {
   int dependenciesCount = 0;
 
@@ -253,14 +253,14 @@ Future<int> checkForAttributeDependencies(Isar isar, int propertyId, AttributeTy
       switch (attributeType) {
         case AttributeType.account:
           final exchanges = await isar.exchanges.filter().accountIdEqualTo(propertyId).or().accountIdEndEqualTo(propertyId).count();
-          final cards = await isar.cards.filter().accountIdEqualTo(propertyId).count();
+          final cardBills = await isar.cardBills.filter().accountIdEqualTo(propertyId).count();
           if (dependency > -1) {
             if (dependency == 1) {
-              return cards;
+              return cardBills;
             }
             return exchanges;
           }
-          dependenciesCount = exchanges + cards;
+          dependenciesCount = exchanges + cardBills;
           return dependenciesCount;
         case AttributeType.incomeType:
         case AttributeType.expenseType:

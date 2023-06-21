@@ -9,14 +9,16 @@ part 'card_bill.g.dart';
 class CardBill {
   CardBill({
     this.id = Isar.autoIncrement,
+    this.accountId = -1,
     required this.cardId,
     this.confirmed = false,
     this.minimal,
     required this.date,
     required this.installmentIdList,
-  });
+  }) : assert(confirmed ? accountId != -1 : accountId == -1);
 
   final Id id; // CardBill id
+  final int accountId; // Account linked
   final int cardId; // related card id
   final bool confirmed; // if bill is paid/confirmed
   final double? minimal; // minimal paid value
@@ -24,10 +26,12 @@ class CardBill {
   final List<int> installmentIdList; // CardBill installments
 
   @override
-  String toString() => 'CardBill(id: $id, cardId: $cardId, confirmed: $confirmed, minimal: $minimal, date: $date, installmentIdList: $installmentIdList)';
+  String toString() =>
+      'CardBill(id: $id, accountId: $accountId, cardId: $cardId, confirmed: $confirmed, minimal: $minimal, date: $date, installmentIdList: $installmentIdList)';
 
   CardBill copyWith({
     Id? id,
+    int? accountId,
     int? cardId,
     bool? confirmed,
     double? minimal,
@@ -36,6 +40,7 @@ class CardBill {
   }) {
     return CardBill(
       id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
       cardId: cardId ?? this.cardId,
       confirmed: confirmed ?? this.confirmed,
       minimal: minimal ?? this.minimal,
@@ -184,8 +189,8 @@ Future<List<Exchange>> getCardBillsAsExchanges(
       cardBillExchange.add(
         Exchange(
           id: -1,
-          accountId: card!.accountId,
-          description: "${card.name}'s bill",
+          accountId: bill.accountId,
+          description: "${card!.name}'s bill",
           date: bill.date,
           eType: EType.expense,
           typeId: bill.id,
@@ -207,12 +212,13 @@ Future<double> getCardBillSumByAccount(Isar isar, int accountId, {int time = 0})
   if (accountId == -1) {
     return value;
   } else {
-    final List<fhelper.Card> cards = await isar.cards.filter().accountIdEqualTo(accountId).findAll();
+    final List<fhelper.Card> cards = await isar.cards.where().findAll();
     for (final card in cards) {
       List<CardBill> cardBills = [];
       if (time == 0) {
         cardBills = await isar.cardBills
             .filter()
+            .accountIdEqualTo(accountId)
             .cardIdEqualTo(card.id)
             .confirmedEqualTo(true)
             .dateBetween(
@@ -225,7 +231,7 @@ Future<double> getCardBillSumByAccount(Isar isar, int accountId, {int time = 0})
             )
             .findAll();
       } else {
-        cardBills = await isar.cardBills.filter().cardIdEqualTo(card.id).confirmedEqualTo(true).findAll();
+        cardBills = await isar.cardBills.filter().accountIdEqualTo(accountId).cardIdEqualTo(card.id).confirmedEqualTo(true).findAll();
       }
       if (cardBills.isNotEmpty) {
         double installmentValue = 0;

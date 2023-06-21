@@ -1,5 +1,4 @@
 import 'package:animations/animations.dart';
-import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_card_dialog.dart';
@@ -283,9 +282,9 @@ class _CardManagerState extends State<CardManager> {
                 ),
                 IconButton(
                   onPressed: () async {
-                    final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[selectedIndex].accountId, context: context);
+                    //final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[selectedIndex].accountId, context: context);
                     if (mounted) {
-                      await showCardForm(context: context, editMode: true, card: cards[selectedIndex], cardAttribute: attribute)
+                      await showCardForm(context: context, editMode: true, card: cards[selectedIndex]) //, cardAttribute: attribute)
                           .then((_) => setState(() => selectedIndex = -1));
                     }
                   },

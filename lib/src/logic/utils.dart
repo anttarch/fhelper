@@ -24,9 +24,9 @@ Future<Exchange?> getLatest(Isar isar, {int? attributeId, AttributeType? attribu
             .sortByDateDesc()
             .findFirst();
         final List<CardBill> cardBills = [];
-        final cardsIds = await isar.cards.where().filter().accountIdEqualTo(attributeId).idProperty().findAll();
+        final cardsIds = await isar.cards.where().idProperty().findAll();
         for (final id in cardsIds) {
-          final cardBill = await isar.cardBills.filter().cardIdEqualTo(id).confirmedEqualTo(true).findAll();
+          final cardBill = await isar.cardBills.filter().accountIdEqualTo(attributeId).cardIdEqualTo(id).confirmedEqualTo(true).findAll();
           cardBills.addAll(cardBill);
         }
         if (cardBills.isNotEmpty) {
@@ -46,6 +46,25 @@ Future<Exchange?> getLatest(Isar isar, {int? attributeId, AttributeType? attribu
     return null;
   } else if (latestPaidCardBill == null && latestExchange != null) {
     return latestExchange;
+  } else if (latestPaidCardBill != null && latestExchange == null) {
+    fhelper.Card? card;
+    double value = 0;
+    for (final id in latestPaidCardBill.installmentIdList) {
+      final Exchange? installment = await isar.exchanges.get(id);
+      if (installment != null) {
+        value -= installment.value;
+      }
+    }
+    card = await fhelper.getCardFromId(isar, latestPaidCardBill.cardId);
+    return Exchange(
+      id: -1,
+      accountId: latestPaidCardBill.accountId,
+      description: "${card!.name}'s bill",
+      date: latestPaidCardBill.date,
+      eType: EType.expense,
+      typeId: latestPaidCardBill.id,
+      value: value,
+    );
   } else if (latestExchange!.date.isBefore(latestPaidCardBill!.date)) {
     if (latestPaidCardBill.date.isBefore(DateTime.now())) {
       fhelper.Card? card;
@@ -59,8 +78,8 @@ Future<Exchange?> getLatest(Isar isar, {int? attributeId, AttributeType? attribu
       card = await fhelper.getCardFromId(isar, latestPaidCardBill.cardId);
       return Exchange(
         id: -1,
-        accountId: card!.accountId,
-        description: "${card.name}'s bill",
+        accountId: latestPaidCardBill.accountId,
+        description: "${card!.name}'s bill",
         date: latestPaidCardBill.date,
         eType: EType.expense,
         typeId: latestPaidCardBill.id,

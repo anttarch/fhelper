@@ -167,29 +167,30 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                   ),
                               ],
                             ),
-                          FutureBuilder(
-                            future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId, context: context).then((value) async {
-                              if (value != null) {
-                                final parent = await getAttributeFromId(Isar.getInstance()!, value.parentId!, context: context);
-                                if (parent != null) {
-                                  return value.copyWith(name: '${parent.name} - ${value.name}');
-                                } else if (mounted) {
-                                  return value.copyWith(name: '${AppLocalizations.of(context)!.deleted} - ${value.name}');
+                          if (widget.item.accountId != -1)
+                            FutureBuilder(
+                              future: getAttributeFromId(Isar.getInstance()!, widget.item.accountId, context: context).then((value) async {
+                                if (value != null) {
+                                  final parent = await getAttributeFromId(Isar.getInstance()!, value.parentId!, context: context);
+                                  if (parent != null) {
+                                    return value.copyWith(name: '${parent.name} - ${value.name}');
+                                  } else if (mounted) {
+                                    return value.copyWith(name: '${AppLocalizations.of(context)!.deleted} - ${value.name}');
+                                  }
                                 }
-                              }
-                              return value;
-                            }),
-                            builder: (context, snapshot) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: InputField(
-                                  label: widget.item.eType != EType.transfer ? AppLocalizations.of(context)!.account(1) : AppLocalizations.of(context)!.from,
-                                  placeholder: snapshot.hasData ? snapshot.data!.name : AppLocalizations.of(context)!.deleted,
-                                  readOnly: true,
-                                ),
-                              );
-                            },
-                          ),
+                                return value;
+                              }),
+                              builder: (context, snapshot) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: InputField(
+                                    label: widget.item.eType != EType.transfer ? AppLocalizations.of(context)!.account(1) : AppLocalizations.of(context)!.from,
+                                    placeholder: snapshot.hasData ? snapshot.data!.name : AppLocalizations.of(context)!.deleted,
+                                    readOnly: true,
+                                  ),
+                                );
+                              },
+                            ),
                           if (widget.item.eType == EType.transfer)
                             FutureBuilder(
                               future: getAttributeFromId(Isar.getInstance()!, widget.item.accountIdEnd!, context: context).then((value) async {

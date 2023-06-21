@@ -5,8 +5,8 @@
 
 ## Cards Management
 - [x] Show next bill information on CardDetailsView (at least value)
-- [ ] Ask for an account for payment
-  - [ ] Remove account root dependency
+- [x] Ask for an account for payment
+  - [x] Remove account root dependency
 
 ## Features
 - [x] Add subaccounts

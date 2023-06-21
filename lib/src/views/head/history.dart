@@ -1,11 +1,15 @@
 import 'package:async/async.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/card_details.dart';
 import 'package:fhelper/src/widgets/historylist.dart';
+import 'package:fhelper/src/widgets/inputfield.dart';
+import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -230,35 +234,122 @@ class _HistoryPageState extends State<HistoryPage> {
                                                 }
                                               },
                                               trailing: IconButton.filled(
-                                                onPressed: () => showDialog<void>(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      title: Text(AppLocalizations.of(context)!.confirmPayQuestion),
-                                                      content: Text(AppLocalizations.of(context)!.irreversibleAction),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () => Navigator.pop(context),
-                                                          child: Text(AppLocalizations.of(context)!.cancel),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () async {
-                                                            final Isar isar = Isar.getInstance()!;
-                                                            final int cardId = cardsValues.values.elementAt(index).last.toInt();
-                                                            final CardBill? bill = await isar.cardBills.get(cardId);
-                                                            if (bill != null) {
-                                                              final CardBill newBill = bill.copyWith(confirmed: true);
-                                                              await isar.writeTxn(() async {
-                                                                await isar.cardBills.put(newBill);
-                                                              }).then((_) => Navigator.pop(context));
-                                                            }
+                                                onPressed: () async {
+                                                  (int, int) accountId = (-1, -1);
+                                                  final TextEditingController controller = TextEditingController();
+                                                  final accounts = await getAttributes(
+                                                    Isar.getInstance()!,
+                                                    AttributeType.account,
+                                                    context: context,
+                                                  ).then((value) {
+                                                    value.removeWhere((_, value) => value.isEmpty);
+                                                    return value;
+                                                  });
+                                                  if (mounted) {
+                                                    await showModalBottomSheet<(String, (int, int))>(
+                                                      context: context,
+                                                      constraints: BoxConstraints(
+                                                        minHeight: MediaQuery.of(context).size.height / 3,
+                                                      ),
+                                                      enableDrag: false,
+                                                      builder: (context) {
+                                                        return StatefulBuilder(
+                                                          builder: (context, setState) {
+                                                            return Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              mainAxisSize: MainAxisSize.min,
+                                                              children: [
+                                                                Padding(
+                                                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                                                  child: Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    children: [
+                                                                      Text(
+                                                                        AppLocalizations.of(context)!.selectAccount,
+                                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                                      ),
+                                                                      TextButton.icon(
+                                                                        onPressed: () => showAttributeDialog<void>(
+                                                                          context: context,
+                                                                          attributeType: AttributeType.account,
+                                                                          attributeRole: AttributeRole.child,
+                                                                          controller: controller,
+                                                                        ).then((_) => controller.clear()),
+                                                                        icon: const Icon(Icons.add),
+                                                                        label: Text(AppLocalizations.of(context)!.add),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                ListChoice(
+                                                                  groupValue: accountId,
+                                                                  onChanged: (name, value) {
+                                                                    accountId = value! as (int, int);
+                                                                    Navigator.pop(context, (name, accountId));
+                                                                  },
+                                                                  attributeMap: accounts,
+                                                                ),
+                                                              ],
+                                                            );
                                                           },
-                                                          child: Text(AppLocalizations.of(context)!.confirm),
-                                                        ),
-                                                      ],
+                                                        );
+                                                      },
+                                                    ).then(
+                                                      (accountRecord) async => accountRecord != null
+                                                          ? await showDialog<void>(
+                                                              context: context,
+                                                              builder: (context) {
+                                                                return AlertDialog(
+                                                                  title: Text(AppLocalizations.of(context)!.confirmPayQuestion),
+                                                                  content: Column(
+                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                    mainAxisSize: MainAxisSize.min,
+                                                                    children: [
+                                                                      Text(
+                                                                        AppLocalizations.of(context)!.irreversibleAction,
+                                                                        style: Theme.of(context).textTheme.bodyLarge,
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.only(top: 10),
+                                                                        child: InputField(
+                                                                          label: AppLocalizations.of(context)!.account(1),
+                                                                          readOnly: true,
+                                                                          placeholder: accountRecord.$1,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  actions: [
+                                                                    TextButton(
+                                                                      onPressed: () => Navigator.pop(context),
+                                                                      child: Text(AppLocalizations.of(context)!.cancel),
+                                                                    ),
+                                                                    TextButton(
+                                                                      onPressed: () async {
+                                                                        final Isar isar = Isar.getInstance()!;
+                                                                        final int cardId = cardsValues.values.elementAt(index).last.toInt();
+                                                                        final CardBill? bill = await isar.cardBills.get(cardId);
+                                                                        final Attribute account = accounts.entries
+                                                                            .elementAt(accountRecord.$2.$1)
+                                                                            .value
+                                                                            .elementAt(accountRecord.$2.$2);
+                                                                        if (bill != null) {
+                                                                          final CardBill newBill = bill.copyWith(accountId: account.id, confirmed: true);
+                                                                          await isar.writeTxn(() async {
+                                                                            await isar.cardBills.put(newBill);
+                                                                          }).then((_) => Navigator.pop(context));
+                                                                        }
+                                                                      },
+                                                                      child: Text(AppLocalizations.of(context)!.confirm),
+                                                                    ),
+                                                                  ],
+                                                                );
+                                                              },
+                                                            )
+                                                          : null,
                                                     );
-                                                  },
-                                                ),
+                                                  }
+                                                },
                                                 icon: Icon(
                                                   Icons.check,
                                                   color: Theme.of(context).colorScheme.onPrimary,

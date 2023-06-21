@@ -10,16 +10,15 @@ class Card {
     required this.statementClosure,
     required this.paymentDue,
     required this.limit,
-    required this.accountId,
+    //required this.accountId,
   });
 
   final Id id; // Isar id
   final String name; // Name
-  // final String brand; Brand of the card (being removed)
   final int statementClosure; // Closure of statement day
   final int paymentDue; // Payment day
   final double limit; // Card limit
-  final int accountId; // Account linked
+  //final int accountId; // Account linked
 
   Card copyWith({
     Id? id,
@@ -27,7 +26,7 @@ class Card {
     int? statementClosure,
     int? paymentDue,
     double? limit,
-    int? accountId,
+    //int? accountId,
   }) {
     return Card(
       id: id ?? this.id,
@@ -35,7 +34,7 @@ class Card {
       statementClosure: statementClosure ?? this.statementClosure,
       paymentDue: paymentDue ?? this.paymentDue,
       limit: limit ?? this.limit,
-      accountId: accountId ?? this.accountId,
+      //accountId: accountId ?? this.accountId,
     );
   }
 }

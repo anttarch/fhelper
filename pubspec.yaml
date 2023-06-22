@@ -29,7 +29,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   isar_generator: ^3.1.0+1
-  lint: ^2.1.2
+  very_good_analysis: ^5.0.0+1
 
 flutter:
   generate: true

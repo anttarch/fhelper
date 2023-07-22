@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 class CardDetailsView extends StatefulWidget {
-  const CardDetailsView({super.key, required this.card});
+  const CardDetailsView({required this.card, super.key});
   final fhelper.Card card;
 
   @override
@@ -36,7 +36,12 @@ class _CardDetailsViewState extends State<CardDetailsView> {
         )
         .sortByDateDesc()
         .findFirstSync();
-    final billCount = Isar.getInstance()!.cardBills.where().filter().cardIdEqualTo(widget.card.id).countSync();
+    final billCount = Isar.getInstance()!
+        .cardBills
+        .where()
+        .filter()
+        .cardIdEqualTo(widget.card.id)
+        .countSync();
     notFirstBill = billCount > 1;
   }
 
@@ -73,23 +78,49 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               FutureBuilder(
-                                future: getAvailableLimit(Isar.getInstance()!, widget.card),
+                                future: getAvailableLimit(
+                                  Isar.getInstance()!,
+                                  widget.card,
+                                ),
                                 builder: (context, snapshot) {
-                                  final double value = snapshot.hasData ? snapshot.data! : 0;
+                                  final value =
+                                      snapshot.hasData ? snapshot.data! : 0.0;
                                   return Center(
                                     child: Stack(
                                       alignment: Alignment.center,
                                       children: [
                                         Text(
                                           '${(((widget.card.limit - value) / widget.card.limit) * 100).round()}%',
-                                          style: Theme.of(context).textTheme.headlineSmall!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall!
+                                              .apply(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onTertiaryContainer,
+                                              ),
                                         ),
                                         SizedBox(
-                                          height: MediaQuery.sizeOf(context).longestSide / 11 + Theme.of(context).textTheme.headlineSmall!.fontSize!,
-                                          width: MediaQuery.sizeOf(context).longestSide / 11 + Theme.of(context).textTheme.headlineSmall!.fontSize!,
+                                          height: MediaQuery.sizeOf(context)
+                                                      .longestSide /
+                                                  11 +
+                                              Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall!
+                                                  .fontSize!,
+                                          width: MediaQuery.sizeOf(context)
+                                                      .longestSide /
+                                                  11 +
+                                              Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall!
+                                                  .fontSize!,
                                           child: CircularProgressIndicator(
-                                            value: (widget.card.limit - value) / widget.card.limit,
-                                            backgroundColor: Theme.of(context).colorScheme.surface,
+                                            value: (widget.card.limit - value) /
+                                                widget.card.limit,
+                                            backgroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .surface,
                                             strokeWidth: 15,
                                           ),
                                         ),
@@ -100,10 +131,14 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                               ),
                               FutureBuilder(
                                 future: Future<double>(() async {
-                                  double cardBillValue = 0;
+                                  var cardBillValue = 0.0;
                                   if (cardbill != null) {
-                                    for (final installmentId in cardbill!.installmentIdList) {
-                                      final installment = await Isar.getInstance()!.exchanges.get(installmentId);
+                                    for (final installmentId
+                                        in cardbill!.installmentIdList) {
+                                      final installment =
+                                          await Isar.getInstance()!
+                                              .exchanges
+                                              .get(installmentId);
                                       if (installment != null) {
                                         cardBillValue += installment.value;
                                       }
@@ -112,34 +147,62 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                   return cardBillValue;
                                 }),
                                 builder: (context, snapshot) {
-                                  final double value = snapshot.hasData ? snapshot.data! : 0;
+                                  final value =
+                                      snapshot.hasData ? snapshot.data! : 0;
                                   return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Flexible(
                                         child: Text(
-                                          AppLocalizations.of(context)!.billDescriptor,
-                                          style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                          AppLocalizations.of(context)!
+                                              .billDescriptor,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge!
+                                              .apply(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onTertiaryContainer,
+                                              ),
                                           overflow: TextOverflow.fade,
                                         ),
                                       ),
                                       const SizedBox(width: 15),
                                       DecoratedBox(
                                         decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.surface,
-                                          borderRadius: BorderRadius.circular(12),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surface,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
                                           child: Text(
-                                            NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
-                                            style: Theme.of(context).textTheme.titleLarge!.apply(
+                                            NumberFormat.simpleCurrency(
+                                              locale: Localizations.localeOf(
+                                                context,
+                                              ).languageCode,
+                                            ).format(value),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge!
+                                                .apply(
                                                   color: Color(
-                                                    value.isNegative ? 0xffbd1c1c : 0xff199225,
+                                                    value.isNegative
+                                                        ? 0xffbd1c1c
+                                                        : 0xff199225,
                                                   ).harmonizeWith(
-                                                    Theme.of(context).colorScheme.primary,
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
                                                   ),
                                                 ),
                                           ),
@@ -164,33 +227,67 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                 ),
                               ),
                               FutureBuilder(
-                                future: getAvailableLimit(Isar.getInstance()!, widget.card),
+                                future: getAvailableLimit(
+                                  Isar.getInstance()!,
+                                  widget.card,
+                                ),
                                 builder: (context, snapshot) {
-                                  final double value = snapshot.hasData ? snapshot.data! : 0;
+                                  final value =
+                                      snapshot.hasData ? snapshot.data! : 0;
                                   return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            AppLocalizations.of(context)!.usedDescriptor,
-                                            style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                            AppLocalizations.of(context)!
+                                                .usedDescriptor,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge!
+                                                .apply(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onTertiaryContainer,
+                                                ),
                                           ),
                                           const SizedBox(width: 15),
                                           DecoratedBox(
                                             decoration: BoxDecoration(
-                                              color: Theme.of(context).colorScheme.surface,
-                                              borderRadius: BorderRadius.circular(12),
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .surface,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 6,
+                                                vertical: 2,
+                                              ),
                                               child: Text(
-                                                NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
-                                                    .format(widget.card.limit - value),
-                                                style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                      color: const Color(0xffbd1c1c).harmonizeWith(
-                                                        Theme.of(context).colorScheme.primary,
+                                                NumberFormat.simpleCurrency(
+                                                  locale:
+                                                      Localizations.localeOf(
+                                                    context,
+                                                  ).languageCode,
+                                                ).format(
+                                                  widget.card.limit - value,
+                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleLarge!
+                                                    .apply(
+                                                      color: const Color(
+                                                        0xffbd1c1c,
+                                                      ).harmonizeWith(
+                                                        Theme.of(context)
+                                                            .colorScheme
+                                                            .primary,
                                                       ),
                                                     ),
                                               ),
@@ -201,25 +298,53 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                       Padding(
                                         padding: const EdgeInsets.only(top: 5),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              AppLocalizations.of(context)!.availableDescriptor,
-                                              style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onTertiaryContainer),
+                                              AppLocalizations.of(context)!
+                                                  .availableDescriptor,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .apply(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onTertiaryContainer,
+                                                  ),
                                             ),
                                             const SizedBox(width: 15),
                                             DecoratedBox(
                                               decoration: BoxDecoration(
-                                                color: Theme.of(context).colorScheme.surface,
-                                                borderRadius: BorderRadius.circular(12),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .surface,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
                                               child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 6,
+                                                  vertical: 2,
+                                                ),
                                                 child: Text(
-                                                  NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
-                                                  style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                        color: const Color(0xff199225).harmonizeWith(
-                                                          Theme.of(context).colorScheme.primary,
+                                                  NumberFormat.simpleCurrency(
+                                                    locale:
+                                                        Localizations.localeOf(
+                                                      context,
+                                                    ).languageCode,
+                                                  ).format(value),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleLarge!
+                                                      .apply(
+                                                        color: const Color(
+                                                          0xff199225,
+                                                        ).harmonizeWith(
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .primary,
                                                         ),
                                                       ),
                                                 ),
@@ -249,12 +374,20 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                         ),
                       ),
                       child: FutureBuilder(
-                        future: getCardBillsFromCard(Isar.getInstance()!, widget.card.id, BillPeriod.next, findOne: true).then((value) async {
-                          double cardBillValue = 0;
+                        future: getCardBillsFromCard(
+                          Isar.getInstance()!,
+                          widget.card.id,
+                          BillPeriod.next,
+                          findOne: true,
+                        ).then((value) async {
+                          var cardBillValue = 0.0;
                           if (value.isNotEmpty) {
-                            final CardBill nextBill = value.first;
-                            for (final installmentId in nextBill.installmentIdList) {
-                              final installment = await Isar.getInstance()!.exchanges.get(installmentId);
+                            final nextBill = value.first;
+                            for (final installmentId
+                                in nextBill.installmentIdList) {
+                              final installment = await Isar.getInstance()!
+                                  .exchanges
+                                  .get(installmentId);
                               if (installment != null) {
                                 cardBillValue += installment.value;
                               }
@@ -273,31 +406,69 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                   children: [
                                     DecoratedBox(
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.secondaryContainer,
-                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondaryContainer,
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                          top: Radius.circular(12),
+                                        ),
                                       ),
                                       child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                                        padding: const EdgeInsets.fromLTRB(
+                                          20,
+                                          16,
+                                          20,
+                                          16,
+                                        ),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              AppLocalizations.of(context)!.nextBillDescriptor,
-                                              style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onSecondaryContainer),
+                                              AppLocalizations.of(context)!
+                                                  .nextBillDescriptor,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .apply(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSecondaryContainer,
+                                                  ),
                                             ),
                                             const SizedBox(width: 15),
                                             DecoratedBox(
                                               decoration: BoxDecoration(
-                                                color: Theme.of(context).colorScheme.surface,
-                                                borderRadius: BorderRadius.circular(12),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .surface,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
                                               child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 6,
+                                                  vertical: 2,
+                                                ),
                                                 child: Text(
-                                                  NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(nextBillValue),
-                                                  style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                        color: const Color(0xffbd1c1c).harmonizeWith(
-                                                          Theme.of(context).colorScheme.primary,
+                                                  NumberFormat.simpleCurrency(
+                                                    locale:
+                                                        Localizations.localeOf(
+                                                      context,
+                                                    ).languageCode,
+                                                  ).format(nextBillValue),
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleLarge!
+                                                      .apply(
+                                                        color: const Color(
+                                                          0xffbd1c1c,
+                                                        ).harmonizeWith(
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .primary,
                                                         ),
                                                       ),
                                                 ),
@@ -313,9 +484,14 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                   ],
                                 ),
                               ListTile(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: nextBillValue != 0 ? const BorderRadius.vertical(bottom: Radius.circular(12)) : BorderRadius.circular(12),
+                                  borderRadius: nextBillValue != 0
+                                      ? const BorderRadius.vertical(
+                                          bottom: Radius.circular(12),
+                                        )
+                                      : BorderRadius.circular(12),
                                 ),
                                 title: Text(
                                   AppLocalizations.of(context)!.seeHistory,
@@ -323,7 +499,8 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                 ),
                                 trailing: Icon(
                                   Icons.arrow_right,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                 ),
                                 onTap: () => Navigator.push(
                                   context,
@@ -342,18 +519,25 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                     ),
                   if (cardbill != null)
                     FutureBuilder(
-                      future: getCardBillInstallments(Isar.getInstance()!, cardbill!.id),
+                      future: getCardBillInstallments(
+                        Isar.getInstance()!,
+                        cardbill!.id,
+                      ),
                       builder: (context, snapshot) {
-                        final List<Exchange> installments = snapshot.hasData ? snapshot.data! : [];
+                        final installments =
+                            snapshot.hasData ? snapshot.data! : <Exchange>[];
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 10, bottom: 15),
+                              padding:
+                                  const EdgeInsets.only(top: 10, bottom: 15),
                               child: Divider(
                                 height: 4,
                                 thickness: 2,
-                                color: Theme.of(context).colorScheme.outlineVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant,
                               ),
                             ),
                             Text(
@@ -365,9 +549,12 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                               margin: const EdgeInsets.only(top: 10),
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
-                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
                                 ),
-                                borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(12)),
                               ),
                               child: ListView.separated(
                                 shrinkWrap: true,
@@ -375,8 +562,12 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: installments.length,
                                 itemBuilder: (context, index) {
-                                  final String installmentNumber = installments[index].description.split('#/spt#/')[0];
-                                  final String description = installments[index].description.split('#/spt#/')[1];
+                                  final installmentNumber = installments[index]
+                                      .description
+                                      .split('#/spt#/')[0];
+                                  final description = installments[index]
+                                      .description
+                                      .split('#/spt#/')[1];
                                   return ListTile(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
@@ -384,10 +575,12 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                     title: Text(description),
                                     subtitle: Text(
                                       NumberFormat.simpleCurrency(
-                                        locale: Localizations.localeOf(context).languageCode,
+                                        locale: Localizations.localeOf(context)
+                                            .languageCode,
                                       ).format(installments[index].value),
                                       style: TextStyle(
-                                        color: const Color(0xffbd1c1c).harmonizeWith(
+                                        color: const Color(0xffbd1c1c)
+                                            .harmonizeWith(
                                           Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
@@ -397,18 +590,28 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                       children: [
                                         Text(
                                           installmentNumber,
-                                          style: Theme.of(context).textTheme.bodyMedium!.apply(color: Theme.of(context).colorScheme.tertiary),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .apply(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .tertiary,
+                                              ),
                                         ),
                                         Icon(
                                           Icons.arrow_right,
-                                          color: Theme.of(context).colorScheme.onSurface,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                       ],
                                     ),
                                     onTap: () => Navigator.push(
                                       context,
                                       MaterialPageRoute<ExchangeDetailsView>(
-                                        builder: (context) => ExchangeDetailsView(
+                                        builder: (context) =>
+                                            ExchangeDetailsView(
                                           item: installments[index],
                                         ),
                                       ),
@@ -418,7 +621,9 @@ class _CardDetailsViewState extends State<CardDetailsView> {
                                 separatorBuilder: (_, __) => Divider(
                                   height: 2,
                                   thickness: 1.5,
-                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
                                 ),
                               ),
                             ),

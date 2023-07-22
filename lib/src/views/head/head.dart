@@ -25,7 +25,7 @@ class _HeadViewState extends State<HeadView> {
   bool displayNavigationBar = true;
 
   static String _getHomeString(BuildContext context) {
-    final int hour = TimeOfDay.now().hour;
+    final hour = TimeOfDay.now().hour;
     switch (hour) {
       case >= 5 && <= 11:
         return AppLocalizations.of(context)!.goodMorning;
@@ -46,7 +46,7 @@ class _HeadViewState extends State<HeadView> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> headline = [
+    final headline = <String>[
       _getHomeString(context),
       AppLocalizations.of(context)!.history,
       AppLocalizations.of(context)!.settings,
@@ -97,7 +97,9 @@ class _HeadViewState extends State<HeadView> {
         ),
         icon: Icon(
           Icons.add,
-          semanticLabel: _pageIndex == 0 ? null : AppLocalizations.of(context)!.addTransactionFAB,
+          semanticLabel: _pageIndex == 0
+              ? null
+              : AppLocalizations.of(context)!.addTransactionFAB,
         ),
         isExtended: _pageIndex == 0,
       ),

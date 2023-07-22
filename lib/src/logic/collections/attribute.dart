@@ -1,31 +1,28 @@
 import 'package:fhelper/src/logic/l10n_attributes.dart';
+import 'package:fhelper/src/logic/utils.dart' show IntFunctions;
 import 'package:flutter/widgets.dart';
 import 'package:isar/isar.dart';
 import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 part 'attribute.g.dart';
 
-enum AttributeRole {
-  parent,
-  child,
-}
+enum AttributeRole { parent, child }
 
-enum AttributeType {
-  account,
-  incomeType,
-  expenseType,
-}
+enum AttributeType { account, incomeType, expenseType }
 
 @immutable
 @Collection()
 class Attribute {
   const Attribute({
-    this.id = Isar.autoIncrement,
     required this.name,
-    this.parentId,
     required this.role,
     required this.type,
-  }) : assert(role == AttributeRole.child ? parentId != null : parentId == null, 'This child needs a parent');
+    this.id = Isar.autoIncrement,
+    this.parentId,
+  }) : assert(
+          role == AttributeRole.child ? parentId != null : parentId == null,
+          'This child needs a parent',
+        );
 
   final Id id;
   final String name;
@@ -57,56 +54,94 @@ class Attribute {
       return true;
     }
 
-    return other.id == id && other.name == name && other.parentId == parentId && other.role == role && other.type == type;
+    return other.id == id &&
+        other.name == name &&
+        other.parentId == parentId &&
+        other.role == role &&
+        other.type == type;
   }
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ parentId.hashCode ^ role.hashCode ^ type.hashCode;
+  int get hashCode =>
+      id.hashCode ^
+      name.hashCode ^
+      parentId.hashCode ^
+      role.hashCode ^
+      type.hashCode;
 
   @override
   String toString() {
+    //ignore: lines_longer_than_80_chars
     return 'Attribute(id: $id, name: $name, parentId: $parentId, role: $role, type: $type)';
   }
 }
 
-Future<Map<Attribute, List<Attribute>>> getAttributes(Isar isar, AttributeType type, {BuildContext? context}) async {
-  final List<Attribute> attributes = await isar.attributes.where().filter().typeEqualTo(type).findAll();
-  final Map<Attribute, List<Attribute>> attributeMap = {};
+/// Maps registred attributes from db
+///
+/// Will handle roles and l10n strings
+Future<Map<Attribute, List<Attribute>>> getAttributes(
+  Isar isar,
+  AttributeType type, {
+  BuildContext? context,
+}) async {
+  final attributes =
+      await isar.attributes.where().filter().typeEqualTo(type).findAll();
+  final attributeMap = <Attribute, List<Attribute>>{};
   if (attributes.isNotEmpty) {
-    // Handles l10n
-    if (context != null) {
-      for (final attribute in attributes) {
-        if (attribute.id >= 0 && attribute.id <= 23 && context.mounted && attribute.name.contains('#/str#/')) {
+    for (final attribute in attributes) {
+      // Handle l10n
+      if (context != null) {
+        // check if the attribute can be translated (default attribute)
+        if (attribute.id.between(0, 23) &&
+            context.mounted &&
+            attribute.name.contains('#/str#/')) {
           final index = attributes.indexOf(attribute);
+
+          // replaces name with l10n string
           final newAttribute = attribute.copyWith(
             name: translatedDefaultAttribute(context, attribute.id),
           );
+
+          // update list
           attributes.replaceRange(index, index + 1, [newAttribute]);
         }
       }
-    }
-    // Handle roles
-    for (final attr in attributes) {
-      if (attr.role == AttributeRole.parent) {
-        attributeMap.addAll({attr: []});
+
+      // Handle roles
+      if (attribute.role == AttributeRole.parent) {
+        // adds parent to map
+        attributeMap.addAll({attribute: []});
       } else {
-        final parent = attributeMap.keys.where((element) => element.id == attr.parentId).toList()
-          ..sort((a, b) => unorm.nfd(a.name).compareTo(unorm.nfd(b.name)));
-        for (final element in parent) {
-          attributeMap.update(element, (value) {
-            final List<Attribute> list = [...value, attr]..sort((a, b) => unorm.nfd(a.name).compareTo(unorm.nfd(b.name)));
-            return value = list;
-          });
-        }
+        // get parent
+        final parent = attributeMap.keys
+            .singleWhere((element) => element.id == attribute.parentId);
+
+        // add child to parent's value on map
+        attributeMap.update(parent, (value) {
+          final list = <Attribute>[...value, attribute]
+            ..sort((a, b) => unorm.nfd(a.name).compareTo(unorm.nfd(b.name)));
+          return value = list;
+        });
       }
     }
   }
   return attributeMap;
 }
 
-Future<Attribute?> getAttributeFromId(Isar isar, int id, {BuildContext? context}) async {
-  final Attribute? attribute = await isar.attributes.get(id);
-  if (context != null && id >= 0 && id <= 23 && attribute != null && context.mounted && attribute.name.contains('#/str#/')) {
+/// Return attribute with provided ID
+///
+/// Can handle l10n strings (with context)
+Future<Attribute?> getAttributeFromId(
+  Isar isar,
+  int id, {
+  BuildContext? context,
+}) async {
+  final attribute = await isar.attributes.get(id);
+  if (context != null &&
+      id.between(0, 23) &&
+      attribute != null &&
+      context.mounted &&
+      attribute.name.contains('#/str#/')) {
     return attribute.copyWith(name: translatedDefaultAttribute(context, id));
   }
   return attribute;

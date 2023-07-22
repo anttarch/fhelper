@@ -53,7 +53,9 @@ class _AccountManagerState extends State<AccountManager> {
               title: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  selectedIndex.$2 > -1 ? AppLocalizations.of(context)!.select : AppLocalizations.of(context)!.account(-1),
+                  selectedIndex.$2 > -1
+                      ? AppLocalizations.of(context)!.select
+                      : AppLocalizations.of(context)!.account(-1),
                 ),
               ),
               actions: [
@@ -64,7 +66,9 @@ class _AccountManagerState extends State<AccountManager> {
                       onPressed: () => setState(() => selectedIndex = (-1, -1)),
                       icon: Icon(
                         Icons.deselect,
-                        semanticLabel: selectedIndex.$2 > -1 ? AppLocalizations.of(context)!.deselectIconButton : null,
+                        semanticLabel: selectedIndex.$2 > -1
+                            ? AppLocalizations.of(context)!.deselectIconButton
+                            : null,
                       ),
                     ),
                   )
@@ -90,22 +94,29 @@ class _AccountManagerState extends State<AccountManager> {
                           itemCount: attributes.length,
                           itemBuilder: (context, parentIndex) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 15),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 22,
+                                vertical: 15,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       TextButton.icon(
                                         onPressed: () async {
                                           if (_controller.text.isEmpty) {
-                                            _controller.text = attributes.keys.elementAt(parentIndex).name;
+                                            _controller.text = attributes.keys
+                                                .elementAt(parentIndex)
+                                                .name;
                                           }
                                           await showAttributeDialog<void>(
                                             context: context,
-                                            attribute: attributes.keys.elementAt(parentIndex),
+                                            attribute: attributes.keys
+                                                .elementAt(parentIndex),
                                             controller: _controller,
                                             editMode: true,
                                           ).then((_) {
@@ -114,19 +125,28 @@ class _AccountManagerState extends State<AccountManager> {
                                         },
                                         icon: const Icon(Icons.edit),
                                         label: Text(
-                                          attributes.keys.toList()[parentIndex].name,
-                                          style: Theme.of(context).textTheme.titleLarge,
+                                          attributes.keys
+                                              .toList()[parentIndex]
+                                              .name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge,
                                         ),
                                       ),
                                       Row(
                                         children: [
                                           IconButton.filledTonal(
-                                            onPressed: () => showAttributeDialog<void>(
+                                            onPressed: () =>
+                                                showAttributeDialog<void>(
                                               context: context,
                                               controller: _controller,
-                                              attributeRole: AttributeRole.child,
-                                              attributeType: AttributeType.account,
-                                              parentId: attributes.keys.elementAt(parentIndex).id,
+                                              attributeRole:
+                                                  AttributeRole.child,
+                                              attributeType:
+                                                  AttributeType.account,
+                                              parentId: attributes.keys
+                                                  .elementAt(parentIndex)
+                                                  .id,
                                             ).then((_) {
                                               _controller.clear();
                                             }),
@@ -138,34 +158,91 @@ class _AccountManagerState extends State<AccountManager> {
                                                 context: context,
                                                 builder: (context) {
                                                   return AlertDialog(
-                                                    icon: const Icon(Icons.delete_forever),
-                                                    title: Text(AppLocalizations.of(context)!.deletePermanentlyQuestion),
-                                                    content: Text(AppLocalizations.of(context)!.deleteContentDescription(1)),
+                                                    icon: const Icon(
+                                                      Icons.delete_forever,
+                                                    ),
+                                                    title: Text(
+                                                      AppLocalizations.of(
+                                                        context,
+                                                      )!
+                                                          .deletePermanentlyQuestion,
+                                                    ),
+                                                    content: Text(
+                                                      AppLocalizations.of(
+                                                        context,
+                                                      )!
+                                                          .deleteContentDescription(
+                                                        1,
+                                                      ),
+                                                    ),
                                                     actions: [
-                                                      TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context)!.cancel)),
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                          context,
+                                                        ),
+                                                        child: Text(
+                                                          AppLocalizations.of(
+                                                            context,
+                                                          )!
+                                                              .cancel,
+                                                        ),
+                                                      ),
                                                       FilledButton.tonal(
                                                         onPressed: () async {
-                                                          final isar = Isar.getInstance()!;
-                                                          await isar.writeTxn(() async {
-                                                            final entry = attributes.entries
-                                                                .singleWhere((element) => element.key == attributes.keys.elementAt(parentIndex));
-                                                            final List<int> idList = [entry.key.id];
-                                                            for (final element in entry.value) {
-                                                              idList.add(element.id);
+                                                          final isar = Isar
+                                                              .getInstance()!;
+                                                          await isar.writeTxn(
+                                                              () async {
+                                                            final entry =
+                                                                attributes
+                                                                    .entries
+                                                                    .singleWhere(
+                                                              (element) =>
+                                                                  element.key ==
+                                                                  attributes
+                                                                      .keys
+                                                                      .elementAt(
+                                                                    parentIndex,
+                                                                  ),
+                                                            );
+                                                            final idList =
+                                                                <int>[
+                                                              entry.key.id
+                                                            ];
+                                                            for (final element
+                                                                in entry
+                                                                    .value) {
+                                                              idList.add(
+                                                                element.id,
+                                                              );
                                                             }
-                                                            await isar.attributes.deleteAll(idList);
+                                                            await isar
+                                                                .attributes
+                                                                .deleteAll(
+                                                              idList,
+                                                            );
                                                           }).then((_) {
-                                                            Navigator.pop(context);
+                                                            Navigator.pop(
+                                                              context,
+                                                            );
                                                           });
                                                         },
-                                                        child: Text(AppLocalizations.of(context)!.delete),
+                                                        child: Text(
+                                                          AppLocalizations.of(
+                                                            context,
+                                                          )!
+                                                              .delete,
+                                                        ),
                                                       )
                                                     ],
                                                   );
                                                 },
                                               );
                                             },
-                                            icon: const Icon(Icons.delete_forever),
+                                            icon: const Icon(
+                                              Icons.delete_forever,
+                                            ),
                                           ),
                                         ],
                                       )
@@ -173,46 +250,85 @@ class _AccountManagerState extends State<AccountManager> {
                                   ),
                                   Card(
                                     elevation: 0,
-                                    margin: EdgeInsets.only(top: attributes.values.toList()[parentIndex].isEmpty ? 0 : 10),
+                                    margin: EdgeInsets.only(
+                                      top: attributes.values
+                                              .toList()[parentIndex]
+                                              .isEmpty
+                                          ? 0
+                                          : 10,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       side: BorderSide(
-                                        color: Theme.of(context).colorScheme.outlineVariant,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outlineVariant,
                                       ),
                                     ),
                                     child: ListView.separated(
                                       shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
                                       padding: EdgeInsets.zero,
-                                      itemCount: attributes.values.toList()[parentIndex].length,
+                                      itemCount: attributes.values
+                                          .toList()[parentIndex]
+                                          .length,
                                       itemBuilder: (context, childIndex) {
                                         return ListTile(
-                                          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                                          shape: wid_utils.getShapeBorder(childIndex, attributes.length - 1),
-                                          tileColor: selectedIndex == (parentIndex, childIndex) ? Theme.of(context).colorScheme.surfaceVariant : null,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                          ),
+                                          shape: wid_utils.getShapeBorder(
+                                            childIndex,
+                                            attributes.length - 1,
+                                          ),
+                                          tileColor: selectedIndex ==
+                                                  (parentIndex, childIndex)
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .surfaceVariant
+                                              : null,
                                           title: Text(
-                                            attributes.values.toList()[parentIndex][childIndex].name,
-                                            style: Theme.of(context).textTheme.bodyLarge,
+                                            attributes.values
+                                                .toList()[parentIndex]
+                                                    [childIndex]
+                                                .name,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge,
                                           ),
                                           trailing: selectedIndex.$2 == -1
                                               ? Icon(
                                                   Icons.arrow_right,
-                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
                                                 )
-                                              : _selectedIndicator(parentIndex, childIndex),
+                                              : _selectedIndicator(
+                                                  parentIndex,
+                                                  childIndex,
+                                                ),
                                           onTap: () {
                                             if (selectedIndex.$2 > -1) {
-                                              if (selectedIndex != (parentIndex, childIndex)) {
+                                              if (selectedIndex !=
+                                                  (parentIndex, childIndex)) {
                                                 setState(() {
-                                                  selectedIndex = (parentIndex, childIndex);
+                                                  selectedIndex =
+                                                      (parentIndex, childIndex);
                                                 });
                                               }
                                             } else {
                                               Navigator.push(
                                                 context,
-                                                MaterialPageRoute<AttributeDetailsView>(
-                                                  builder: (context) => AttributeDetailsView(
-                                                    attribute: attributes.values.toList()[parentIndex][childIndex],
+                                                MaterialPageRoute<
+                                                    AttributeDetailsView>(
+                                                  builder: (context) =>
+                                                      AttributeDetailsView(
+                                                    attribute: attributes.values
+                                                                .toList()[
+                                                            parentIndex]
+                                                        [childIndex],
                                                   ),
                                                 ),
                                               );
@@ -220,7 +336,8 @@ class _AccountManagerState extends State<AccountManager> {
                                           },
                                           onLongPress: () {
                                             setState(() {
-                                              selectedIndex = (parentIndex, childIndex);
+                                              selectedIndex =
+                                                  (parentIndex, childIndex);
                                             });
                                           },
                                         );
@@ -228,7 +345,9 @@ class _AccountManagerState extends State<AccountManager> {
                                       separatorBuilder: (_, __) => Divider(
                                         height: 2,
                                         thickness: 1.5,
-                                        color: Theme.of(context).colorScheme.outlineVariant,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .outlineVariant,
                                       ),
                                     ),
                                   ),
@@ -267,10 +386,14 @@ class _AccountManagerState extends State<AccountManager> {
           icon: const Icon(Icons.add),
           elevation: selectedIndex.$2 > -1 ? 0 : null,
         ),
-        floatingActionButtonLocation: selectedIndex.$2 > -1 ? FloatingActionButtonLocation.endContained : null,
+        floatingActionButtonLocation: selectedIndex.$2 > -1
+            ? FloatingActionButtonLocation.endContained
+            : null,
         bottomNavigationBar: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          height: selectedIndex.$2 > -1 ? 80 + MediaQuery.paddingOf(context).bottom : 0,
+          height: selectedIndex.$2 > -1
+              ? 80 + MediaQuery.paddingOf(context).bottom
+              : 0,
           child: BottomAppBar(
             child: Row(
               children: [
@@ -279,14 +402,19 @@ class _AccountManagerState extends State<AccountManager> {
                     context,
                     MaterialPageRoute<AttributeDetailsView>(
                       builder: (context) => AttributeDetailsView(
-                        attribute: attributes.values.toList()[selectedIndex.$1][selectedIndex.$2],
+                        attribute: attributes.values.toList()[selectedIndex.$1]
+                            [selectedIndex.$2],
                       ),
                     ),
                   ),
                   icon: Icon(
                     Icons.info,
                     semanticLabel: selectedIndex.$2 > -1
-                        ? AppLocalizations.of(context)!.infoIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        ? AppLocalizations.of(context)!.infoIconButton(
+                            attributes.values
+                                .toList()[selectedIndex.$1][selectedIndex.$2]
+                                .name,
+                          )
                         : null,
                   ),
                 ),
@@ -294,19 +422,26 @@ class _AccountManagerState extends State<AccountManager> {
                   onPressed: () async {
                     await checkForAttributeDependencies(
                       Isar.getInstance()!,
-                      attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id,
+                      attributes.values
+                          .toList()[selectedIndex.$1][selectedIndex.$2]
+                          .id,
                       AttributeType.account,
                     ).then(
                       (value) async {
-                        final Isar isar = Isar.getInstance()!;
+                        final isar = Isar.getInstance()!;
                         if (value > 0) {
                           await showDialog<void>(
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: Text(AppLocalizations.of(context)!.proceedQuestion),
+                                title: Text(
+                                  AppLocalizations.of(context)!.proceedQuestion,
+                                ),
                                 icon: const Icon(Icons.warning),
-                                content: Text(AppLocalizations.of(context)!.dependencyPhrase(value)),
+                                content: Text(
+                                  AppLocalizations.of(context)!
+                                      .dependencyPhrase(value),
+                                ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
@@ -317,35 +452,79 @@ class _AccountManagerState extends State<AccountManager> {
                                   FilledButton.tonal(
                                     onPressed: () async {
                                       final backupIndex = selectedIndex;
-                                      final backup =
-                                          await getAttributeFromId(isar, attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id, context: context);
+                                      final backup = await getAttributeFromId(
+                                        isar,
+                                        attributes.values
+                                            .toList()[selectedIndex.$1]
+                                                [selectedIndex.$2]
+                                            .id,
+                                        context: context,
+                                      );
                                       await isar.writeTxn(() async {
-                                        await isar.attributes.delete(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id);
+                                        await isar.attributes.delete(
+                                          attributes.values
+                                              .toList()[selectedIndex.$1]
+                                                  [selectedIndex.$2]
+                                              .id,
+                                        );
                                       }).then((_) {
-                                        setState(() => selectedIndex = (-1, -1));
+                                        setState(
+                                          () => selectedIndex = (-1, -1),
+                                        );
                                         Navigator.pop(context);
                                       });
                                       if (mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(
-                                            content: Text(AppLocalizations.of(context)!.deletedSnackBar(backup!.name)),
+                                            content: Text(
+                                              AppLocalizations.of(
+                                                context,
+                                              )!
+                                                  .deletedSnackBar(
+                                                backup!.name,
+                                              ),
+                                            ),
                                             action: SnackBarAction(
-                                              label: AppLocalizations.of(context)!.undo,
+                                              label:
+                                                  AppLocalizations.of(context)!
+                                                      .undo,
                                               onPressed: () async {
                                                 await isar.writeTxn(() async {
-                                                  await isar.attributes.put(backup);
+                                                  await isar.attributes
+                                                      .put(backup);
                                                 }).then((_) {
-                                                  if (backup.role == AttributeRole.child) {
-                                                    final list = attributes.values.toList()[backupIndex.$1];
-                                                    if (!list.contains(backup)) {
-                                                      if (list.length + 1 == backupIndex.$2) {
-                                                        attributes.values.toList()[backupIndex.$1].add(backup);
-                                                      } else if (backupIndex.$2 < list.length + 1) {
-                                                        attributes.values.toList()[backupIndex.$1].insert(backupIndex.$2, backup);
+                                                  if (backup.role ==
+                                                      AttributeRole.child) {
+                                                    final list = attributes
+                                                            .values
+                                                            .toList()[
+                                                        backupIndex.$1];
+                                                    if (!list
+                                                        .contains(backup)) {
+                                                      if (list.length + 1 ==
+                                                          backupIndex.$2) {
+                                                        attributes.values
+                                                            .toList()[
+                                                                backupIndex.$1]
+                                                            .add(backup);
+                                                      } else if (backupIndex
+                                                              .$2 <
+                                                          list.length + 1) {
+                                                        attributes.values
+                                                            .toList()[
+                                                                backupIndex.$1]
+                                                            .insert(
+                                                              backupIndex.$2,
+                                                              backup,
+                                                            );
                                                       }
                                                     }
                                                   }
-                                                  setState(() => selectedIndex = backupIndex);
+                                                  setState(
+                                                    () => selectedIndex =
+                                                        backupIndex,
+                                                  );
                                                 });
                                               },
                                             ),
@@ -354,7 +533,9 @@ class _AccountManagerState extends State<AccountManager> {
                                         );
                                       }
                                     },
-                                    child: Text(AppLocalizations.of(context)!.proceed),
+                                    child: Text(
+                                      AppLocalizations.of(context)!.proceed,
+                                    ),
                                   )
                                 ],
                               );
@@ -362,14 +543,29 @@ class _AccountManagerState extends State<AccountManager> {
                           );
                         } else {
                           final backupIndex = selectedIndex;
-                          final backup = await getAttributeFromId(isar, attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id, context: context);
+                          final backup = await getAttributeFromId(
+                            isar,
+                            attributes.values
+                                .toList()[selectedIndex.$1][selectedIndex.$2]
+                                .id,
+                            context: context,
+                          );
                           await isar.writeTxn(() async {
-                            await isar.attributes.delete(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].id);
-                          }).then((_) => setState(() => selectedIndex = (-1, -1)));
+                            await isar.attributes.delete(
+                              attributes.values
+                                  .toList()[selectedIndex.$1][selectedIndex.$2]
+                                  .id,
+                            );
+                          }).then(
+                            (_) => setState(() => selectedIndex = (-1, -1)),
+                          );
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(AppLocalizations.of(context)!.deletedSnackBar(backup!.name)),
+                                content: Text(
+                                  AppLocalizations.of(context)!
+                                      .deletedSnackBar(backup!.name),
+                                ),
                                 action: SnackBarAction(
                                   label: AppLocalizations.of(context)!.undo,
                                   onPressed: () async {
@@ -377,16 +573,25 @@ class _AccountManagerState extends State<AccountManager> {
                                       await isar.attributes.put(backup);
                                     }).then((_) {
                                       if (backup.role == AttributeRole.child) {
-                                        final list = attributes.values.toList()[backupIndex.$1];
+                                        final list = attributes.values
+                                            .toList()[backupIndex.$1];
                                         if (!list.contains(backup)) {
-                                          if (list.length + 1 == backupIndex.$2) {
-                                            attributes.values.toList()[backupIndex.$1].add(backup);
-                                          } else if (backupIndex.$2 < list.length + 1) {
-                                            attributes.values.toList()[backupIndex.$1].insert(backupIndex.$2, backup);
+                                          if (list.length + 1 ==
+                                              backupIndex.$2) {
+                                            attributes.values
+                                                .toList()[backupIndex.$1]
+                                                .add(backup);
+                                          } else if (backupIndex.$2 <
+                                              list.length + 1) {
+                                            attributes.values
+                                                .toList()[backupIndex.$1]
+                                                .insert(backupIndex.$2, backup);
                                           }
                                         }
                                       }
-                                      setState(() => selectedIndex = backupIndex);
+                                      setState(
+                                        () => selectedIndex = backupIndex,
+                                      );
                                     });
                                   },
                                 ),
@@ -401,18 +606,25 @@ class _AccountManagerState extends State<AccountManager> {
                   icon: Icon(
                     Icons.delete,
                     semanticLabel: selectedIndex.$2 > -1
-                        ? AppLocalizations.of(context)!.deleteIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        ? AppLocalizations.of(context)!.deleteIconButton(
+                            attributes.values
+                                .toList()[selectedIndex.$1][selectedIndex.$2]
+                                .name,
+                          )
                         : null,
                   ),
                 ),
                 IconButton(
                   onPressed: () async {
                     if (_controller.text.isEmpty) {
-                      _controller.text = attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name;
+                      _controller.text = attributes.values
+                          .toList()[selectedIndex.$1][selectedIndex.$2]
+                          .name;
                     }
                     await showAttributeDialog<void>(
                       context: context,
-                      attribute: attributes.values.toList()[selectedIndex.$1][selectedIndex.$2],
+                      attribute: attributes.values.toList()[selectedIndex.$1]
+                          [selectedIndex.$2],
                       controller: _controller,
                       editMode: true,
                     ).then((_) {
@@ -423,7 +635,11 @@ class _AccountManagerState extends State<AccountManager> {
                   icon: Icon(
                     Icons.edit,
                     semanticLabel: selectedIndex.$2 > -1
-                        ? AppLocalizations.of(context)!.editIconButton(attributes.values.toList()[selectedIndex.$1][selectedIndex.$2].name)
+                        ? AppLocalizations.of(context)!.editIconButton(
+                            attributes.values
+                                .toList()[selectedIndex.$1][selectedIndex.$2]
+                                .name,
+                          )
                         : null,
                   ),
                 ),

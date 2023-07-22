@@ -4,78 +4,97 @@ import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:isar/isar.dart';
 
-Future<Exchange?> getLatest(Isar isar, {int? attributeId, AttributeType? attributeType}) async {
-  assert(attributeId != null ? attributeType != null : attributeType == null);
+extension IntFunctions on int {
+  bool between(int first, int last) {
+    return this >= first && this <= last;
+  }
+}
+
+// TODO: add l10n to bills
+Future<Exchange?> getLatest(
+  Isar isar, {
+  int? attributeId,
+  AttributeType? attributeType,
+}) async {
+  assert(
+    attributeId != null ? attributeType != null : attributeType == null,
+    attributeId != null
+        ? 'Attribute type is required'
+        : 'Cannot receive an attribute type',
+  );
   Exchange? latestExchange;
   CardBill? latestPaidCardBill;
 
   if (attributeId != null) {
-    switch (attributeType) {
-      case AttributeType.account:
-        latestExchange = await Isar.getInstance()!
-            .exchanges
-            .where()
-            .filter()
-            .accountIdEqualTo(attributeId)
-            .or()
-            .accountIdEndEqualTo(attributeId)
-            .not()
-            .eTypeEqualTo(EType.installment)
-            .sortByDateDesc()
-            .findFirst();
-        final List<CardBill> cardBills = [];
-        final cardsIds = await isar.cards.where().idProperty().findAll();
-        for (final id in cardsIds) {
-          final cardBill = await isar.cardBills.filter().accountIdEqualTo(attributeId).cardIdEqualTo(id).confirmedEqualTo(true).findAll();
-          cardBills.addAll(cardBill);
-        }
-        if (cardBills.isNotEmpty) {
-          cardBills.sort((a, b) => b.date.compareTo(a.date));
-          latestPaidCardBill = cardBills.first;
-        }
-      default:
-        latestExchange =
-            await Isar.getInstance()!.exchanges.where().filter().typeIdEqualTo(attributeId).not().eTypeEqualTo(EType.installment).sortByDateDesc().findFirst();
+    if (attributeType == AttributeType.account) {
+      // gets the latest exchange linked to the given account
+      latestExchange = await isar.exchanges
+          .filter()
+          .accountIdEqualTo(attributeId)
+          .or()
+          .accountIdEndEqualTo(attributeId)
+          .not()
+          .eTypeEqualTo(EType.installment)
+          .sortByDateDesc()
+          .findFirst();
+
+      // gets the latest confirmed cardbill linked to the given account
+      final cardBills = await isar.cardBills
+          .filter()
+          .accountIdEqualTo(attributeId)
+          .confirmedEqualTo(true)
+          .findAll();
+      if (cardBills.isNotEmpty) {
+        cardBills.sort((a, b) => b.date.compareTo(a.date));
+        latestPaidCardBill = cardBills.first;
+      }
+    } else {
+      // gets the latest exchange linked to type
+      // cardbill is not linked to any type
+      latestExchange = await isar.exchanges
+          .filter()
+          .typeIdEqualTo(attributeId)
+          .not()
+          .eTypeEqualTo(EType.installment)
+          .sortByDateDesc()
+          .findFirst();
     }
   } else {
-    latestExchange = await Isar.getInstance()!.exchanges.where().filter().not().eTypeEqualTo(EType.installment).sortByDateDesc().findFirst();
-    latestPaidCardBill = await Isar.getInstance()!.cardBills.where().filter().confirmedEqualTo(true).sortByDateDesc().findFirst();
+    // gets the latest exchnage/cardbill computed
+    latestExchange = await isar.exchanges
+        .filter()
+        .not()
+        .eTypeEqualTo(EType.installment)
+        .sortByDateDesc()
+        .findFirst();
+    latestPaidCardBill = await isar.cardBills
+        .filter()
+        .confirmedEqualTo(true)
+        .sortByDateDesc()
+        .findFirst();
   }
 
-  if (latestPaidCardBill == null && latestExchange == null) {
-    return null;
-  } else if (latestPaidCardBill == null && latestExchange != null) {
-    return latestExchange;
-  } else if (latestPaidCardBill != null && latestExchange == null) {
-    fhelper.Card? card;
-    double value = 0;
-    for (final id in latestPaidCardBill.installmentIdList) {
-      final Exchange? installment = await isar.exchanges.get(id);
-      if (installment != null) {
-        value -= installment.value;
-      }
-    }
-    card = await fhelper.getCardFromId(isar, latestPaidCardBill.cardId);
-    return Exchange(
-      id: -1,
-      accountId: latestPaidCardBill.accountId,
-      description: "${card!.name}'s bill",
-      date: latestPaidCardBill.date,
-      eType: EType.expense,
-      typeId: latestPaidCardBill.id,
-      value: value,
-    );
-  } else if (latestExchange!.date.isBefore(latestPaidCardBill!.date)) {
-    if (latestPaidCardBill.date.isBefore(DateTime.now())) {
+  // process based on the latest exchange/cardbill
+  switch ((latestExchange, latestPaidCardBill)) {
+    // returns latest exchange if there is no cardbill
+    case (final Exchange? a, final CardBill? b) when a != null && b == null:
+      return latestExchange;
+
+    cardBill:
+    // returns the latest cardbill if there is no exchange
+    case (final Exchange? a, final CardBill? b) when a == null && b != null:
       fhelper.Card? card;
-      double value = 0;
-      for (final id in latestPaidCardBill.installmentIdList) {
-        final Exchange? installment = await isar.exchanges.get(id);
+      var value = 0.0;
+
+      // gets the total bill value
+      for (final id in latestPaidCardBill!.installmentIdList) {
+        final installment = await isar.exchanges.get(id);
         if (installment != null) {
           value -= installment.value;
         }
       }
       card = await fhelper.getCardFromId(isar, latestPaidCardBill.cardId);
+      // returns an exchange with the cardbill values
       return Exchange(
         id: -1,
         accountId: latestPaidCardBill.accountId,
@@ -85,8 +104,16 @@ Future<Exchange?> getLatest(Isar isar, {int? attributeId, AttributeType? attribu
         typeId: latestPaidCardBill.id,
         value: value,
       );
-    }
-    return latestExchange;
+    // returns a cardbill or exchange depending on which is newer
+    case (final Exchange? a, final CardBill? b)
+        when a != null && b != null && a.date.isBefore(b.date):
+      if (b.date.isBefore(DateTime.now())) {
+        // go to cardbill processing
+        continue cardBill;
+      }
+      return a;
+    // no cardbill or exchange
+    default:
+      return null;
   }
-  return latestExchange;
 }

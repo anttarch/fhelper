@@ -16,14 +16,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final dir = await getApplicationSupportDirectory();
-  await Isar.open([ExchangeSchema, AttributeSchema, CardSchema, CardBillSchema], directory: dir.path);
+  await Isar.open(
+    [ExchangeSchema, AttributeSchema, CardSchema, CardBillSchema],
+    directory: dir.path,
+  );
   runApp(const MyApp());
 
   // Set default values for first launch
-  final Isar isar = Isar.getInstance()!;
+  final isar = Isar.getInstance()!;
   final prefs = await SharedPreferences.getInstance();
   final json = await rootBundle.load('assets/attributes.json');
-  if (!prefs.containsKey('default') || (prefs.containsKey('default') && prefs.getBool('default') == false)) {
+  if (!prefs.containsKey('default') ||
+      (prefs.containsKey('default') && prefs.getBool('default') == false)) {
     await isar.writeTxn(() async {
       await isar.attributes.importJsonRaw(json.buffer.asUint8List());
     }).then((_) => prefs.setBool('default', true));
@@ -35,33 +39,45 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent),
+    );
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
         final lightTheme = SeedColorScheme.fromSeeds(
-          primaryKey: lightDynamic?.primary ?? const ColorScheme.light().primary,
-          secondaryKey: lightDynamic?.secondary ?? const ColorScheme.light().secondary,
-          tertiaryKey: lightDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+          primaryKey:
+              lightDynamic?.primary ?? const ColorScheme.light().primary,
+          secondaryKey:
+              lightDynamic?.secondary ?? const ColorScheme.light().secondary,
+          tertiaryKey:
+              lightDynamic?.tertiary ?? const ColorScheme.light().tertiary,
           tones: FlexTones.vivid(Brightness.light),
         );
         final lightThemeHc = SeedColorScheme.fromSeeds(
-          primaryKey: lightDynamic?.primary ?? const ColorScheme.light().primary,
-          secondaryKey: lightDynamic?.secondary ?? const ColorScheme.light().secondary,
-          tertiaryKey: lightDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+          primaryKey:
+              lightDynamic?.primary ?? const ColorScheme.light().primary,
+          secondaryKey:
+              lightDynamic?.secondary ?? const ColorScheme.light().secondary,
+          tertiaryKey:
+              lightDynamic?.tertiary ?? const ColorScheme.light().tertiary,
           tones: FlexTones.highContrast(Brightness.light),
         );
         final darkTheme = SeedColorScheme.fromSeeds(
           primaryKey: darkDynamic?.primary ?? const ColorScheme.light().primary,
-          secondaryKey: darkDynamic?.secondary ?? const ColorScheme.light().secondary,
-          tertiaryKey: darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+          secondaryKey:
+              darkDynamic?.secondary ?? const ColorScheme.light().secondary,
+          tertiaryKey:
+              darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
           tones: FlexTones.vivid(Brightness.dark),
           brightness: Brightness.dark,
         );
         final darkThemeHc = SeedColorScheme.fromSeeds(
           primaryKey: darkDynamic?.primary ?? const ColorScheme.light().primary,
-          secondaryKey: darkDynamic?.secondary ?? const ColorScheme.light().secondary,
-          tertiaryKey: darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+          secondaryKey:
+              darkDynamic?.secondary ?? const ColorScheme.light().secondary,
+          tertiaryKey:
+              darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
           tones: FlexTones.ultraContrast(Brightness.dark),
           brightness: Brightness.dark,
         );

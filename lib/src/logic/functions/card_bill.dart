@@ -3,31 +3,51 @@ import 'package:isar/isar.dart';
 
 enum BillPeriod { past, latest, next }
 
-Future<List<CardBill>> getCardBillsFromCard(Isar isar, int cardId, BillPeriod period, {bool findOne = false}) async {
-  List<CardBill> list = [];
-  final nowMonthStart = DateTime(
+Future<List<CardBill>> getCardBillsFromCard(
+  Isar isar,
+  int cardId,
+  BillPeriod period, {
+  bool findOne = false,
+}) async {
+  var list = <CardBill>[];
+
+  final start = DateTime(
     DateTime.now().year,
     DateTime.now().month,
   );
-  final nowMonthEnd = DateTime(
-    DateTime.now().year,
-    DateTime.now().month + 1,
-  ).subtract(const Duration(microseconds: 1));
+
+  final end = start
+      .copyWith(month: start.month + 1)
+      .subtract(const Duration(microseconds: 1));
+
   switch (period) {
     case BillPeriod.past:
-      list = await isar.cardBills.filter().cardIdEqualTo(cardId).dateLessThan(nowMonthStart).findAll();
+      list = await isar.cardBills
+          .filter()
+          .cardIdEqualTo(cardId)
+          .dateLessThan(start)
+          .findAll();
+    case BillPeriod.latest:
+      list = await isar.cardBills.filter().cardIdEqualTo(cardId).findAll();
     case BillPeriod.next:
       // Only implemented for upcoming bills (for now)
       if (findOne) {
-        final CardBill? bill = await isar.cardBills.filter().cardIdEqualTo(cardId).dateGreaterThan(nowMonthEnd).sortByDate().findFirst();
+        final bill = await isar.cardBills
+            .filter()
+            .cardIdEqualTo(cardId)
+            .dateGreaterThan(end)
+            .sortByDate()
+            .findFirst();
         if (bill != null) {
           list.add(bill);
         }
       } else {
-        list = await isar.cardBills.filter().cardIdEqualTo(cardId).dateGreaterThan(nowMonthEnd).findAll();
+        list = await isar.cardBills
+            .filter()
+            .cardIdEqualTo(cardId)
+            .dateGreaterThan(end)
+            .findAll();
       }
-    default:
-      list = await isar.cardBills.filter().cardIdEqualTo(cardId).findAll();
   }
   return list;
 }

@@ -51,7 +51,10 @@ class _TransferViewState extends State<TransferView> {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height - 68 - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top,
+              height: MediaQuery.of(context).size.height -
+                  68 -
+                  MediaQuery.of(context).padding.bottom -
+                  MediaQuery.of(context).padding.top,
               child: CustomScrollView(
                 slivers: [
                   SliverAppBar.medium(
@@ -71,7 +74,11 @@ class _TransferViewState extends State<TransferView> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             FutureBuilder(
-                              future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context).then((value) {
+                              future: getAttributes(
+                                Isar.getInstance()!,
+                                AttributeType.account,
+                                context: context,
+                              ).then((value) {
                                 value.removeWhere((_, value) => value.isEmpty);
                                 return value;
                               }),
@@ -81,87 +88,165 @@ class _TransferViewState extends State<TransferView> {
                                   child: FutureBuilder(
                                     future: getSumValueByAttribute(
                                       Isar.getInstance()!,
-                                      _accountId != (-1, -1) ? snapshot.data!.values.toList()[_accountId.$1][_accountId.$2].id : -1,
+                                      _accountId != (-1, -1)
+                                          ? snapshot.data!.values
+                                              .toList()[_accountId.$1]
+                                                  [_accountId.$2]
+                                              .id
+                                          : -1,
                                       AttributeType.account,
                                     ),
                                     builder: (context, sum) {
                                       return InputField(
-                                        label: AppLocalizations.of(context)!.from,
+                                        label:
+                                            AppLocalizations.of(context)!.from,
                                         readOnly: true,
-                                        placeholder: displayText[0] ?? AppLocalizations.of(context)!.select,
+                                        placeholder: displayText[0] ??
+                                            AppLocalizations.of(context)!
+                                                .select,
                                         suffix: displayText[0] != null
-                                            ? NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(sum.data)
+                                            ? NumberFormat.simpleCurrency(
+                                                locale: Localizations.localeOf(
+                                                  context,
+                                                ).languageCode,
+                                              ).format(sum.data)
                                             : null,
                                         suffixStyle: TextStyle(
                                           color: Color(
-                                            sum.hasData && sum.data! < 0 ? 0xffbd1c1c : 0xff199225,
+                                            sum.hasData && sum.data! < 0
+                                                ? 0xffbd1c1c
+                                                : 0xff199225,
                                           ).harmonizeWith(
-                                            Theme.of(context).colorScheme.primary,
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                           ),
                                         ),
                                         validator: (value) {
-                                          if (value!.isEmpty || displayText[0] == null) {
-                                            return AppLocalizations.of(context)!.emptyField;
+                                          if (value!.isEmpty ||
+                                              displayText[0] == null) {
+                                            return AppLocalizations.of(context)!
+                                                .emptyField;
                                           }
                                           return null;
                                         },
-                                        onTap: () => showModalBottomSheet<String?>(
+                                        onTap: () =>
+                                            showModalBottomSheet<String?>(
                                           context: context,
                                           constraints: BoxConstraints(
-                                            minHeight: MediaQuery.of(context).size.height / 3,
+                                            minHeight: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                3,
                                           ),
                                           enableDrag: false,
                                           builder: (context) {
                                             return StatefulBuilder(
                                               builder: (context, setState) {
                                                 return Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                                      padding: const EdgeInsets
+                                                          .fromLTRB(
+                                                        20,
+                                                        20,
+                                                        20,
+                                                        0,
+                                                      ),
                                                       child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: [
                                                           Text(
-                                                            AppLocalizations.of(context)!.selectAccount,
-                                                            style: Theme.of(context).textTheme.titleLarge,
+                                                            AppLocalizations.of(
+                                                              context,
+                                                            )!
+                                                                .selectAccount,
+                                                            style: Theme.of(
+                                                              context,
+                                                            )
+                                                                .textTheme
+                                                                .titleLarge,
                                                           ),
                                                           TextButton.icon(
-                                                            onPressed: () => showAttributeDialog<void>(
+                                                            onPressed: () =>
+                                                                showAttributeDialog<
+                                                                    void>(
                                                               context: context,
-                                                              attributeRole: AttributeRole.child,
-                                                              attributeType: AttributeType.account,
-                                                              controller: _controller[1],
-                                                            ).then((_) => _controller[1].clear()),
-                                                            icon: const Icon(Icons.add),
-                                                            label: Text(AppLocalizations.of(context)!.add),
+                                                              attributeRole:
+                                                                  AttributeRole
+                                                                      .child,
+                                                              attributeType:
+                                                                  AttributeType
+                                                                      .account,
+                                                              controller:
+                                                                  _controller[
+                                                                      1],
+                                                            ).then(
+                                                              (_) =>
+                                                                  _controller[1]
+                                                                      .clear(),
+                                                            ),
+                                                            icon: const Icon(
+                                                              Icons.add,
+                                                            ),
+                                                            label: Text(
+                                                              AppLocalizations
+                                                                      .of(
+                                                                context,
+                                                              )!
+                                                                  .add,
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
                                                     ),
                                                     ListChoice(
                                                       groupValue: _accountId,
-                                                      onChanged: (name, value) async {
+                                                      onChanged:
+                                                          (name, value) async {
                                                         setState(() {
-                                                          _accountId = value! as (int, int);
-                                                          if (_accountIdEnd == value) {
-                                                            _accountIdEnd = (-1, -1);
-                                                            displayText[1] = null;
+                                                          _accountId = value!
+                                                              as (int, int);
+                                                          if (_accountIdEnd ==
+                                                              value) {
+                                                            _accountIdEnd =
+                                                                (-1, -1);
+                                                            displayText[1] =
+                                                                null;
                                                           }
                                                         });
                                                         await getSumValueByAttribute(
                                                           Isar.getInstance()!,
-                                                          _accountId != (-1, -1) ? snapshot.data!.values.toList()[_accountId.$1][_accountId.$2].id : -1,
+                                                          _accountId != (-1, -1)
+                                                              ? snapshot
+                                                                  .data!.values
+                                                                  .toList()[
+                                                                      _accountId
+                                                                          .$1][
+                                                                      _accountId
+                                                                          .$2]
+                                                                  .id
+                                                              : -1,
                                                           AttributeType.account,
                                                         ).then((value) {
                                                           setState(() {
-                                                            _accountFromValue = value;
+                                                            _accountFromValue =
+                                                                value;
                                                           });
-                                                          Navigator.pop(context, name);
+                                                          Navigator.pop(
+                                                            context,
+                                                            name,
+                                                          );
                                                         });
                                                       },
-                                                      attributeMap: snapshot.data,
+                                                      attributeMap:
+                                                          snapshot.data,
                                                     ),
                                                   ],
                                                 );
@@ -169,7 +254,12 @@ class _TransferViewState extends State<TransferView> {
                                             );
                                           },
                                         ).then(
-                                          (name) => _accountId != (-1, -1) && name != null ? setState(() => displayText[0] = name) : null,
+                                          (name) => _accountId != (-1, -1) &&
+                                                  name != null
+                                              ? setState(
+                                                  () => displayText[0] = name,
+                                                )
+                                              : null,
                                         ),
                                       );
                                     },
@@ -178,7 +268,11 @@ class _TransferViewState extends State<TransferView> {
                               },
                             ),
                             FutureBuilder(
-                              future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context).then((value) {
+                              future: getAttributes(
+                                Isar.getInstance()!,
+                                AttributeType.account,
+                                context: context,
+                              ).then((value) {
                                 value.removeWhere((_, value) => value.isEmpty);
                                 return value;
                               }),
@@ -189,44 +283,80 @@ class _TransferViewState extends State<TransferView> {
                                     label: AppLocalizations.of(context)!.to,
                                     locked: _accountId == (-1, -1),
                                     readOnly: true,
-                                    placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
+                                    placeholder: displayText[1] ??
+                                        AppLocalizations.of(context)!.select,
                                     validator: (value) {
-                                      if (value!.isEmpty || displayText[1] == null) {
-                                        return AppLocalizations.of(context)!.emptyField;
+                                      if (value!.isEmpty ||
+                                          displayText[1] == null) {
+                                        return AppLocalizations.of(context)!
+                                            .emptyField;
                                       }
                                       return null;
                                     },
                                     onTap: () => showModalBottomSheet<String?>(
                                       context: context,
                                       constraints: BoxConstraints(
-                                        minHeight: MediaQuery.of(context).size.height / 3,
+                                        minHeight:
+                                            MediaQuery.of(context).size.height /
+                                                3,
                                       ),
                                       enableDrag: false,
                                       builder: (context) {
                                         return StatefulBuilder(
                                           builder: (context, setState) {
                                             return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                    20,
+                                                    20,
+                                                    20,
+                                                    0,
+                                                  ),
                                                   child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
                                                       Text(
-                                                        AppLocalizations.of(context)!.selectAccount,
-                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                        AppLocalizations.of(
+                                                          context,
+                                                        )!
+                                                            .selectAccount,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleLarge,
                                                       ),
                                                       TextButton.icon(
-                                                        onPressed: () => showAttributeDialog<void>(
+                                                        onPressed: () =>
+                                                            showAttributeDialog<
+                                                                void>(
                                                           context: context,
-                                                          attributeRole: AttributeRole.child,
-                                                          attributeType: AttributeType.account,
-                                                          controller: _controller[1],
-                                                        ).then((_) => _controller[1].clear()),
-                                                        icon: const Icon(Icons.add),
-                                                        label: Text(AppLocalizations.of(context)!.add),
+                                                          attributeRole:
+                                                              AttributeRole
+                                                                  .child,
+                                                          attributeType:
+                                                              AttributeType
+                                                                  .account,
+                                                          controller:
+                                                              _controller[1],
+                                                        ).then(
+                                                          (_) => _controller[1]
+                                                              .clear(),
+                                                        ),
+                                                        icon: const Icon(
+                                                          Icons.add,
+                                                        ),
+                                                        label: Text(
+                                                          AppLocalizations.of(
+                                                            context,
+                                                          )!
+                                                              .add,
+                                                        ),
                                                       ),
                                                     ],
                                                   ),
@@ -236,9 +366,13 @@ class _TransferViewState extends State<TransferView> {
                                                   hiddenIndex: _accountId,
                                                   onChanged: (name, value) {
                                                     setState(() {
-                                                      _accountIdEnd = value! as (int, int);
+                                                      _accountIdEnd =
+                                                          value! as (int, int);
                                                     });
-                                                    Navigator.pop(context, name);
+                                                    Navigator.pop(
+                                                      context,
+                                                      name,
+                                                    );
                                                   },
                                                   attributeMap: snapshot.data,
                                                 ),
@@ -248,7 +382,12 @@ class _TransferViewState extends State<TransferView> {
                                         );
                                       },
                                     ).then(
-                                      (name) => _accountIdEnd != (-1, -1) && name != null ? setState(() => displayText[1] = name) : null,
+                                      (name) => _accountIdEnd != (-1, -1) &&
+                                              name != null
+                                          ? setState(
+                                              () => displayText[1] = name,
+                                            )
+                                          : null,
                                     ),
                                   ),
                                 );
@@ -262,19 +401,25 @@ class _TransferViewState extends State<TransferView> {
                                 keyboardType: TextInputType.number,
                                 inputFormatters: [
                                   CurrencyInputFormatter(
-                                    locale: Localizations.localeOf(context).languageCode,
+                                    locale: Localizations.localeOf(context)
+                                        .languageCode,
                                   )
                                 ],
                                 validator: (value) {
-                                  final String numberValue = value!.replaceAll(RegExp('[^0-9]'), '');
+                                  final numberValue =
+                                      value!.replaceAll(RegExp('[^0-9]'), '');
                                   if (value.isEmpty) {
-                                    return AppLocalizations.of(context)!.emptyField;
+                                    return AppLocalizations.of(context)!
+                                        .emptyField;
                                   } else if (numberValue == '000') {
-                                    return AppLocalizations.of(context)!.invalidValue;
+                                    return AppLocalizations.of(context)!
+                                        .invalidValue;
                                   }
 
-                                  if ((double.parse(numberValue) / 100) > _accountFromValue) {
-                                    return AppLocalizations.of(context)!.insufficientFunds;
+                                  if ((double.parse(numberValue) / 100) >
+                                      _accountFromValue) {
+                                    return AppLocalizations.of(context)!
+                                        .insufficientFunds;
                                   }
                                   return null;
                                 },
@@ -304,11 +449,19 @@ class _TransferViewState extends State<TransferView> {
                     child: FilledButton.icon(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          final String value = _controller[0].text.replaceAll(RegExp('[^0-9]'), '');
-                          final Isar isar = Isar.getInstance()!;
-                          final Attribute from = (await getAttributes(isar, AttributeType.account)).values.toList()[_accountId.$1][_accountId.$2];
-                          final Attribute to = (await getAttributes(isar, AttributeType.account)).values.toList()[_accountIdEnd.$1][_accountIdEnd.$2];
-                          final Exchange exchange = Exchange(
+                          final value = _controller[0]
+                              .text
+                              .replaceAll(RegExp('[^0-9]'), '');
+                          final isar = Isar.getInstance()!;
+                          final from =
+                              (await getAttributes(isar, AttributeType.account))
+                                  .values
+                                  .toList()[_accountId.$1][_accountId.$2];
+                          final to =
+                              (await getAttributes(isar, AttributeType.account))
+                                  .values
+                                  .toList()[_accountIdEnd.$1][_accountIdEnd.$2];
+                          final exchange = Exchange(
                             eType: EType.transfer,
                             description: '#/str#/#/spt#/#/str#/',
                             value: double.parse(value) / 100,

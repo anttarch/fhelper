@@ -27,7 +27,9 @@ class HomePage extends StatelessWidget {
 
   Color _getColor(BuildContext context, Exchange? exchange) {
     if (exchange != null) {
-      Color valueColor = Color(exchange.value.isNegative ? 0xffbd1c1c : 0xff199225).harmonizeWith(Theme.of(context).colorScheme.primary);
+      var valueColor =
+          Color(exchange.value.isNegative ? 0xffbd1c1c : 0xff199225)
+              .harmonizeWith(Theme.of(context).colorScheme.primary);
       if (exchange.installments != null) {
         valueColor = Theme.of(context).colorScheme.inverseSurface;
       } else if (exchange.eType == EType.transfer) {
@@ -51,7 +53,10 @@ class HomePage extends StatelessWidget {
               FutureBuilder(
                 future: getLatest(Isar.getInstance()!).then((value) async {
                   if (value != null && value.eType == EType.transfer) {
-                    final transfer = value.copyWith(description: await wid_utils.parseTransferName(context, value));
+                    final transfer = value.copyWith(
+                      description:
+                          await wid_utils.parseTransferName(context, value),
+                    );
                     return transfer;
                   }
                   return value;
@@ -59,7 +64,8 @@ class HomePage extends StatelessWidget {
                 builder: (context, snapshot) {
                   final exchange = snapshot.data;
                   return Visibility(
-                    visible: exchange != null || exchange != null && exchange.eType == EType.transfer,
+                    visible: exchange != null ||
+                        exchange != null && exchange.eType == EType.transfer,
                     child: Card(
                       elevation: 4,
                       margin: const EdgeInsets.only(top: 12),
@@ -71,30 +77,52 @@ class HomePage extends StatelessWidget {
                             Text(
                               AppLocalizations.of(context)!.latestDescriptor,
                               textAlign: TextAlign.start,
-                              style: Theme.of(context).textTheme.titleLarge!.apply(
-                                    color: Theme.of(context).colorScheme.onSurface,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge!
+                                  .apply(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                   ),
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        if (exchange != null && (exchange.installments != null || exchange.id == -1 || exchange.eType == EType.transfer))
+                                        if (exchange != null &&
+                                            (exchange.installments != null ||
+                                                exchange.id == -1 ||
+                                                exchange.eType ==
+                                                    EType.transfer))
                                           Padding(
-                                            padding: const EdgeInsets.only(right: 5),
-                                            child: _getLeadingIcon(exchange, Theme.of(context).colorScheme.inverseSurface),
+                                            padding:
+                                                const EdgeInsets.only(right: 5),
+                                            child: _getLeadingIcon(
+                                              exchange,
+                                              Theme.of(context)
+                                                  .colorScheme
+                                                  .inverseSurface,
+                                            ),
                                           ),
                                         Flexible(
                                           child: Text(
-                                            exchange != null ? exchange.description : 'Placeholder',
+                                            exchange != null
+                                                ? exchange.description
+                                                : 'Placeholder',
                                             textAlign: TextAlign.start,
-                                            style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyLarge!
+                                                .apply(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                                 ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -106,12 +134,16 @@ class HomePage extends StatelessWidget {
                                     padding: const EdgeInsets.only(left: 15),
                                     child: Text(
                                       NumberFormat.simpleCurrency(
-                                        locale: Localizations.localeOf(context).languageCode,
+                                        locale: Localizations.localeOf(context)
+                                            .languageCode,
                                       ).format(
                                         exchange != null ? exchange.value : 0,
                                       ),
                                       textAlign: TextAlign.start,
-                                      style: Theme.of(context).textTheme.bodyLarge!.apply(
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .apply(
                                             color: _getColor(context, exchange),
                                           ),
                                     ),
@@ -128,7 +160,8 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              child: Text(AppLocalizations.of(context)!.details),
+                              child:
+                                  Text(AppLocalizations.of(context)!.details),
                             )
                           ],
                         ),
@@ -150,44 +183,71 @@ class HomePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Semantics(
-                            label: AppLocalizations.of(context)!.totalValueHistoryCard(AppLocalizations.of(context)!.today, snapshot.data ?? 0),
+                            label: AppLocalizations.of(context)!
+                                .totalValueHistoryCard(
+                              AppLocalizations.of(context)!.today,
+                              snapshot.data ?? 0,
+                            ),
                             container: true,
                             readOnly: true,
                             child: ExcludeSemantics(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     AppLocalizations.of(context)!.today,
                                     textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.titleLarge!.apply(
-                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge!
+                                        .apply(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondaryContainer,
                                         ),
                                   ),
                                   if (snapshot.hasData)
                                     DecoratedBox(
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.surface,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
                                         child: Text(
                                           NumberFormat.simpleCurrency(
-                                            locale: Localizations.localeOf(context).languageCode,
+                                            locale:
+                                                Localizations.localeOf(context)
+                                                    .languageCode,
                                           ).format(snapshot.data),
                                           textAlign: TextAlign.start,
-                                          style: Theme.of(context).textTheme.titleLarge!.apply(
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge!
+                                              .apply(
                                                 color: Color(
-                                                  snapshot.data!.isNegative ? 0xffbd1c1c : 0xff199225,
+                                                  snapshot.data!.isNegative
+                                                      ? 0xffbd1c1c
+                                                      : 0xff199225,
                                                 ).harmonizeWith(
-                                                  Theme.of(context).colorScheme.primary,
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
                                                 ),
                                               ),
                                         ),
                                       ),
                                     )
-                                  else if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting)
+                                  else if (snapshot.connectionState ==
+                                          ConnectionState.active ||
+                                      snapshot.connectionState ==
+                                          ConnectionState.waiting)
                                     const CircularProgressIndicator.adaptive()
                                   else
                                     const Text('OOPS')
@@ -205,7 +265,8 @@ class HomePage extends StatelessWidget {
                             icon: const Icon(Icons.add),
                             label: Text(
                               AppLocalizations.of(context)!.add,
-                              semanticsLabel: AppLocalizations.of(context)!.addTransactionFAB,
+                              semanticsLabel: AppLocalizations.of(context)!
+                                  .addTransactionFAB,
                             ),
                           ),
                         ],
@@ -238,37 +299,64 @@ class HomePage extends StatelessWidget {
                               ),
                         ),
                         FutureBuilder(
-                          future: Isar.getInstance()!.attributes.filter().typeEqualTo(AttributeType.account).roleEqualTo(AttributeRole.child).count(),
+                          future: Isar.getInstance()!
+                              .attributes
+                              .filter()
+                              .typeEqualTo(AttributeType.account)
+                              .roleEqualTo(AttributeRole.child)
+                              .count(),
                           builder: (context, snapshot) {
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Visibility(
-                                  visible: Isar.getInstance()!.exchanges.countSync() == 0 || snapshot.hasData && snapshot.data! == 1,
+                                  visible: Isar.getInstance()!
+                                              .exchanges
+                                              .countSync() ==
+                                          0 ||
+                                      snapshot.hasData && snapshot.data! == 1,
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 5),
                                     child: Text(
                                       snapshot.hasData && snapshot.data! == 1
-                                          ? AppLocalizations.of(context)!.transferAccountRequirement
-                                          : AppLocalizations.of(context)!.transferExchangeRequirement,
+                                          ? AppLocalizations.of(context)!
+                                              .transferAccountRequirement
+                                          : AppLocalizations.of(context)!
+                                              .transferExchangeRequirement,
                                       textAlign: TextAlign.start,
-                                      style: Theme.of(context).textTheme.bodyLarge!.apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .apply(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                          ),
                                     ),
                                   ),
                                 ),
                                 Semantics(
                                   button: true,
                                   child: FilledButton.tonalIcon(
-                                    onPressed: Isar.getInstance()!.exchanges.countSync() > 0 && snapshot.hasData && snapshot.data! > 1
+                                    onPressed: Isar.getInstance()!
+                                                    .exchanges
+                                                    .countSync() >
+                                                0 &&
+                                            snapshot.hasData &&
+                                            snapshot.data! > 1
                                         ? () => Navigator.push(
                                               context,
                                               MaterialPageRoute<TransferView>(
-                                                builder: (context) => const TransferView(),
+                                                builder: (context) =>
+                                                    const TransferView(),
                                               ),
                                             )
                                         : null,
                                     icon: const Icon(Icons.swap_horiz),
-                                    label: Text(AppLocalizations.of(context)!.transfer),
+                                    label: Text(
+                                      AppLocalizations.of(context)!.transfer,
+                                    ),
                                   ),
                                 ),
                               ],

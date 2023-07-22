@@ -25,15 +25,29 @@ ShapeBorder? getShapeBorder(int index, int finalIndex) {
   }
 }
 
-Future<String> parseTransferName(BuildContext context, Exchange transfer) async {
-  final String deleted = AppLocalizations.of(context)!.deleted;
-  String from = (await getAttributeFromId(Isar.getInstance()!, transfer.accountId))?.name ?? deleted;
-  String to = (await getAttributeFromId(Isar.getInstance()!, transfer.accountIdEnd!))?.name ?? deleted;
+Future<String> parseTransferName(
+  BuildContext context,
+  Exchange transfer,
+) async {
+  final deleted = AppLocalizations.of(context)!.deleted;
+  var from = (await getAttributeFromId(Isar.getInstance()!, transfer.accountId))
+          ?.name ??
+      deleted;
+  var to =
+      (await getAttributeFromId(Isar.getInstance()!, transfer.accountIdEnd!))
+              ?.name ??
+          deleted;
 
-  if (transfer.accountId >= 0 && transfer.accountId <= 23 && context.mounted && transfer.description.split('#/spt#/')[0] == '#/str#/') {
+  if (transfer.accountId >= 0 &&
+      transfer.accountId <= 23 &&
+      context.mounted &&
+      transfer.description.split('#/spt#/')[0] == '#/str#/') {
     from = translatedDefaultAttribute(context, transfer.accountId)!;
   }
-  if (transfer.accountIdEnd! >= 0 && transfer.accountIdEnd! <= 23 && context.mounted && transfer.description.split('#/spt#/')[1] == '#/str#/') {
+  if (transfer.accountIdEnd! >= 0 &&
+      transfer.accountIdEnd! <= 23 &&
+      context.mounted &&
+      transfer.description.split('#/spt#/')[1] == '#/str#/') {
     to = translatedDefaultAttribute(context, transfer.accountIdEnd!)!;
   }
   if (context.mounted) {

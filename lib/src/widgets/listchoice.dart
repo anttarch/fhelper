@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 
 class ListChoice extends StatelessWidget {
   const ListChoice({
-    super.key,
     required this.groupValue,
     required this.onChanged,
+    super.key,
     this.attributeMap,
     this.attributeListBehavior = false,
     this.cardList,
@@ -19,7 +19,10 @@ class ListChoice extends StatelessWidget {
               (intList == null && attributeMap == null && cardList != null),
           'Use only one list at a time',
         ),
-        assert(!(intList == null && attributeMap == null && cardList == null), 'Need data');
+        assert(
+          !(intList == null && attributeMap == null && cardList == null),
+          'Need data',
+        );
 
   final Map<Attribute, List<Attribute>>? attributeMap;
   final bool attributeListBehavior;
@@ -33,11 +36,15 @@ class ListChoice extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2 - 68),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height / 2 - 68,
+        ),
         child: ListView.separated(
           shrinkWrap: true,
           padding: EdgeInsets.zero,
-          itemCount: attributeMap != null && !attributeListBehavior ? attributeMap!.length : 1,
+          itemCount: attributeMap != null && !attributeListBehavior
+              ? attributeMap!.length
+              : 1,
           itemBuilder: (context, parentIndex) {
             if (hiddenIndex != null && attributeMap != null) {
               final parent = attributeMap!.keys.elementAt(hiddenIndex!.$1);
@@ -49,7 +56,11 @@ class ListChoice extends StatelessWidget {
               });
             }
             return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 22, vertical: attributeMap != null && !attributeListBehavior ? 15 : 5),
+              padding: EdgeInsets.symmetric(
+                horizontal: 22,
+                vertical:
+                    attributeMap != null && !attributeListBehavior ? 15 : 5,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -61,7 +72,10 @@ class ListChoice extends StatelessWidget {
                     ),
                   Card(
                     elevation: 0,
-                    margin: attributeMap != null && attributeMap!.values.toList()[parentIndex].isEmpty ? null : const EdgeInsets.only(top: 10),
+                    margin: attributeMap != null &&
+                            attributeMap!.values.toList()[parentIndex].isEmpty
+                        ? null
+                        : const EdgeInsets.only(top: 10),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
@@ -76,13 +90,17 @@ class ListChoice extends StatelessWidget {
                       itemCount: attributeMap != null
                           ? attributeListBehavior
                               ? attributeMap!.keys.length
-                              : attributeMap!.values.toList()[parentIndex].length
+                              : attributeMap!.values
+                                  .toList()[parentIndex]
+                                  .length
                           : cardList != null
                               ? cardList!.length
                               : intList!.length,
                       itemBuilder: (context, childIndex) {
                         return RadioListTile(
-                          value: attributeMap != null && !attributeListBehavior ? (parentIndex, childIndex) : childIndex,
+                          value: attributeMap != null && !attributeListBehavior
+                              ? (parentIndex, childIndex)
+                              : childIndex,
                           groupValue: groupValue,
                           onChanged: (value) {
                             if (attributeMap != null) {
@@ -91,7 +109,10 @@ class ListChoice extends StatelessWidget {
                                     '${attributeMap!.keys.elementAt(parentIndex).name} - ${attributeMap!.values.toList()[parentIndex][childIndex].name}';
                                 onChanged!(name, value);
                               } else {
-                                onChanged!(attributeMap!.keys.toList()[childIndex].name, value);
+                                onChanged!(
+                                  attributeMap!.keys.toList()[childIndex].name,
+                                  value,
+                                );
                               }
                             } else {
                               onChanged!('', value);
@@ -100,14 +121,21 @@ class ListChoice extends StatelessWidget {
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 20,
                           ),
-                          selected: attributeMap != null && !attributeListBehavior ? groupValue == (parentIndex, childIndex) : groupValue == childIndex,
-                          selectedTileColor: Theme.of(context).colorScheme.surfaceVariant,
+                          selected:
+                              attributeMap != null && !attributeListBehavior
+                                  ? groupValue == (parentIndex, childIndex)
+                                  : groupValue == childIndex,
+                          selectedTileColor:
+                              Theme.of(context).colorScheme.surfaceVariant,
                           shape: wid_utils.getShapeBorder(
                             childIndex,
                             attributeMap != null
                                 ? attributeListBehavior
                                     ? attributeMap!.keys.length - 1
-                                    : attributeMap!.values.toList()[parentIndex].length - 1
+                                    : attributeMap!.values
+                                            .toList()[parentIndex]
+                                            .length -
+                                        1
                                 : cardList != null
                                     ? cardList!.length - 1
                                     : intList!.length - 1,
@@ -115,8 +143,12 @@ class ListChoice extends StatelessWidget {
                           title: Text(
                             attributeMap != null
                                 ? attributeListBehavior
-                                    ? attributeMap!.keys.toList()[childIndex].name
-                                    : attributeMap!.values.toList()[parentIndex][childIndex].name
+                                    ? attributeMap!.keys
+                                        .toList()[childIndex]
+                                        .name
+                                    : attributeMap!.values
+                                        .toList()[parentIndex][childIndex]
+                                        .name
                                 : cardList != null
                                     ? cardList![childIndex].name
                                     : intList![childIndex].toString(),
@@ -126,7 +158,8 @@ class ListChoice extends StatelessWidget {
                         );
                       },
                       separatorBuilder: (_, index) {
-                        if ((hiddenIndex != null || hiddenIndex != (-1, -1)) && hiddenIndex == (parentIndex, index)) {
+                        if ((hiddenIndex != null || hiddenIndex != (-1, -1)) &&
+                            hiddenIndex == (parentIndex, index)) {
                           return const SizedBox.shrink();
                         }
                         return Divider(

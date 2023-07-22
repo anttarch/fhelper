@@ -10,7 +10,7 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> elements = [
+    final elements = <String>[
       AppLocalizations.of(context)!.account(-1),
       AppLocalizations.of(context)!.card(-1),
       //AppLocalizations.of(context)!.theme,
@@ -18,7 +18,7 @@ class SettingsPage extends StatelessWidget {
       //AppLocalizations.of(context)!.privacy,
       //AppLocalizations.of(context)!.security,
     ];
-    final List<VoidCallback> callbacks = [
+    final callbacks = <VoidCallback>[
       // Accounts
       () => Navigator.push(
             context,

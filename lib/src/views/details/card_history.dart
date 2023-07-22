@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 
 class CardHistory extends StatefulWidget {
-  const CardHistory({super.key, required this.card, this.cardBill});
+  const CardHistory({required this.card, super.key, this.cardBill});
   final fhelper.Card card;
   final CardBill? cardBill;
 
@@ -77,15 +77,25 @@ class _CardHistoryState extends State<CardHistory> {
                 ),
                 if (_bill != BillPeriod.latest)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 15,
+                    ),
                     child: FutureBuilder(
-                      future: getCardBillsFromCard(Isar.getInstance()!, widget.card.id, _bill).then((value) async {
-                        final Map<CardBill, double> map = {};
+                      future: getCardBillsFromCard(
+                        Isar.getInstance()!,
+                        widget.card.id,
+                        _bill,
+                      ).then((value) async {
+                        final map = <CardBill, double>{};
                         if (value.isNotEmpty) {
                           for (final bill in value) {
-                            double cardBillValue = 0;
-                            for (final installmentId in bill.installmentIdList) {
-                              final installment = await Isar.getInstance()!.exchanges.get(installmentId);
+                            var cardBillValue = 0.0;
+                            for (final installmentId
+                                in bill.installmentIdList) {
+                              final installment = await Isar.getInstance()!
+                                  .exchanges
+                                  .get(installmentId);
                               if (installment != null) {
                                 cardBillValue += installment.value;
                               }
@@ -103,19 +113,23 @@ class _CardHistoryState extends State<CardHistory> {
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: values.length,
                           itemBuilder: (context, index) {
-                            final String name = DateFormat.yMMMM(
+                            final name = DateFormat.yMMMM(
                               Localizations.localeOf(context).languageCode,
                             ).format(values.keys.elementAt(index).date);
-                            final String value = NumberFormat.simpleCurrency(
-                              locale: Localizations.localeOf(context).languageCode,
+                            final value = NumberFormat.simpleCurrency(
+                              locale:
+                                  Localizations.localeOf(context).languageCode,
                             ).format(values.values.elementAt(index));
                             return Card(
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
-                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
                                 ),
-                                borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(12)),
                               ),
                               child: AnimatedSize(
                                 duration: const Duration(milliseconds: 150),
@@ -124,35 +138,59 @@ class _CardHistoryState extends State<CardHistory> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     ListTile(
-                                      tileColor: Theme.of(context).colorScheme.primaryContainer,
+                                      tileColor: Theme.of(context)
+                                          .colorScheme
+                                          .primaryContainer,
                                       title: Text(name),
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           DecoratedBox(
                                             decoration: BoxDecoration(
-                                              color: Theme.of(context).colorScheme.surface,
-                                              borderRadius: BorderRadius.circular(12),
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .surface,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 6,
+                                                vertical: 2,
+                                              ),
                                               child: Text(
                                                 value,
                                                 textAlign: TextAlign.start,
-                                                style: Theme.of(context).textTheme.titleMedium!.apply(
-                                                      color: const Color(0xffbd1c1c).harmonizeWith(
-                                                        Theme.of(context).colorScheme.primary,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .titleMedium!
+                                                    .apply(
+                                                      color: const Color(
+                                                        0xffbd1c1c,
+                                                      ).harmonizeWith(
+                                                        Theme.of(context)
+                                                            .colorScheme
+                                                            .primary,
                                                       ),
                                                     ),
                                               ),
                                             ),
                                           ),
                                           const SizedBox(width: 5),
-                                          Icon(openIndex == index ? Icons.arrow_drop_down : Icons.arrow_drop_up)
+                                          Icon(
+                                            openIndex == index
+                                                ? Icons.arrow_drop_down
+                                                : Icons.arrow_drop_up,
+                                          )
                                         ],
                                       ),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: openIndex == index ? const BorderRadius.vertical(top: Radius.circular(12)) : BorderRadius.circular(12),
+                                        borderRadius: openIndex == index
+                                            ? const BorderRadius.vertical(
+                                                top: Radius.circular(12),
+                                              )
+                                            : BorderRadius.circular(12),
                                       ),
                                       onTap: () {
                                         setState(() {
@@ -167,70 +205,134 @@ class _CardHistoryState extends State<CardHistory> {
                                     if (openIndex == index)
                                       DecoratedBox(
                                         decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.primaryContainer,
-                                          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer,
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                            bottom: Radius.circular(12),
+                                          ),
                                         ),
                                         child: FutureBuilder(
-                                          future: getCardBillInstallments(Isar.getInstance()!, values.keys.elementAt(index).id),
+                                          future: getCardBillInstallments(
+                                            Isar.getInstance()!,
+                                            values.keys.elementAt(index).id,
+                                          ),
                                           builder: (context, snapshot) {
-                                            final List<Exchange> installments = snapshot.hasData ? snapshot.data! : [];
+                                            final installments =
+                                                snapshot.hasData
+                                                    ? snapshot.data!
+                                                    : <Exchange>[];
                                             return Card(
                                               elevation: 0,
-                                              margin: const EdgeInsets.fromLTRB(10, 5, 10, 10),
+                                              margin: const EdgeInsets.fromLTRB(
+                                                10,
+                                                5,
+                                                10,
+                                                10,
+                                              ),
                                               shape: RoundedRectangleBorder(
                                                 side: BorderSide(
-                                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .outlineVariant,
                                                 ),
-                                                borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                  Radius.circular(12),
+                                                ),
                                               ),
                                               child: ListView.separated(
                                                 shrinkWrap: true,
                                                 padding: EdgeInsets.zero,
-                                                physics: const NeverScrollableScrollPhysics(),
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
                                                 itemCount: installments.length,
                                                 itemBuilder: (context, index) {
-                                                  final String installmentNumber = installments[index].description.split('#/spt#/')[0];
-                                                  final String description = installments[index].description.split('#/spt#/')[1];
+                                                  final installmentNumber =
+                                                      installments[index]
+                                                          .description
+                                                          .split('#/spt#/')[0];
+                                                  final description =
+                                                      installments[index]
+                                                          .description
+                                                          .split('#/spt#/')[1];
                                                   return ListTile(
-                                                    shape: wid_utils.getShapeBorder(index, installments.length - 1),
+                                                    shape: wid_utils
+                                                        .getShapeBorder(
+                                                      index,
+                                                      installments.length - 1,
+                                                    ),
                                                     title: Text(description),
                                                     subtitle: Text(
-                                                      NumberFormat.simpleCurrency(
-                                                        locale: Localizations.localeOf(context).languageCode,
-                                                      ).format(installments[index].value),
+                                                      NumberFormat
+                                                          .simpleCurrency(
+                                                        locale: Localizations
+                                                            .localeOf(
+                                                          context,
+                                                        ).languageCode,
+                                                      ).format(
+                                                        installments[index]
+                                                            .value,
+                                                      ),
                                                       style: TextStyle(
-                                                        color: const Color(0xffbd1c1c).harmonizeWith(
-                                                          Theme.of(context).colorScheme.primary,
+                                                        color: const Color(
+                                                          0xffbd1c1c,
+                                                        ).harmonizeWith(
+                                                          Theme.of(context)
+                                                              .colorScheme
+                                                              .primary,
                                                         ),
                                                       ),
                                                     ),
                                                     trailing: Row(
-                                                      mainAxisSize: MainAxisSize.min,
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
                                                       children: [
                                                         Text(
                                                           installmentNumber,
-                                                          style: Theme.of(context).textTheme.bodyMedium!.apply(color: Theme.of(context).colorScheme.tertiary),
+                                                          style: Theme.of(
+                                                            context,
+                                                          )
+                                                              .textTheme
+                                                              .bodyMedium!
+                                                              .apply(
+                                                                color: Theme.of(
+                                                                  context,
+                                                                )
+                                                                    .colorScheme
+                                                                    .tertiary,
+                                                              ),
                                                         ),
                                                         Icon(
                                                           Icons.arrow_right,
-                                                          color: Theme.of(context).colorScheme.onSurface,
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .onSurface,
                                                         ),
                                                       ],
                                                     ),
                                                     onTap: () => Navigator.push(
                                                       context,
-                                                      MaterialPageRoute<ExchangeDetailsView>(
-                                                        builder: (context) => ExchangeDetailsView(
-                                                          item: installments[index],
+                                                      MaterialPageRoute<
+                                                          ExchangeDetailsView>(
+                                                        builder: (context) =>
+                                                            ExchangeDetailsView(
+                                                          item: installments[
+                                                              index],
                                                         ),
                                                       ),
                                                     ),
                                                   );
                                                 },
-                                                separatorBuilder: (_, __) => Divider(
+                                                separatorBuilder: (_, __) =>
+                                                    Divider(
                                                   height: 2,
                                                   thickness: 1.5,
-                                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .outlineVariant,
                                                 ),
                                               ),
                                             );
@@ -248,11 +350,18 @@ class _CardHistoryState extends State<CardHistory> {
                   ),
                 if (widget.cardBill != null && _bill == BillPeriod.latest)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 15,
+                    ),
                     child: FutureBuilder(
-                      future: getCardBillInstallments(Isar.getInstance()!, widget.cardBill!.id),
+                      future: getCardBillInstallments(
+                        Isar.getInstance()!,
+                        widget.cardBill!.id,
+                      ),
                       builder: (context, snapshot) {
-                        final List<Exchange> installments = snapshot.hasData ? snapshot.data! : [];
+                        final installments =
+                            snapshot.hasData ? snapshot.data! : <Exchange>[];
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -265,9 +374,12 @@ class _CardHistoryState extends State<CardHistory> {
                               margin: const EdgeInsets.only(top: 10),
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
-                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
                                 ),
-                                borderRadius: const BorderRadius.all(Radius.circular(12)),
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(12)),
                               ),
                               child: ListView.separated(
                                 shrinkWrap: true,
@@ -275,17 +387,26 @@ class _CardHistoryState extends State<CardHistory> {
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: installments.length,
                                 itemBuilder: (context, index) {
-                                  final String installmentNumber = installments[index].description.split('#/spt#/')[0];
-                                  final String description = installments[index].description.split('#/spt#/')[1];
+                                  final installmentNumber = installments[index]
+                                      .description
+                                      .split('#/spt#/')[0];
+                                  final description = installments[index]
+                                      .description
+                                      .split('#/spt#/')[1];
                                   return ListTile(
-                                    shape: wid_utils.getShapeBorder(index, installments.length - 1),
+                                    shape: wid_utils.getShapeBorder(
+                                      index,
+                                      installments.length - 1,
+                                    ),
                                     title: Text(description),
                                     subtitle: Text(
                                       NumberFormat.simpleCurrency(
-                                        locale: Localizations.localeOf(context).languageCode,
+                                        locale: Localizations.localeOf(context)
+                                            .languageCode,
                                       ).format(installments[index].value),
                                       style: TextStyle(
-                                        color: const Color(0xffbd1c1c).harmonizeWith(
+                                        color: const Color(0xffbd1c1c)
+                                            .harmonizeWith(
                                           Theme.of(context).colorScheme.primary,
                                         ),
                                       ),
@@ -295,18 +416,28 @@ class _CardHistoryState extends State<CardHistory> {
                                       children: [
                                         Text(
                                           installmentNumber,
-                                          style: Theme.of(context).textTheme.bodyMedium!.apply(color: Theme.of(context).colorScheme.tertiary),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .apply(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .tertiary,
+                                              ),
                                         ),
                                         Icon(
                                           Icons.arrow_right,
-                                          color: Theme.of(context).colorScheme.onSurface,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
                                         ),
                                       ],
                                     ),
                                     onTap: () => Navigator.push(
                                       context,
                                       MaterialPageRoute<ExchangeDetailsView>(
-                                        builder: (context) => ExchangeDetailsView(
+                                        builder: (context) =>
+                                            ExchangeDetailsView(
                                           item: installments[index],
                                         ),
                                       ),
@@ -316,7 +447,9 @@ class _CardHistoryState extends State<CardHistory> {
                                 separatorBuilder: (_, __) => Divider(
                                   height: 2,
                                   thickness: 1.5,
-                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
                                 ),
                               ),
                             ),

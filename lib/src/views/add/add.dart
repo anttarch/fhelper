@@ -137,7 +137,8 @@ class _AddViewState extends State<AddView> {
                             if (value!.isEmpty) {
                               return AppLocalizations.of(context)!.emptyField;
                             } else if (value.length < 3) {
-                              return AppLocalizations.of(context)!.threeCharactersMinimum;
+                              return AppLocalizations.of(context)!
+                                  .threeCharactersMinimum;
                             } else if (value.contains('#/spt#/')) {
                               return AppLocalizations.of(context)!.invalidName;
                             }
@@ -149,21 +150,29 @@ class _AddViewState extends State<AddView> {
                         padding: const EdgeInsets.only(top: 20),
                         child: InputField(
                           controller: textController[1],
-                          label: _eType.single == EType.income ? AppLocalizations.of(context)!.amount : AppLocalizations.of(context)!.price,
+                          label: _eType.single == EType.income
+                              ? AppLocalizations.of(context)!.amount
+                              : AppLocalizations.of(context)!.price,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             CurrencyInputFormatter(
-                              locale: Localizations.localeOf(context).languageCode,
+                              locale:
+                                  Localizations.localeOf(context).languageCode,
                             )
                           ],
                           validator: (value) {
-                            final String price = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
+                            final price = textController[1]
+                                .text
+                                .replaceAll(RegExp('[^0-9]'), '');
                             if (value!.isEmpty) {
                               return AppLocalizations.of(context)!.emptyField;
-                            } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
+                            } else if (value.replaceAll(RegExp('[^0-9]'), '') ==
+                                '000') {
                               return AppLocalizations.of(context)!.invalidValue;
-                            } else if (_cardIndex != -1 && double.parse(price) / 100 > _availabeLimit) {
-                              return AppLocalizations.of(context)!.insufficientLimit;
+                            } else if (_cardIndex != -1 &&
+                                double.parse(price) / 100 > _availabeLimit) {
+                              return AppLocalizations.of(context)!
+                                  .insufficientLimit;
                             }
                             return null;
                           },
@@ -174,24 +183,37 @@ class _AddViewState extends State<AddView> {
                         child: InputField(
                           label: AppLocalizations.of(context)!.date,
                           readOnly: true,
-                          placeholder: DateTime.now().difference(DateTime.parse(displayText[0]!)).inHours < 24
+                          placeholder: DateTime.now()
+                                      .difference(
+                                        DateTime.parse(displayText[0]!),
+                                      )
+                                      .inHours <
+                                  24
                               ? DateFormat.yMd(
                                   Localizations.localeOf(context).languageCode,
-                                ).add_jm().format(DateTime.parse(displayText[0]!))
+                                )
+                                  .add_jm()
+                                  .format(DateTime.parse(displayText[0]!))
                               : DateFormat.yMd(
                                   Localizations.localeOf(context).languageCode,
                                 ).format(DateTime.parse(displayText[0]!)),
                           onTap: () async {
-                            final DateTime? picked = await showDatePicker(
+                            final picked = await showDatePicker(
                               context: context,
                               initialDate: DateTime.parse(displayText[0]!),
-                              firstDate: DateTime(DateTime.now().year, DateTime.now().month),
+                              firstDate: DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month,
+                              ),
                               lastDate: DateTime.now(),
                             );
                             if (picked != null) {
                               setState(
                                 () {
-                                  if (DateTime.now().difference(picked).inHours < 24) {
+                                  if (DateTime.now()
+                                          .difference(picked)
+                                          .inHours <
+                                      24) {
                                     displayText[0] = DateTime.now().toString();
                                   } else {
                                     displayText[0] = picked.toString();
@@ -205,7 +227,9 @@ class _AddViewState extends State<AddView> {
                       FutureBuilder(
                         future: getAttributes(
                           Isar.getInstance()!,
-                          _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType,
+                          _eType.single == EType.income
+                              ? AttributeType.incomeType
+                              : AttributeType.expenseType,
                           context: context,
                         ),
                         builder: (context, snapshot) {
@@ -214,44 +238,75 @@ class _AddViewState extends State<AddView> {
                             child: InputField(
                               label: AppLocalizations.of(context)!.type(1),
                               readOnly: true,
-                              placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
+                              placeholder: displayText[1] ??
+                                  AppLocalizations.of(context)!.select,
                               validator: (value) {
                                 if (value!.isEmpty || displayText[1] == null) {
-                                  return AppLocalizations.of(context)!.emptyField;
+                                  return AppLocalizations.of(context)!
+                                      .emptyField;
                                 }
                                 return null;
                               },
                               onTap: () => showModalBottomSheet<String?>(
                                 context: context,
                                 constraints: BoxConstraints(
-                                  minHeight: MediaQuery.of(context).size.height / 3,
+                                  minHeight:
+                                      MediaQuery.of(context).size.height / 3,
                                 ),
                                 enableDrag: false,
                                 builder: (context) {
                                   return StatefulBuilder(
                                     builder: (context, setState) {
                                       return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                            padding: const EdgeInsets.fromLTRB(
+                                              20,
+                                              20,
+                                              20,
+                                              0,
+                                            ),
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 Text(
-                                                  AppLocalizations.of(context)!.selectType,
-                                                  style: Theme.of(context).textTheme.titleLarge,
+                                                  AppLocalizations.of(context)!
+                                                      .selectType,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleLarge,
                                                 ),
                                                 TextButton.icon(
-                                                  onPressed: () => showAttributeDialog<void>(
+                                                  onPressed: () =>
+                                                      showAttributeDialog<void>(
                                                     context: context,
-                                                    attributeRole: AttributeRole.child,
-                                                    attributeType: _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType,
-                                                    controller: textController[3],
-                                                  ).then((_) => textController[3].clear()),
+                                                    attributeRole:
+                                                        AttributeRole.child,
+                                                    attributeType:
+                                                        _eType.single ==
+                                                                EType.income
+                                                            ? AttributeType
+                                                                .incomeType
+                                                            : AttributeType
+                                                                .expenseType,
+                                                    controller:
+                                                        textController[3],
+                                                  ).then(
+                                                    (_) => textController[3]
+                                                        .clear(),
+                                                  ),
                                                   icon: const Icon(Icons.add),
-                                                  label: Text(AppLocalizations.of(context)!.add),
+                                                  label: Text(
+                                                    AppLocalizations.of(
+                                                      context,
+                                                    )!
+                                                        .add,
+                                                  ),
                                                 ),
                                               ],
                                             ),
@@ -272,7 +327,9 @@ class _AddViewState extends State<AddView> {
                                   );
                                 },
                               ).then(
-                                (name) => _typeId != (-1, -1) && name != null ? setState(() => displayText[1] = name) : null,
+                                (name) => _typeId != (-1, -1) && name != null
+                                    ? setState(() => displayText[1] = name)
+                                    : null,
                               ),
                             ),
                           );
@@ -288,36 +345,64 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: AppLocalizations.of(context)!.card(1),
+                                    label:
+                                        AppLocalizations.of(context)!.card(1),
                                     readOnly: true,
-                                    placeholder: displayText[3] ?? AppLocalizations.of(context)!.none,
+                                    placeholder: displayText[3] ??
+                                        AppLocalizations.of(context)!.none,
                                     onTap: () => showModalBottomSheet<void>(
                                       context: context,
                                       constraints: BoxConstraints(
-                                        minHeight: MediaQuery.of(context).size.height / 3,
+                                        minHeight:
+                                            MediaQuery.of(context).size.height /
+                                                3,
                                       ),
                                       enableDrag: false,
                                       builder: (context) {
                                         return StatefulBuilder(
                                           builder: (context, setState) {
                                             return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Padding(
-                                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                    20,
+                                                    20,
+                                                    20,
+                                                    0,
+                                                  ),
                                                   child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
                                                       Text(
-                                                        AppLocalizations.of(context)!.selectCard,
-                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                        AppLocalizations.of(
+                                                          context,
+                                                        )!
+                                                            .selectCard,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleLarge,
                                                       ),
                                                       if (_cardIndex == -1)
                                                         TextButton.icon(
-                                                          onPressed: () => showCardForm(context: context),
-                                                          icon: const Icon(Icons.add),
-                                                          label: Text(AppLocalizations.of(context)!.add),
+                                                          onPressed: () =>
+                                                              showCardForm(
+                                                            context: context,
+                                                          ),
+                                                          icon: const Icon(
+                                                            Icons.add,
+                                                          ),
+                                                          label: Text(
+                                                            AppLocalizations.of(
+                                                              context,
+                                                            )!
+                                                                .add,
+                                                          ),
                                                         )
                                                       else
                                                         TextButton.icon(
@@ -325,10 +410,19 @@ class _AddViewState extends State<AddView> {
                                                             setState(() {
                                                               _cardIndex = -1;
                                                             });
-                                                            Navigator.pop(context);
+                                                            Navigator.pop(
+                                                              context,
+                                                            );
                                                           },
-                                                          icon: const Icon(Icons.clear),
-                                                          label: Text(AppLocalizations.of(context)!.clear),
+                                                          icon: const Icon(
+                                                            Icons.clear,
+                                                          ),
+                                                          label: Text(
+                                                            AppLocalizations.of(
+                                                              context,
+                                                            )!
+                                                                .clear,
+                                                          ),
                                                         ),
                                                     ],
                                                   ),
@@ -337,17 +431,24 @@ class _AddViewState extends State<AddView> {
                                                   groupValue: _cardIndex,
                                                   onChanged: (_, value) async {
                                                     setState(() {
-                                                      _cardIndex = value! as int;
+                                                      _cardIndex =
+                                                          value! as int;
                                                     });
                                                     await getAvailableLimit(
                                                       Isar.getInstance()!,
-                                                      snapshot.data![_cardIndex],
+                                                      snapshot
+                                                          .data![_cardIndex],
                                                     ).then((freeLimit) {
-                                                      setState(() => _availabeLimit = freeLimit);
+                                                      setState(
+                                                        () => _availabeLimit =
+                                                            freeLimit,
+                                                      );
                                                       Navigator.pop(context);
                                                     });
                                                   },
-                                                  cardList: snapshot.hasData ? snapshot.data! : null,
+                                                  cardList: snapshot.hasData
+                                                      ? snapshot.data!
+                                                      : null,
                                                 )
                                               ],
                                             );
@@ -361,7 +462,10 @@ class _AddViewState extends State<AddView> {
                                           //     await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId, context: context);
                                           setState(
                                             () {
-                                              displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null;
+                                              displayText[3] = snapshot.hasData
+                                                  ? snapshot
+                                                      .data![_cardIndex].name
+                                                  : null;
                                               // if (snapshot.hasData) {
                                               //   displayText[2] = account!.name;
                                               //   _accountFieldLock = true;
@@ -384,12 +488,14 @@ class _AddViewState extends State<AddView> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 15),
                                     child: InputField(
-                                      label: AppLocalizations.of(context)!.installments,
+                                      label: AppLocalizations.of(context)!
+                                          .installments,
                                       readOnly: true,
                                       placeholder: displayText[4],
                                       validator: (value) {
                                         if (value!.isEmpty) {
-                                          return AppLocalizations.of(context)!.emptyField;
+                                          return AppLocalizations.of(context)!
+                                              .emptyField;
                                         }
                                         return null;
                                       },
@@ -400,25 +506,38 @@ class _AddViewState extends State<AddView> {
                                           return StatefulBuilder(
                                             builder: (context, setState) {
                                               return Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Padding(
-                                                    padding: const EdgeInsets.all(20),
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                      20,
+                                                    ),
                                                     child: Text(
-                                                      AppLocalizations.of(context)!.installments,
-                                                      style: Theme.of(context).textTheme.titleLarge,
+                                                      AppLocalizations.of(
+                                                        context,
+                                                      )!
+                                                          .installments,
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleLarge,
                                                     ),
                                                   ),
                                                   ListChoice(
                                                     groupValue: _installments,
                                                     onChanged: (_, value) {
                                                       setState(() {
-                                                        _installments = value! as int;
+                                                        _installments =
+                                                            value! as int;
                                                       });
                                                       Navigator.pop(context);
                                                     },
-                                                    intList: List.generate(48, (index) => index + 1),
+                                                    intList: List.generate(
+                                                      48,
+                                                      (index) => index + 1,
+                                                    ),
                                                   )
                                                 ],
                                               );
@@ -428,13 +547,31 @@ class _AddViewState extends State<AddView> {
                                       ).then(
                                         (_) {
                                           if (_installments >= 0) {
-                                            setState(() => displayText[4] = '${_installments + 1}');
-                                            final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
-                                            if (_installments > 0 && (value != '000' || value.isNotEmpty)) {
-                                              final double price = double.parse(value) / 100;
+                                            setState(
+                                              () => displayText[4] =
+                                                  '${_installments + 1}',
+                                            );
+                                            final value = textController[1]
+                                                .text
+                                                .replaceAll(
+                                                  RegExp('[^0-9]'),
+                                                  '',
+                                                );
+                                            if (_installments > 0 &&
+                                                (value != '000' ||
+                                                    value.isNotEmpty)) {
+                                              final price =
+                                                  double.parse(value) / 100;
                                               setState(
-                                                () => textController[2].text = NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
-                                                    .format(price / (_installments + 1)),
+                                                () => textController[2].text =
+                                                    NumberFormat.simpleCurrency(
+                                                  locale:
+                                                      Localizations.localeOf(
+                                                    context,
+                                                  ).languageCode,
+                                                ).format(
+                                                  price / (_installments + 1),
+                                                ),
                                               );
                                             }
                                           }
@@ -449,18 +586,27 @@ class _AddViewState extends State<AddView> {
                                     padding: const EdgeInsets.only(top: 15),
                                     child: InputField(
                                       controller: textController[2],
-                                      label: AppLocalizations.of(context)!.perInstallmentValue,
+                                      label: AppLocalizations.of(context)!
+                                          .perInstallmentValue,
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
                                         CurrencyInputFormatter(
-                                          locale: Localizations.localeOf(context).languageCode,
+                                          locale:
+                                              Localizations.localeOf(context)
+                                                  .languageCode,
                                         )
                                       ],
                                       validator: (value) {
                                         if (value!.isEmpty) {
-                                          return AppLocalizations.of(context)!.emptyField;
-                                        } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                          return AppLocalizations.of(context)!.invalidValue;
+                                          return AppLocalizations.of(context)!
+                                              .emptyField;
+                                        } else if (value.replaceAll(
+                                              RegExp('[^0-9]'),
+                                              '',
+                                            ) ==
+                                            '000') {
+                                          return AppLocalizations.of(context)!
+                                              .invalidValue;
                                         }
                                         return null;
                                       },
@@ -474,7 +620,11 @@ class _AddViewState extends State<AddView> {
                       ),
                       if (_cardIndex == -1)
                         FutureBuilder(
-                          future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context).then((value) {
+                          future: getAttributes(
+                            Isar.getInstance()!,
+                            AttributeType.account,
+                            context: context,
+                          ).then((value) {
                             value.removeWhere((_, value) => value.isEmpty);
                             return value;
                           }),
@@ -484,44 +634,71 @@ class _AddViewState extends State<AddView> {
                               child: InputField(
                                 label: AppLocalizations.of(context)!.account(1),
                                 readOnly: true,
-                                placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
+                                placeholder: displayText[2] ??
+                                    AppLocalizations.of(context)!.select,
                                 validator: (value) {
-                                  if (value!.isEmpty || displayText[2] == null) {
-                                    return AppLocalizations.of(context)!.emptyField;
+                                  if (value!.isEmpty ||
+                                      displayText[2] == null) {
+                                    return AppLocalizations.of(context)!
+                                        .emptyField;
                                   }
                                   return null;
                                 },
                                 onTap: () => showModalBottomSheet<String?>(
                                   context: context,
                                   constraints: BoxConstraints(
-                                    minHeight: MediaQuery.of(context).size.height / 3,
+                                    minHeight:
+                                        MediaQuery.of(context).size.height / 3,
                                   ),
                                   enableDrag: false,
                                   builder: (context) {
                                     return StatefulBuilder(
                                       builder: (context, setState) {
                                         return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Padding(
-                                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 20, 20, 0),
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
                                                 children: [
                                                   Text(
-                                                    AppLocalizations.of(context)!.selectAccount,
-                                                    style: Theme.of(context).textTheme.titleLarge,
+                                                    AppLocalizations.of(
+                                                      context,
+                                                    )!
+                                                        .selectAccount,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleLarge,
                                                   ),
                                                   TextButton.icon(
-                                                    onPressed: () => showAttributeDialog<void>(
+                                                    onPressed: () =>
+                                                        showAttributeDialog<
+                                                            void>(
                                                       context: context,
-                                                      attributeType: AttributeType.account,
-                                                      attributeRole: AttributeRole.child,
-                                                      controller: textController[3],
-                                                    ).then((_) => textController[3].clear()),
+                                                      attributeType:
+                                                          AttributeType.account,
+                                                      attributeRole:
+                                                          AttributeRole.child,
+                                                      controller:
+                                                          textController[3],
+                                                    ).then(
+                                                      (_) => textController[3]
+                                                          .clear(),
+                                                    ),
                                                     icon: const Icon(Icons.add),
-                                                    label: Text(AppLocalizations.of(context)!.add),
+                                                    label: Text(
+                                                      AppLocalizations.of(
+                                                        context,
+                                                      )!
+                                                          .add,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -530,7 +707,8 @@ class _AddViewState extends State<AddView> {
                                               groupValue: _accountId,
                                               onChanged: (name, value) {
                                                 setState(() {
-                                                  _accountId = value! as (int, int);
+                                                  _accountId =
+                                                      value! as (int, int);
                                                 });
                                                 Navigator.pop(context, name);
                                               },
@@ -542,7 +720,10 @@ class _AddViewState extends State<AddView> {
                                     );
                                   },
                                 ).then(
-                                  (name) => _accountId != (-1, -1) && name != null ? setState(() => displayText[2] = name) : null,
+                                  (name) => _accountId != (-1, -1) &&
+                                          name != null
+                                      ? setState(() => displayText[2] = name)
+                                      : null,
                                 ),
                               ),
                             );
@@ -573,26 +754,46 @@ class _AddViewState extends State<AddView> {
                 child: FilledButton.icon(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
-                      final String installmentValue = textController[2].text.replaceAll(RegExp('[^0-9]'), '');
-                      final Isar isar = Isar.getInstance()!;
-                      final Map<Attribute, List<Attribute>> types =
-                          await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType, context: context);
-                      final Exchange exchange = Exchange(
+                      final value = textController[1]
+                          .text
+                          .replaceAll(RegExp('[^0-9]'), '');
+                      final installmentValue = textController[2]
+                          .text
+                          .replaceAll(RegExp('[^0-9]'), '');
+                      final isar = Isar.getInstance()!;
+                      final types = await getAttributes(
+                        isar,
+                        _eType.single == EType.income
+                            ? AttributeType.incomeType
+                            : AttributeType.expenseType,
+                        context: context,
+                      );
+                      final exchange = Exchange(
                         eType: _eType.single,
                         description: textController[0].text,
-                        value: _eType.single == EType.income ? double.parse(value) / 100 : -double.parse(value) / 100,
+                        value: _eType.single == EType.income
+                            ? double.parse(value) / 100
+                            : -double.parse(value) / 100,
                         date: DateTime.parse(displayText[0]!),
-                        typeId: types.values.toList()[_typeId.$1][_typeId.$2].id,
+                        typeId:
+                            types.values.toList()[_typeId.$1][_typeId.$2].id,
                         accountId: _cardIndex > -1
                             //? (await fhelper.getCards(isar))[_cardIndex].accountId :
                             ? -1
-                            : (await getAttributes(isar, AttributeType.account, context: mounted ? context : null))
+                            : (await getAttributes(
+                                isar,
+                                AttributeType.account,
+                                context: mounted ? context : null,
+                              ))
                                 .values
                                 .toList()[_accountId.$1][_accountId.$2]
                                 .id,
-                        cardId: _eType.single == EType.expense && _cardIndex > -1 ? (await fhelper.getCards(isar))[_cardIndex].id : null,
-                        installments: _cardIndex > -1 ? _installments + 1 : null,
+                        cardId:
+                            _eType.single == EType.expense && _cardIndex > -1
+                                ? (await fhelper.getCards(isar))[_cardIndex].id
+                                : null,
+                        installments:
+                            _cardIndex > -1 ? _installments + 1 : null,
                         installmentValue: _cardIndex > -1
                             ? _installments > 0
                                 ? -double.parse(installmentValue) / 100

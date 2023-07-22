@@ -16,14 +16,26 @@ Future<T?> showAttributeDialog<T>({
   bool editMode = false,
   int? parentId,
 }) {
-  assert(editMode ? attribute != null : attribute == null);
-  assert(editMode ? attributeType == null && attributeRole == null && parentId == null : attributeType != null && attributeRole != null);
+  assert(
+    editMode ? attribute != null : attribute == null,
+    editMode
+        ? 'An attribute is required for editing'
+        : 'An attribute is forbidden when adding',
+  );
+  assert(
+    editMode
+        ? attributeType == null && attributeRole == null && parentId == null
+        : attributeType != null && attributeRole != null,
+    editMode
+        ? 'The type, role and parentId are contained in the editing attribute'
+        : "The new attribute's type and role are required",
+  );
   String? displayText;
-  int groupValue = -1;
+  var groupValue = -1;
   int? parentIndex;
-  Set<AttributeRole> role = {AttributeRole.parent};
+  var role = <AttributeRole>{AttributeRole.parent};
 
-  final Map<String, bool> defaultSubaccounts = {
+  final defaultSubaccounts = <String, bool>{
     AppLocalizations.of(context)!.checkingSubaccount: true,
     AppLocalizations.of(context)!.savingsSubaccount: true,
   };
@@ -34,10 +46,15 @@ Future<T?> showAttributeDialog<T>({
     builder: (context) {
       return OrientationBuilder(
         builder: (context, orientation) {
-          final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-          if (orientation == Orientation.portrait && (parentId != null || editMode)) {
+          final formKey = GlobalKey<FormState>();
+          if (orientation == Orientation.portrait &&
+              (parentId != null || editMode)) {
             return AlertDialog(
-              title: Text(editMode ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.add),
+              title: Text(
+                editMode
+                    ? AppLocalizations.of(context)!.edit
+                    : AppLocalizations.of(context)!.add,
+              ),
               icon: Icon(editMode ? Icons.edit : Icons.add),
               content: Form(
                 key: formKey,
@@ -51,8 +68,10 @@ Future<T?> showAttributeDialog<T>({
                     if (value!.isEmpty) {
                       return AppLocalizations.of(context)!.emptyField;
                     } else if (value.length < 3) {
-                      return AppLocalizations.of(context)!.threeCharactersMinimum;
-                    } else if (value.contains('#/spt#/') || value.contains('#/str#/')) {
+                      return AppLocalizations.of(context)!
+                          .threeCharactersMinimum;
+                    } else if (value.contains('#/spt#/') ||
+                        value.contains('#/str#/')) {
                       return AppLocalizations.of(context)!.invalidName;
                     }
                     return null;
@@ -70,7 +89,7 @@ Future<T?> showAttributeDialog<T>({
                   icon: Icon(editMode ? Icons.save : Icons.add),
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
-                      final Isar isar = Isar.getInstance()!;
+                      final isar = Isar.getInstance()!;
                       late Attribute attr;
                       if (editMode) {
                         attr = attribute!.copyWith(name: controller.text);
@@ -87,7 +106,11 @@ Future<T?> showAttributeDialog<T>({
                       }).then((_) => Navigator.pop(context));
                     }
                   },
-                  label: Text(editMode ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),
+                  label: Text(
+                    editMode
+                        ? AppLocalizations.of(context)!.save
+                        : AppLocalizations.of(context)!.add,
+                  ),
                 ),
               ],
             );
@@ -100,7 +123,11 @@ Future<T?> showAttributeDialog<T>({
                     SliverAppBar(
                       pinned: true,
                       forceElevated: true,
-                      title: Text(editMode ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.add),
+                      title: Text(
+                        editMode
+                            ? AppLocalizations.of(context)!.edit
+                            : AppLocalizations.of(context)!.add,
+                      ),
                       leading: IconButton(
                         onPressed: () => Navigator.pop(context),
                         icon: const Icon(Icons.close),
@@ -109,38 +136,38 @@ Future<T?> showAttributeDialog<T>({
                         TextButton(
                           onPressed: () async {
                             if (formKey.currentState!.validate()) {
-                              final Isar isar = Isar.getInstance()!;
+                              final isar = Isar.getInstance()!;
                               late Attribute attr;
                               if (editMode) {
-                                attr = attribute!.copyWith(name: controller.text);
+                                attr =
+                                    attribute!.copyWith(name: controller.text);
                               } else {
-                                if (parentId != null) {
-                                  attr = Attribute(
-                                    name: controller.text,
-                                    parentId: parentId,
-                                    role: attributeRole!,
-                                    type: attributeType!,
-                                  );
-                                } else {
-                                  attr = Attribute(
-                                    name: controller.text,
-                                    parentId: parentIndex,
-                                    role: role.single,
-                                    type: attributeType!,
-                                  );
-                                }
+                                attr = Attribute(
+                                  name: controller.text,
+                                  parentId: parentId ?? parentIndex,
+                                  role: attributeRole ?? role.single,
+                                  type: attributeType!,
+                                );
                               }
                               await isar.writeTxn(() async {
-                                if (role.single == AttributeRole.parent && attributeType == AttributeType.account) {
-                                  final parentId = await isar.attributes.put(attr);
-                                  final Map<int, String> strBased = {
+                                if (role.single == AttributeRole.parent &&
+                                    attributeType == AttributeType.account) {
+                                  final parentId =
+                                      await isar.attributes.put(attr);
+
+                                  final strBased = <int, String>{
                                     0: '#/str#/checkingString',
                                     1: '#/str#/savingsString',
                                   };
-                                  defaultSubaccounts.forEach((key, value) async {
+                                  defaultSubaccounts
+                                      .forEach((key, value) async {
                                     if (value) {
                                       final subaccount = Attribute(
-                                        name: strBased.values.elementAt(defaultSubaccounts.keys.toList().indexOf(key)),
+                                        name: strBased.values.elementAt(
+                                          defaultSubaccounts.keys
+                                              .toList()
+                                              .indexOf(key),
+                                        ),
                                         parentId: parentId,
                                         role: AttributeRole.child,
                                         type: AttributeType.account,
@@ -154,7 +181,11 @@ Future<T?> showAttributeDialog<T>({
                               }).then((_) => Navigator.pop(context));
                             }
                           },
-                          child: Text(editMode ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),
+                          child: Text(
+                            editMode
+                                ? AppLocalizations.of(context)!.save
+                                : AppLocalizations.of(context)!.add,
+                          ),
                         ),
                       ],
                     ),
@@ -175,16 +206,20 @@ Future<T?> showAttributeDialog<T>({
                                         value: AttributeRole.parent,
                                         label: Text(
                                           attributeType == AttributeType.account
-                                              ? AppLocalizations.of(context)!.account(1)
-                                              : AppLocalizations.of(context)!.type(1),
+                                              ? AppLocalizations.of(context)!
+                                                  .account(1)
+                                              : AppLocalizations.of(context)!
+                                                  .type(1),
                                         ),
                                       ),
                                       ButtonSegment(
                                         value: AttributeRole.child,
                                         label: Text(
                                           attributeType == AttributeType.account
-                                              ? AppLocalizations.of(context)!.subaccount
-                                              : AppLocalizations.of(context)!.subtype,
+                                              ? AppLocalizations.of(context)!
+                                                  .subaccount
+                                              : AppLocalizations.of(context)!
+                                                  .subtype,
                                         ),
                                       ),
                                     ],
@@ -204,37 +239,51 @@ Future<T?> showAttributeDialog<T>({
                                   ],
                                   validator: (value) {
                                     if (value!.isEmpty) {
-                                      return AppLocalizations.of(context)!.emptyField;
+                                      return AppLocalizations.of(context)!
+                                          .emptyField;
                                     } else if (value.length < 3) {
-                                      return AppLocalizations.of(context)!.threeCharactersMinimum;
-                                    } else if (value.contains('#/spt#/') || value.contains('#/str#/')) {
-                                      return AppLocalizations.of(context)!.invalidName;
+                                      return AppLocalizations.of(context)!
+                                          .threeCharactersMinimum;
+                                    } else if (value.contains('#/spt#/') ||
+                                        value.contains('#/str#/')) {
+                                      return AppLocalizations.of(context)!
+                                          .invalidName;
                                     }
                                     return null;
                                   },
                                 ),
                               ),
-                              if (!editMode && role.single == AttributeRole.child)
+                              if (!editMode &&
+                                  role.single == AttributeRole.child)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 15),
                                   child: InputField(
-                                    label: attributeType == AttributeType.account
-                                        ? AppLocalizations.of(context)!.account(1)
+                                    label: attributeType ==
+                                            AttributeType.account
+                                        ? AppLocalizations.of(context)!
+                                            .account(1)
                                         : AppLocalizations.of(context)!.type(1),
                                     readOnly: true,
-                                    placeholder: displayText ?? AppLocalizations.of(context)!.select,
+                                    placeholder: displayText ??
+                                        AppLocalizations.of(context)!.select,
                                     validator: (value) {
                                       if (value!.isEmpty) {
-                                        return AppLocalizations.of(context)!.emptyField;
+                                        return AppLocalizations.of(context)!
+                                            .emptyField;
                                       }
                                       return null;
                                     },
                                     onTap: () async {
                                       final isar = Isar.getInstance()!;
-                                      final parents = await getAttributes(isar, attributeType!, context: context);
-                                      final Map<Attribute, List<Attribute>> data = {};
+                                      final parents = await getAttributes(
+                                          isar, attributeType!,
+                                          context: context);
+                                      final data =
+                                          <Attribute, List<Attribute>>{};
                                       for (final element in parents.entries) {
-                                        data.addAll({element.key: <Attribute>[]});
+                                        data.addAll(
+                                          {element.key: <Attribute>[]},
+                                        );
                                       }
                                       if (context.mounted) {
                                         await showModalBottomSheet<String?>(
@@ -244,28 +293,44 @@ Future<T?> showAttributeDialog<T>({
                                             return StatefulBuilder(
                                               builder: (context, setState) {
                                                 return Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  mainAxisSize: MainAxisSize.min,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
                                                   children: [
                                                     Padding(
-                                                      padding: const EdgeInsets.all(20),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              20),
                                                       child: Text(
-                                                        attributeType == AttributeType.account
-                                                            ? AppLocalizations.of(context)!.selectAccount
-                                                            : AppLocalizations.of(context)!.selectType,
-                                                        style: Theme.of(context).textTheme.titleLarge,
+                                                        attributeType ==
+                                                                AttributeType
+                                                                    .account
+                                                            ? AppLocalizations
+                                                                    .of(
+                                                                        context)!
+                                                                .selectAccount
+                                                            : AppLocalizations
+                                                                    .of(context)!
+                                                                .selectType,
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleLarge,
                                                       ),
                                                     ),
                                                     ListChoice(
                                                       groupValue: groupValue,
                                                       onChanged: (name, value) {
                                                         setState(() {
-                                                          groupValue = value! as int;
+                                                          groupValue =
+                                                              value! as int;
                                                         });
-                                                        Navigator.pop(context, name);
+                                                        Navigator.pop(
+                                                            context, name);
                                                       },
                                                       attributeMap: data,
-                                                      attributeListBehavior: true,
+                                                      attributeListBehavior:
+                                                          true,
                                                     )
                                                   ],
                                                 );
@@ -273,50 +338,76 @@ Future<T?> showAttributeDialog<T>({
                                             );
                                           },
                                         ).then(
-                                          (name) => groupValue != -1 && name != null
-                                              ? setState(() {
-                                                  displayText = name;
-                                                  parentIndex = data.keys.elementAt(groupValue).id;
-                                                })
-                                              : null,
+                                          (name) =>
+                                              groupValue != -1 && name != null
+                                                  ? setState(() {
+                                                      displayText = name;
+                                                      parentIndex = data.keys
+                                                          .elementAt(groupValue)
+                                                          .id;
+                                                    })
+                                                  : null,
                                         );
                                       }
                                     },
                                   ),
                                 ),
-                              if (!editMode && role.single == AttributeRole.parent && attributeType == AttributeType.account)
+                              if (!editMode &&
+                                  role.single == AttributeRole.parent &&
+                                  attributeType == AttributeType.account)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 15),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        AppLocalizations.of(context)!.defaultSubaccounts,
-                                        style: Theme.of(context).textTheme.titleLarge,
+                                        AppLocalizations.of(context)!
+                                            .defaultSubaccounts,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge,
                                       ),
                                       Card(
                                         elevation: 0,
                                         margin: const EdgeInsets.only(top: 5),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           side: BorderSide(
-                                            color: Theme.of(context).colorScheme.outlineVariant,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outlineVariant,
                                           ),
                                         ),
                                         child: ListView.separated(
                                           shrinkWrap: true,
                                           padding: EdgeInsets.zero,
-                                          physics: const NeverScrollableScrollPhysics(),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
                                           itemCount: defaultSubaccounts.length,
                                           itemBuilder: (context, index) {
                                             return CheckboxListTile(
-                                              title: Text(defaultSubaccounts.keys.elementAt(index)),
-                                              shape: wid_utils.getShapeBorder(index, defaultSubaccounts.length - 1),
-                                              tileColor: Theme.of(context).colorScheme.background,
-                                              value: defaultSubaccounts.values.elementAt(index),
+                                              title: Text(
+                                                defaultSubaccounts.keys
+                                                    .elementAt(index),
+                                              ),
+                                              shape: wid_utils.getShapeBorder(
+                                                index,
+                                                defaultSubaccounts.length - 1,
+                                              ),
+                                              tileColor: Theme.of(context)
+                                                  .colorScheme
+                                                  .background,
+                                              value: defaultSubaccounts.values
+                                                  .elementAt(index),
                                               onChanged: (val) {
                                                 setState(() {
-                                                  defaultSubaccounts.update(defaultSubaccounts.keys.elementAt(index), (value) => val ?? value);
+                                                  defaultSubaccounts.update(
+                                                    defaultSubaccounts.keys
+                                                        .elementAt(index),
+                                                    (value) => val ?? value,
+                                                  );
                                                 });
                                               },
                                             );
@@ -324,20 +415,29 @@ Future<T?> showAttributeDialog<T>({
                                           separatorBuilder: (_, __) => Divider(
                                             height: 2,
                                             thickness: 1.5,
-                                            color: Theme.of(context).colorScheme.outlineVariant,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .outlineVariant,
                                           ),
                                         ),
                                       ),
                                       Visibility(
-                                        visible: !defaultSubaccounts.containsValue(true),
+                                        visible: !defaultSubaccounts
+                                            .containsValue(true),
                                         child: Card(
                                           elevation: 0,
-                                          margin: const EdgeInsets.only(top: 15),
-                                          color: Theme.of(context).colorScheme.errorContainer,
+                                          margin:
+                                              const EdgeInsets.only(top: 15),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .errorContainer,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(12),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                             side: BorderSide(
-                                              color: Theme.of(context).colorScheme.error,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .error,
                                             ),
                                           ),
                                           child: Padding(
@@ -347,16 +447,30 @@ Future<T?> showAttributeDialog<T>({
                                                 children: [
                                                   WidgetSpan(
                                                     child: Padding(
-                                                      padding: const EdgeInsets.only(right: 5),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 5),
                                                       child: Icon(
                                                         Icons.warning_amber,
-                                                        color: Theme.of(context).colorScheme.error,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .error,
                                                       ),
                                                     ),
                                                   ),
                                                   TextSpan(
-                                                    text: AppLocalizations.of(context)!.noSubaccountWarning,
-                                                    style: Theme.of(context).textTheme.bodyLarge!.apply(color: Theme.of(context).colorScheme.onErrorContainer),
+                                                    text: AppLocalizations.of(
+                                                            context)!
+                                                        .noSubaccountWarning,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge!
+                                                        .apply(
+                                                          color: Theme.of(
+                                                                  context)
+                                                              .colorScheme
+                                                              .onErrorContainer,
+                                                        ),
                                                   )
                                                 ],
                                               ),

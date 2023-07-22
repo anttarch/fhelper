@@ -8,7 +8,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 /// - Accounts (type 0) -> from 0 to 4
 /// - Income Types (type 1) -> from 5 to 9
 /// - Expense Types (type 2) -> from 10 to 23
-String? translatedDefaultAttribute(BuildContext context, int defaultAttributeid) => switch (defaultAttributeid) {
+String? translatedDefaultAttribute(
+  BuildContext context,
+  int defaultAttributeid,
+) =>
+    switch (defaultAttributeid) {
       // Accounts
 
       // MAIN BANK

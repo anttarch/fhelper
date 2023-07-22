@@ -14,14 +14,14 @@ Future<void> showCardForm({
   bool editMode = false,
 }) {
   assert(editMode ? card != null : card == null);
-  final List<TextEditingController> controller = [
+  final controller = <TextEditingController>[
     TextEditingController(),
     TextEditingController(),
 
     // controller for dialog
     TextEditingController(),
   ];
-  final List<String?> displayText = [
+  final displayText = <String?>[
     // Statement Closing Date
     null,
     // Payment Due Date,
@@ -30,8 +30,8 @@ Future<void> showCardForm({
     //null,
   ];
   //(int parentIndex, int childIndex) accountId = (-1, -1);
-  int pdDate = -1;
-  int stcDate = -1;
+  var pdDate = -1;
+  var stcDate = -1;
 
   void cleanForm() {
     //accountId = (-1, -1);
@@ -44,9 +44,9 @@ Future<void> showCardForm({
   }
 
   Future<void> addCard() async {
-    final String value = controller[1].text.replaceAll(RegExp('[^0-9]'), '');
-    final Isar isar = Isar.getInstance()!;
-    final fhelper.Card card = fhelper.Card(
+    final value = controller[1].text.replaceAll(RegExp('[^0-9]'), '');
+    final isar = Isar.getInstance()!;
+    final card = fhelper.Card(
       name: controller[0].text,
       statementClosure: stcDate + 1,
       paymentDue: pdDate + 1,
@@ -60,9 +60,9 @@ Future<void> showCardForm({
   }
 
   Future<void> editCard(fhelper.Card originalCard) async {
-    final Isar isar = Isar.getInstance()!;
-    final String value = controller[1].text.replaceAll(RegExp('[^0-9]'), '');
-    final fhelper.Card newCard = originalCard.copyWith(
+    final isar = Isar.getInstance()!;
+    final value = controller[1].text.replaceAll(RegExp('[^0-9]'), '');
+    final newCard = originalCard.copyWith(
       name: controller[0].text,
       statementClosure: stcDate + 1,
       paymentDue: pdDate + 1,
@@ -80,11 +80,14 @@ Future<void> showCardForm({
   if (card != null && editMode) {
     stcDate = card.statementClosure - 1;
     pdDate = card.paymentDue - 1;
-    displayText[0] = AppLocalizations.of(context)!.dayOfMonth(card.statementClosure);
+    displayText[0] =
+        AppLocalizations.of(context)!.dayOfMonth(card.statementClosure);
     displayText[1] = AppLocalizations.of(context)!.dayOfMonth(card.paymentDue);
     //displayText[2] = cardAttribute!.name;
     controller[0].text = card.name;
-    controller[1].text = NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(card.limit);
+    controller[1].text = NumberFormat.simpleCurrency(
+      locale: Localizations.localeOf(context).languageCode,
+    ).format(card.limit);
   }
   return showDialog<void>(
     context: context,
@@ -99,7 +102,11 @@ Future<void> showCardForm({
                 SliverAppBar(
                   pinned: true,
                   forceElevated: true,
-                  title: Text(editMode ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.addCard),
+                  title: Text(
+                    editMode
+                        ? AppLocalizations.of(context)!.edit
+                        : AppLocalizations.of(context)!.addCard,
+                  ),
                   leading: IconButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -118,7 +125,11 @@ Future<void> showCardForm({
                           }
                         }
                       },
-                      child: Text(editMode ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),
+                      child: Text(
+                        editMode
+                            ? AppLocalizations.of(context)!.save
+                            : AppLocalizations.of(context)!.add,
+                      ),
                     ),
                   ],
                 ),
@@ -139,9 +150,11 @@ Future<void> showCardForm({
                               ],
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return AppLocalizations.of(context)!.emptyField;
+                                  return AppLocalizations.of(context)!
+                                      .emptyField;
                                 } else if (value.length < 3) {
-                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                  return AppLocalizations.of(context)!
+                                      .threeCharactersMinimum;
                                 }
                                 return null;
                               },
@@ -150,12 +163,15 @@ Future<void> showCardForm({
                           Padding(
                             padding: const EdgeInsets.only(top: 15),
                             child: InputField(
-                              label: AppLocalizations.of(context)!.statementClosing,
+                              label: AppLocalizations.of(context)!
+                                  .statementClosing,
                               readOnly: true,
-                              placeholder: displayText[0] ?? AppLocalizations.of(context)!.select,
+                              placeholder: displayText[0] ??
+                                  AppLocalizations.of(context)!.select,
                               validator: (value) {
                                 if (value!.isEmpty || displayText[0] == null) {
-                                  return AppLocalizations.of(context)!.emptyField;
+                                  return AppLocalizations.of(context)!
+                                      .emptyField;
                                 }
                                 return null;
                               },
@@ -166,14 +182,18 @@ Future<void> showCardForm({
                                   return StatefulBuilder(
                                     builder: (context, setState) {
                                       return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.all(20),
                                             child: Text(
-                                              AppLocalizations.of(context)!.selectDay,
-                                              style: Theme.of(context).textTheme.titleLarge,
+                                              AppLocalizations.of(context)!
+                                                  .selectDay,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge,
                                             ),
                                           ),
                                           ListChoice(
@@ -184,7 +204,10 @@ Future<void> showCardForm({
                                               });
                                               Navigator.pop(context);
                                             },
-                                            intList: List.generate(31, (index) => index + 1),
+                                            intList: List.generate(
+                                              31,
+                                              (index) => index + 1,
+                                            ),
                                           )
                                         ],
                                       );
@@ -194,7 +217,9 @@ Future<void> showCardForm({
                               ).then(
                                 (_) => stcDate != -1
                                     ? setState(
-                                        () => displayText[0] = AppLocalizations.of(context)!.dayOfMonth(stcDate + 1),
+                                        () => displayText[0] =
+                                            AppLocalizations.of(context)!
+                                                .dayOfMonth(stcDate + 1),
                                       )
                                     : null,
                               ),
@@ -205,10 +230,12 @@ Future<void> showCardForm({
                             child: InputField(
                               label: AppLocalizations.of(context)!.paymentDue,
                               readOnly: true,
-                              placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
+                              placeholder: displayText[1] ??
+                                  AppLocalizations.of(context)!.select,
                               validator: (value) {
                                 if (value!.isEmpty || displayText[1] == null) {
-                                  return AppLocalizations.of(context)!.emptyField;
+                                  return AppLocalizations.of(context)!
+                                      .emptyField;
                                 }
                                 return null;
                               },
@@ -219,14 +246,18 @@ Future<void> showCardForm({
                                   return StatefulBuilder(
                                     builder: (context, setState) {
                                       return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Padding(
                                             padding: const EdgeInsets.all(20),
                                             child: Text(
-                                              AppLocalizations.of(context)!.selectDay,
-                                              style: Theme.of(context).textTheme.titleLarge,
+                                              AppLocalizations.of(context)!
+                                                  .selectDay,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge,
                                             ),
                                           ),
                                           ListChoice(
@@ -237,7 +268,10 @@ Future<void> showCardForm({
                                               });
                                               Navigator.pop(context);
                                             },
-                                            intList: List.generate(31, (index) => index + 1),
+                                            intList: List.generate(
+                                              31,
+                                              (index) => index + 1,
+                                            ),
                                           )
                                         ],
                                       );
@@ -247,7 +281,9 @@ Future<void> showCardForm({
                               ).then(
                                 (_) => pdDate != -1
                                     ? setState(
-                                        () => displayText[1] = AppLocalizations.of(context)!.dayOfMonth(pdDate + 1),
+                                        () => displayText[1] =
+                                            AppLocalizations.of(context)!
+                                                .dayOfMonth(pdDate + 1),
                                       )
                                     : null,
                               ),
@@ -261,14 +297,21 @@ Future<void> showCardForm({
                               keyboardType: TextInputType.number,
                               inputFormatters: [
                                 CurrencyInputFormatter(
-                                  locale: Localizations.localeOf(context).languageCode,
+                                  locale: Localizations.localeOf(context)
+                                      .languageCode,
                                 )
                               ],
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return AppLocalizations.of(context)!.emptyField;
-                                } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                  return AppLocalizations.of(context)!.invalidValue;
+                                  return AppLocalizations.of(context)!
+                                      .emptyField;
+                                } else if (value.replaceAll(
+                                      RegExp('[^0-9]'),
+                                      '',
+                                    ) ==
+                                    '000') {
+                                  return AppLocalizations.of(context)!
+                                      .invalidValue;
                                 }
                                 return null;
                               },

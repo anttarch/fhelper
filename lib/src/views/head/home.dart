@@ -42,6 +42,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: StreamBuilder(
@@ -75,7 +77,7 @@ class HomePage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              AppLocalizations.of(context)!.latestDescriptor,
+                              localization.latestDescriptor,
                               textAlign: TextAlign.start,
                               style: Theme.of(context)
                                   .textTheme
@@ -134,8 +136,7 @@ class HomePage extends StatelessWidget {
                                     padding: const EdgeInsets.only(left: 15),
                                     child: Text(
                                       NumberFormat.simpleCurrency(
-                                        locale: Localizations.localeOf(context)
-                                            .languageCode,
+                                        locale: languageCode,
                                       ).format(
                                         exchange != null ? exchange.value : 0,
                                       ),
@@ -160,8 +161,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              child:
-                                  Text(AppLocalizations.of(context)!.details),
+                              child: Text(localization.details),
                             )
                           ],
                         ),
@@ -183,9 +183,8 @@ class HomePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Semantics(
-                            label: AppLocalizations.of(context)!
-                                .totalValueHistoryCard(
-                              AppLocalizations.of(context)!.today,
+                            label: localization.totalValueHistoryCard(
+                              localization.today,
                               snapshot.data ?? 0,
                             ),
                             container: true,
@@ -196,7 +195,7 @@ class HomePage extends StatelessWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    AppLocalizations.of(context)!.today,
+                                    localization.today,
                                     textAlign: TextAlign.start,
                                     style: Theme.of(context)
                                         .textTheme
@@ -222,9 +221,7 @@ class HomePage extends StatelessWidget {
                                         ),
                                         child: Text(
                                           NumberFormat.simpleCurrency(
-                                            locale:
-                                                Localizations.localeOf(context)
-                                                    .languageCode,
+                                            locale: languageCode,
                                           ).format(snapshot.data),
                                           textAlign: TextAlign.start,
                                           style: Theme.of(context)
@@ -264,9 +261,8 @@ class HomePage extends StatelessWidget {
                             ),
                             icon: const Icon(Icons.add),
                             label: Text(
-                              AppLocalizations.of(context)!.add,
-                              semanticsLabel: AppLocalizations.of(context)!
-                                  .addTransactionFAB,
+                              localization.add,
+                              semanticsLabel: localization.addTransactionFAB,
                             ),
                           ),
                         ],
@@ -292,7 +288,7 @@ class HomePage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          AppLocalizations.of(context)!.transfer,
+                          localization.transfer,
                           textAlign: TextAlign.start,
                           style: Theme.of(context).textTheme.titleLarge!.apply(
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -306,23 +302,27 @@ class HomePage extends StatelessWidget {
                               .roleEqualTo(AttributeRole.child)
                               .count(),
                           builder: (context, snapshot) {
+                            final visible =
+                                Isar.getInstance()!.exchanges.countSync() ==
+                                        0 ||
+                                    snapshot.hasData && snapshot.data! == 1;
+                            final enabled =
+                                Isar.getInstance()!.exchanges.countSync() > 0 &&
+                                    snapshot.hasData &&
+                                    snapshot.data! > 1;
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Visibility(
-                                  visible: Isar.getInstance()!
-                                              .exchanges
-                                              .countSync() ==
-                                          0 ||
-                                      snapshot.hasData && snapshot.data! == 1,
+                                  visible: visible,
                                   child: Padding(
                                     padding:
                                         const EdgeInsets.symmetric(vertical: 5),
                                     child: Text(
                                       snapshot.hasData && snapshot.data! == 1
-                                          ? AppLocalizations.of(context)!
+                                          ? localization
                                               .transferAccountRequirement
-                                          : AppLocalizations.of(context)!
+                                          : localization
                                               .transferExchangeRequirement,
                                       textAlign: TextAlign.start,
                                       style: Theme.of(context)
@@ -339,12 +339,7 @@ class HomePage extends StatelessWidget {
                                 Semantics(
                                   button: true,
                                   child: FilledButton.tonalIcon(
-                                    onPressed: Isar.getInstance()!
-                                                    .exchanges
-                                                    .countSync() >
-                                                0 &&
-                                            snapshot.hasData &&
-                                            snapshot.data! > 1
+                                    onPressed: enabled
                                         ? () => Navigator.push(
                                               context,
                                               MaterialPageRoute<TransferView>(
@@ -354,9 +349,7 @@ class HomePage extends StatelessWidget {
                                             )
                                         : null,
                                     icon: const Icon(Icons.swap_horiz),
-                                    label: Text(
-                                      AppLocalizations.of(context)!.transfer,
-                                    ),
+                                    label: Text(localization.transfer),
                                   ),
                                 ),
                               ],

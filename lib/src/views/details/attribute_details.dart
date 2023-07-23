@@ -62,8 +62,201 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
         _ => AppLocalizations.of(context)!.todayDescription
       };
 
+  Widget _latestExchange() {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    return FutureBuilder(
+      future: getLatest(
+        Isar.getInstance()!,
+        attributeId: widget.attribute.id,
+        attributeType: widget.attribute.type,
+      ).then((value) async {
+        if (value != null && value.eType == EType.transfer) {
+          final transfer = value.copyWith(
+            description: await wid_utils.parseTransferName(context, value),
+          );
+          return transfer;
+        }
+        return value;
+      }),
+      builder: (context, snapshot) {
+        final exchange = snapshot.data;
+        return Visibility(
+          visible: exchange != null ||
+              (exchange != null && exchange.eType == EType.transfer),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Card(
+                elevation: 4,
+                margin: const EdgeInsets.only(top: 10),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        localization.latestDescriptor,
+                        textAlign: TextAlign.start,
+                        style: Theme.of(context).textTheme.titleLarge!.apply(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (exchange != null &&
+                                      (exchange.installments != null ||
+                                          exchange.id == -1 ||
+                                          exchange.eType == EType.transfer))
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 5,
+                                      ),
+                                      child: _getLeadingIcon(
+                                        exchange,
+                                      ),
+                                    ),
+                                  Flexible(
+                                    child: Text(
+                                      exchange != null
+                                          ? exchange.description
+                                          : 'Placeholder',
+                                      textAlign: TextAlign.start,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .apply(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15),
+                              child: Text(
+                                NumberFormat.simpleCurrency(
+                                  locale: languageCode,
+                                ).format(
+                                  exchange != null ? exchange.value : 0,
+                                ),
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .apply(color: _getColor(context, exchange)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute<ExchangeDetailsView>(
+                            builder: (context) => ExchangeDetailsView(
+                              item: exchange!,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          localization.details,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: exchange != null &&
+                    widget.attribute.type != AttributeType.account,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 15),
+                  child: Divider(
+                    height: 4,
+                    thickness: 2,
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _trendingWidget(num value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Icon(
+          _getTrendingIcon(value.toDouble()),
+          size: MediaQuery.sizeOf(context).longestSide / 11,
+          color: Color(
+            value.isNegative ? 0xffbd1c1c : 0xff199225,
+          ).harmonizeWith(
+            Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _getTimeString(),
+              style: Theme.of(context).textTheme.titleLarge!.apply(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+            ),
+            const SizedBox(width: 15),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
+                ),
+                child: Text(
+                  NumberFormat.simpleCurrency(
+                    locale: Localizations.localeOf(
+                      context,
+                    ).languageCode,
+                  ).format(value),
+                  style: Theme.of(context).textTheme.titleLarge!.apply(
+                        color: Color(
+                          value.isNegative ? 0xffbd1c1c : 0xff199225,
+                        ).harmonizeWith(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                ),
+              ),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -81,171 +274,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  FutureBuilder(
-                    future: getLatest(
-                      Isar.getInstance()!,
-                      attributeId: widget.attribute.id,
-                      attributeType: widget.attribute.type,
-                    ).then((value) async {
-                      if (value != null && value.eType == EType.transfer) {
-                        final transfer = value.copyWith(
-                          description: await wid_utils.parseTransferName(
-                            context,
-                            value,
-                          ),
-                        );
-                        return transfer;
-                      }
-                      return value;
-                    }),
-                    builder: (context, snapshot) {
-                      final exchange = snapshot.data;
-                      return Visibility(
-                        visible: exchange != null ||
-                            (exchange != null &&
-                                exchange.eType == EType.transfer),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Card(
-                              elevation: 4,
-                              margin: const EdgeInsets.only(top: 10),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!
-                                          .latestDescriptor,
-                                      textAlign: TextAlign.start,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge!
-                                          .apply(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface,
-                                          ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                if (exchange != null &&
-                                                    (exchange.installments !=
-                                                            null ||
-                                                        exchange.id == -1 ||
-                                                        exchange.eType ==
-                                                            EType.transfer))
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                      right: 5,
-                                                    ),
-                                                    child: _getLeadingIcon(
-                                                      exchange,
-                                                    ),
-                                                  ),
-                                                Flexible(
-                                                  child: Text(
-                                                    exchange != null
-                                                        ? exchange.description
-                                                        : 'Placeholder',
-                                                    textAlign: TextAlign.start,
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .bodyLarge!
-                                                        .apply(
-                                                          color: Theme.of(
-                                                            context,
-                                                          )
-                                                              .colorScheme
-                                                              .onSurfaceVariant,
-                                                        ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 15),
-                                            child: Text(
-                                              NumberFormat.simpleCurrency(
-                                                locale: Localizations.localeOf(
-                                                  context,
-                                                ).languageCode,
-                                              ).format(
-                                                exchange != null
-                                                    ? exchange.value
-                                                    : 0,
-                                              ),
-                                              textAlign: TextAlign.start,
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyLarge!
-                                                  .apply(
-                                                    color: _getColor(
-                                                      context,
-                                                      exchange,
-                                                    ),
-                                                  ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    OutlinedButton(
-                                      onPressed: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute<ExchangeDetailsView>(
-                                          builder: (context) =>
-                                              ExchangeDetailsView(
-                                            item: exchange!,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        AppLocalizations.of(context)!.details,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: exchange != null &&
-                                  widget.attribute.type !=
-                                      AttributeType.account,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 10, bottom: 15),
-                                child: Divider(
-                                  height: 4,
-                                  thickness: 2,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .outlineVariant,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                  _latestExchange(),
                   Visibility(
                     visible: widget.attribute.type == AttributeType.account,
                     child: Card(
@@ -269,80 +298,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                     ConnectionState.done) {
                                   final value =
                                       snapshot.hasData ? snapshot.data! : 0;
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Icon(
-                                        _getTrendingIcon(value.toDouble()),
-                                        size: MediaQuery.sizeOf(context)
-                                                .longestSide /
-                                            11,
-                                        color: Color(
-                                          value.isNegative
-                                              ? 0xffbd1c1c
-                                              : 0xff199225,
-                                        ).harmonizeWith(
-                                          Theme.of(context).colorScheme.primary,
-                                        ),
-                                      ),
-                                      Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            _getTimeString(),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge!
-                                                .apply(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondaryContainer,
-                                                ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                          DecoratedBox(
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .surface,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 6,
-                                                vertical: 2,
-                                              ),
-                                              child: Text(
-                                                NumberFormat.simpleCurrency(
-                                                  locale:
-                                                      Localizations.localeOf(
-                                                    context,
-                                                  ).languageCode,
-                                                ).format(value),
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .titleLarge!
-                                                    .apply(
-                                                      color: Color(
-                                                        value.isNegative
-                                                            ? 0xffbd1c1c
-                                                            : 0xff199225,
-                                                      ).harmonizeWith(
-                                                        Theme.of(context)
-                                                            .colorScheme
-                                                            .primary,
-                                                      ),
-                                                    ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  );
+                                  return _trendingWidget(value);
                                 }
                                 if (snapshot.connectionState ==
                                         ConnectionState.active ||
@@ -368,7 +324,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10),
                                   child: Text(
-                                    AppLocalizations.of(context)!.showOnly,
+                                    localization.showOnly,
                                     textAlign: TextAlign.start,
                                     style: Theme.of(context)
                                         .textTheme
@@ -385,13 +341,13 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                     ButtonSegment(
                                       value: Period.today,
                                       label: Text(
-                                        AppLocalizations.of(context)!.today,
+                                        localization.today,
                                       ),
                                     ),
                                     ButtonSegment(
                                       value: Period.allTime,
                                       label: Text(
-                                        AppLocalizations.of(context)!.all,
+                                        localization.all,
                                       ),
                                     ),
                                   ],
@@ -442,7 +398,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
                         child: Text(
-                          AppLocalizations.of(context)!.statistics,
+                          localization.statistics,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
@@ -470,8 +426,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                       final percentage =
                                           snapshot.hasData ? snapshot.data! : 0;
                                       return Text(
-                                        AppLocalizations.of(context)!
-                                            .todayAttributeStatistics(
+                                        localization.todayAttributeStatistics(
                                           percentage,
                                           (widget.attribute.type ==
                                                   AttributeType.account)
@@ -503,8 +458,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                       final percentage =
                                           snapshot.hasData ? snapshot.data! : 0;
                                       return Text(
-                                        AppLocalizations.of(context)!
-                                            .allAttributeStatistics(
+                                        localization.allAttributeStatistics(
                                           percentage,
                                           (widget.attribute.type ==
                                                   AttributeType.account)
@@ -543,8 +497,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        AppLocalizations.of(context)!
-                                            .relatedCardsDescription,
+                                        localization.relatedCardsDescription,
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium,
@@ -575,7 +528,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      AppLocalizations.of(context)!
+                                      localization
                                           .relatedTransactionsDescription,
                                       style: Theme.of(context)
                                           .textTheme

@@ -10,13 +10,14 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
     final elements = <String>[
-      AppLocalizations.of(context)!.account(-1),
-      AppLocalizations.of(context)!.card(-1),
-      //AppLocalizations.of(context)!.theme,
-      AppLocalizations.of(context)!.type(-1),
-      //AppLocalizations.of(context)!.privacy,
-      //AppLocalizations.of(context)!.security,
+      localization.account(-1),
+      localization.card(-1),
+      //localization.theme,
+      localization.type(-1),
+      //localization.privacy,
+      //localization.security,
     ];
     final callbacks = <VoidCallback>[
       // Accounts

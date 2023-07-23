@@ -105,8 +105,13 @@ class ListChoice extends StatelessWidget {
                           onChanged: (value) {
                             if (attributeMap != null) {
                               if (!attributeListBehavior) {
-                                final name =
-                                    '${attributeMap!.keys.elementAt(parentIndex).name} - ${attributeMap!.values.toList()[parentIndex][childIndex].name}';
+                                final parentName = attributeMap!.keys
+                                    .elementAt(parentIndex)
+                                    .name;
+                                final childName = attributeMap!.values
+                                    .toList()[parentIndex][childIndex]
+                                    .name;
+                                final name = '$parentName - $childName';
                                 onChanged!(name, value);
                               } else {
                                 onChanged!(

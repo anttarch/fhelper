@@ -31,6 +31,160 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
     ).add_jm().format(date);
   }
 
+  Attribute _displayString(
+    Attribute child,
+    Attribute? parent,
+  ) {
+    final localization = AppLocalizations.of(context)!;
+
+    if (parent != null) {
+      return child.copyWith(
+        name: '${parent.name} - ${child.name}',
+      );
+    }
+    return child.copyWith(
+      name: '${localization.deleted} - ${child.name}',
+    );
+  }
+
+  Widget _cardBillList() {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    return FutureBuilder(
+      future: getCardBillFromId(
+        Isar.getInstance()!,
+        widget.item.typeId,
+      ).then((value) async {
+        final installments = <Exchange>[];
+        for (final id in value!.installmentIdList) {
+          final installment = await Isar.getInstance()!.exchanges.get(id);
+          if (installment != null) {
+            installments.add(installment);
+          }
+        }
+        return {value: installments};
+      }),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final cardBill = snapshot.data!.keys.first;
+          final installments = snapshot.data!.values.first;
+          return Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: Material(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 10,
+                    ),
+                    child: Divider(
+                      height: 4,
+                      thickness: 2,
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                  ),
+                  Text(
+                    localization.installments,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Card(
+                    elevation: 0,
+                    margin: const EdgeInsets.only(top: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                    ),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: cardBill.installmentIdList.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final installmentNumber =
+                            installments[index].description.split('#/spt#/')[0];
+                        final description =
+                            installments[index].description.split('#/spt#/')[1];
+                        return Column(
+                          children: [
+                            ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              leading: const Icon(
+                                Icons.credit_card,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              title: Text(
+                                description,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              subtitle: Text(
+                                NumberFormat.simpleCurrency(
+                                  locale: languageCode,
+                                ).format(
+                                  installments[index].value,
+                                ),
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .inverseSurface,
+                                ),
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    installmentNumber,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .apply(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .tertiary,
+                                        ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_right,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
+                                ],
+                              ),
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute<ExchangeDetailsView>(
+                                  builder: (context) => ExchangeDetailsView(
+                                    item: installments[index],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                      separatorBuilder: (_, __) => Divider(
+                        height: 2,
+                        thickness: 1.5,
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return const CircularProgressIndicator.adaptive();
+      },
+    );
+  }
+
   @override
   void initState() {
     if (widget.item.id == -1) {
@@ -41,6 +195,8 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return ColoredBox(
       color: Theme.of(context).colorScheme.background,
       child: SafeArea(
@@ -60,7 +216,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                       child: Text(
                         isCardBill
                             ? widget.item.description
-                            : AppLocalizations.of(context)!.details,
+                            : localization.details,
                       ),
                     ),
                   ),
@@ -74,8 +230,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                             child: Padding(
                               padding: const EdgeInsets.only(top: 8),
                               child: InputField(
-                                label:
-                                    AppLocalizations.of(context)!.description,
+                                label: localization.description,
                                 placeholder:
                                     widget.item.eType == EType.installment
                                         ? widget.item.description
@@ -106,11 +261,10 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                 : const EdgeInsets.only(top: 20),
                             child: InputField(
                               label: widget.item.value.isNegative
-                                  ? AppLocalizations.of(context)!.price
-                                  : AppLocalizations.of(context)!.amount,
+                                  ? localization.price
+                                  : localization.amount,
                               placeholder: NumberFormat.simpleCurrency(
-                                locale: Localizations.localeOf(context)
-                                    .languageCode,
+                                locale: languageCode,
                               ).format(widget.item.value),
                               readOnly: true,
                               textColor: Color(
@@ -126,7 +280,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
-                              label: AppLocalizations.of(context)!.date,
+                              label: localization.date,
                               placeholder: exchangeDate(widget.item.date),
                               readOnly: true,
                             ),
@@ -146,15 +300,8 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                     value.parentId!,
                                     context: context,
                                   );
-                                  if (parent != null) {
-                                    return value.copyWith(
-                                      name: '${parent.name} - ${value.name}',
-                                    );
-                                  } else if (mounted) {
-                                    return value.copyWith(
-                                      name:
-                                          '${AppLocalizations.of(context)!.deleted} - ${value.name}',
-                                    );
+                                  if (mounted) {
+                                    return _displayString(value, parent);
                                   }
                                 }
                                 return value;
@@ -163,11 +310,10 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label:
-                                        AppLocalizations.of(context)!.type(1),
+                                    label: localization.type(1),
                                     placeholder: snapshot.hasData
                                         ? snapshot.data!.name
-                                        : AppLocalizations.of(context)!.deleted,
+                                        : localization.deleted,
                                     readOnly: true,
                                   ),
                                 );
@@ -186,8 +332,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                 child: Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label:
-                                        AppLocalizations.of(context)!.card(1),
+                                    label: localization.card(1),
                                     placeholder: snapshot.hasData
                                         ? snapshot.data!.name
                                         : '',
@@ -203,8 +348,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: AppLocalizations.of(context)!
-                                        .installments,
+                                    label: localization.installments,
                                     placeholder:
                                         widget.item.installments.toString(),
                                     readOnly: true,
@@ -214,12 +358,9 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                   Padding(
                                     padding: const EdgeInsets.only(top: 20),
                                     child: InputField(
-                                      label: AppLocalizations.of(context)!
-                                          .perInstallmentValue,
+                                      label: localization.perInstallmentValue,
                                       placeholder: NumberFormat.simpleCurrency(
-                                        locale: Localizations.localeOf(
-                                          context,
-                                        ).languageCode,
+                                        locale: languageCode,
                                       ).format(widget.item.installmentValue),
                                       readOnly: true,
                                     ),
@@ -239,15 +380,8 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                     value.parentId!,
                                     context: context,
                                   );
-                                  if (parent != null) {
-                                    return value.copyWith(
-                                      name: '${parent.name} - ${value.name}',
-                                    );
-                                  } else if (mounted) {
-                                    return value.copyWith(
-                                      name:
-                                          '${AppLocalizations.of(context)!.deleted} - ${value.name}',
-                                    );
+                                  if (mounted) {
+                                    return _displayString(value, parent);
                                   }
                                 }
                                 return value;
@@ -257,12 +391,11 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
                                     label: widget.item.eType != EType.transfer
-                                        ? AppLocalizations.of(context)!
-                                            .account(1)
-                                        : AppLocalizations.of(context)!.from,
+                                        ? localization.account(1)
+                                        : localization.from,
                                     placeholder: snapshot.hasData
                                         ? snapshot.data!.name
-                                        : AppLocalizations.of(context)!.deleted,
+                                        : localization.deleted,
                                     readOnly: true,
                                   ),
                                 );
@@ -281,15 +414,8 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                     value.parentId!,
                                     context: context,
                                   );
-                                  if (parent != null) {
-                                    return value.copyWith(
-                                      name: '${parent.name} - ${value.name}',
-                                    );
-                                  } else if (mounted) {
-                                    return value.copyWith(
-                                      name:
-                                          '${AppLocalizations.of(context)!.deleted} - ${value.name}',
-                                    );
+                                  if (mounted) {
+                                    return _displayString(value, parent);
                                   }
                                 }
                                 return value;
@@ -298,198 +424,16 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
                                 return Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: AppLocalizations.of(context)!.to,
+                                    label: localization.to,
                                     placeholder: snapshot.hasData
                                         ? snapshot.data!.name
-                                        : AppLocalizations.of(context)!.deleted,
+                                        : localization.deleted,
                                     readOnly: true,
                                   ),
                                 );
                               },
                             ),
-                          if (widget.item.id == -1)
-                            FutureBuilder(
-                              future: getCardBillFromId(
-                                Isar.getInstance()!,
-                                widget.item.typeId,
-                              ).then((value) async {
-                                final installments = <Exchange>[];
-                                for (final id in value!.installmentIdList) {
-                                  final installment = await Isar.getInstance()!
-                                      .exchanges
-                                      .get(id);
-                                  if (installment != null) {
-                                    installments.add(installment);
-                                  }
-                                }
-                                return {value: installments};
-                              }),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  final cardBill = snapshot.data!.keys.first;
-                                  final installments =
-                                      snapshot.data!.values.first;
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 20),
-                                    child: Material(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                              bottom: 10,
-                                            ),
-                                            child: Divider(
-                                              height: 4,
-                                              thickness: 2,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .outlineVariant,
-                                            ),
-                                          ),
-                                          Text(
-                                            AppLocalizations.of(context)!
-                                                .installments,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleLarge,
-                                          ),
-                                          Card(
-                                            elevation: 0,
-                                            margin:
-                                                const EdgeInsets.only(top: 15),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              side: BorderSide(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outlineVariant,
-                                              ),
-                                            ),
-                                            child: ListView.separated(
-                                              shrinkWrap: true,
-                                              itemCount: cardBill
-                                                  .installmentIdList.length,
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              itemBuilder: (context, index) {
-                                                final installmentNumber =
-                                                    installments[index]
-                                                        .description
-                                                        .split('#/spt#/')[0];
-                                                final description =
-                                                    installments[index]
-                                                        .description
-                                                        .split('#/spt#/')[1];
-                                                return Column(
-                                                  children: [
-                                                    ListTile(
-                                                      contentPadding:
-                                                          const EdgeInsets
-                                                              .symmetric(
-                                                        horizontal: 20,
-                                                      ),
-                                                      leading: const Icon(
-                                                        Icons.credit_card,
-                                                      ),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                      ),
-                                                      title: Text(
-                                                        description,
-                                                        style: Theme.of(context)
-                                                            .textTheme
-                                                            .bodyLarge,
-                                                      ),
-                                                      subtitle: Text(
-                                                        NumberFormat
-                                                            .simpleCurrency(
-                                                          locale: Localizations
-                                                              .localeOf(
-                                                            context,
-                                                          ).languageCode,
-                                                        ).format(
-                                                          installments[index]
-                                                              .value,
-                                                        ),
-                                                        style: TextStyle(
-                                                          color: Theme.of(
-                                                            context,
-                                                          )
-                                                              .colorScheme
-                                                              .inverseSurface,
-                                                        ),
-                                                      ),
-                                                      trailing: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          Text(
-                                                            installmentNumber,
-                                                            style: Theme.of(
-                                                              context,
-                                                            )
-                                                                .textTheme
-                                                                .bodyMedium!
-                                                                .apply(
-                                                                  color: Theme
-                                                                          .of(
-                                                                    context,
-                                                                  )
-                                                                      .colorScheme
-                                                                      .tertiary,
-                                                                ),
-                                                          ),
-                                                          Icon(
-                                                            Icons.arrow_right,
-                                                            color: Theme.of(
-                                                              context,
-                                                            )
-                                                                .colorScheme
-                                                                .onSurface,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      onTap: () =>
-                                                          Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute<
-                                                            ExchangeDetailsView>(
-                                                          builder: (context) =>
-                                                              ExchangeDetailsView(
-                                                            item: installments[
-                                                                index],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                              separatorBuilder: (_, __) =>
-                                                  Divider(
-                                                height: 2,
-                                                thickness: 1.5,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .outlineVariant,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                }
-                                return const CircularProgressIndicator
-                                    .adaptive();
-                              },
-                            ),
+                          if (widget.item.id == -1) _cardBillList(),
                         ],
                       ),
                     ),
@@ -502,7 +446,7 @@ class _ExchangeDetailsViewState extends State<ExchangeDetailsView> {
               child: FilledButton.tonalIcon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back),
-                label: Text(AppLocalizations.of(context)!.back),
+                label: Text(localization.back),
               ),
             ),
           ],

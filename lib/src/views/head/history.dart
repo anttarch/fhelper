@@ -5,11 +5,11 @@ import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
+import 'package:fhelper/src/logic/widgets/show_selector_bottom_sheet.dart';
 import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/card_details.dart';
 import 'package:fhelper/src/widgets/historylist.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
-import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -31,6 +31,194 @@ class _HistoryPageState extends State<HistoryPage> {
 
   final Map<Time, int> _indexMap = {Time.today: 0, Time.week: 1, Time.month: 2};
 
+  Widget _pendingCardBills(Map<String, List<double>> cardsValues) {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Divider(
+            height: 4,
+            thickness: 2,
+            color: Theme.of(context).colorScheme.tertiary,
+          ),
+        ),
+        Card(
+          child: ListView.separated(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: cardsValues.entries.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                title: Text(
+                  cardsValues.keys.elementAt(index),
+                ),
+                subtitle: Text(
+                  NumberFormat.simpleCurrency(
+                    locale: languageCode,
+                  ).format(
+                    cardsValues.isNotEmpty
+                        ? cardsValues.values.elementAt(index).first
+                        : 0,
+                  ),
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    color: const Color(0xffbd1c1c).harmonizeWith(
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+                onTap: () async {
+                  final isar = Isar.getInstance()!;
+                  final cardId =
+                      cardsValues.values.elementAt(index).last.toInt();
+                  final card = await isar.cards.get(cardId);
+                  if (mounted) {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute<CardDetailsView>(
+                        builder: (context) => CardDetailsView(
+                          card: card!,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                trailing: IconButton.filled(
+                  onPressed: () async {
+                    var accountId = (-1, -1);
+                    final controller = TextEditingController();
+                    final accounts = await getAttributes(
+                      Isar.getInstance()!,
+                      AttributeType.account,
+                      context: context,
+                    ).then((value) {
+                      value.removeWhere(
+                        (_, value) => value.isEmpty,
+                      );
+                      return value;
+                    });
+                    if (mounted) {
+                      await showSelectorBottomSheet<(String, (int, int))>(
+                        context: context,
+                        groupValue: accountId,
+                        title: localization.selectAccount,
+                        onSelect: (name, value) {
+                          accountId = value! as (int, int);
+                          Navigator.pop(context, (name, accountId));
+                        },
+                        attributeMap: accounts,
+                        action: TextButton.icon(
+                          onPressed: () => showAttributeDialog<void>(
+                            context: context,
+                            attributeType: AttributeType.account,
+                            attributeRole: AttributeRole.child,
+                            controller: controller,
+                          ).then((_) => controller.clear()),
+                          icon: const Icon(Icons.add),
+                          label: Text(localization.add),
+                        ),
+                      ).then(
+                        (accountRecord) async {
+                          if (accountRecord != null) {
+                            await showDialog<void>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    localization.confirmPayQuestion,
+                                  ),
+                                  content: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        localization.irreversibleAction,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: InputField(
+                                          label: localization.account(1),
+                                          readOnly: true,
+                                          placeholder: accountRecord.$1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text(localization.cancel),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        final isar = Isar.getInstance()!;
+                                        final cardId = cardsValues.values
+                                            .elementAt(index)
+                                            .last
+                                            .toInt();
+                                        final bill =
+                                            await isar.cardBills.get(cardId);
+                                        final account = accounts.entries
+                                            .elementAt(accountRecord.$2.$1)
+                                            .value
+                                            .elementAt(accountRecord.$2.$2);
+                                        if (bill != null) {
+                                          final newBill = bill.copyWith(
+                                            accountId: account.id,
+                                            confirmed: true,
+                                          );
+                                          await isar.writeTxn(() async {
+                                            await isar.cardBills.put(newBill);
+                                          }).then(
+                                            (_) => Navigator.pop(context),
+                                          );
+                                        }
+                                      },
+                                      child: Text(localization.confirm),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        },
+                      );
+                    }
+                  },
+                  icon: Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              );
+            },
+            separatorBuilder: (_, __) => Divider(
+              height: 2,
+              thickness: 1.5,
+              indent: 16,
+              endIndent: 16,
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -39,6 +227,8 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -50,7 +240,7 @@ class _HistoryPageState extends State<HistoryPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                 child: Text(
-                  AppLocalizations.of(context)!.showOnly,
+                  localization.showOnly,
                   textAlign: TextAlign.start,
                   style: Theme.of(context).textTheme.labelMedium,
                 ),
@@ -61,15 +251,15 @@ class _HistoryPageState extends State<HistoryPage> {
                   segments: [
                     ButtonSegment(
                       value: Time.today,
-                      label: Text(AppLocalizations.of(context)!.today),
+                      label: Text(localization.today),
                     ),
                     ButtonSegment(
                       value: Time.week,
-                      label: Text(AppLocalizations.of(context)!.week),
+                      label: Text(localization.week),
                     ),
                     ButtonSegment(
                       value: Time.month,
-                      label: Text(AppLocalizations.of(context)!.month),
+                      label: Text(localization.month),
                     ),
                   ],
                   selected: {_time},
@@ -105,7 +295,8 @@ class _HistoryPageState extends State<HistoryPage> {
                           finalValue += bill.value;
                         }
                       }
-                      // This still is necessary to avoid calling context across async gaps
+                      // This still is necessary to avoid calling context across
+                      // async gaps
                       if (!mounted) {
                         return {
                           '': [finalValue]
@@ -145,9 +336,8 @@ class _HistoryPageState extends State<HistoryPage> {
                             child: Column(
                               children: [
                                 Semantics(
-                                  label: AppLocalizations.of(context)!
-                                      .totalValueHistoryCard(
-                                    AppLocalizations.of(context)!
+                                  label: localization.totalValueHistoryCard(
+                                    localization
                                         .dateSelector(_indexMap[_time]!),
                                     snapshot.hasData
                                         ? snapshot.data!.values.first.first
@@ -160,7 +350,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        AppLocalizations.of(context)!
+                                        localization
                                             .dateSelector(_indexMap[_time]!),
                                         textAlign: TextAlign.start,
                                         style: Theme.of(context)
@@ -187,9 +377,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                           ),
                                           child: Text(
                                             NumberFormat.simpleCurrency(
-                                              locale: Localizations.localeOf(
-                                                context,
-                                              ).languageCode,
+                                              locale: languageCode,
                                             ).format(
                                               snapshot.hasData
                                                   ? snapshot
@@ -225,310 +413,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                   ),
                                 ),
                                 if (cardsValues.isNotEmpty)
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Divider(
-                                          height: 4,
-                                          thickness: 2,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .tertiary,
-                                        ),
-                                      ),
-                                      Card(
-                                        child: ListView.separated(
-                                          shrinkWrap: true,
-                                          padding: EdgeInsets.zero,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          itemCount: cardsValues.entries.length,
-                                          itemBuilder: (context, index) {
-                                            return ListTile(
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 10,
-                                              ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              title: Text(
-                                                cardsValues.keys
-                                                    .elementAt(index),
-                                              ),
-                                              subtitle: Text(
-                                                NumberFormat.simpleCurrency(
-                                                  locale:
-                                                      Localizations.localeOf(
-                                                    context,
-                                                  ).languageCode,
-                                                ).format(
-                                                  snapshot.hasData
-                                                      ? cardsValues.values
-                                                          .elementAt(index)
-                                                          .first
-                                                      : 0,
-                                                ),
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                  color: const Color(0xffbd1c1c)
-                                                      .harmonizeWith(
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .primary,
-                                                  ),
-                                                ),
-                                              ),
-                                              onTap: () async {
-                                                final isar =
-                                                    Isar.getInstance()!;
-                                                final cardId = cardsValues
-                                                    .values
-                                                    .elementAt(index)
-                                                    .last
-                                                    .toInt();
-                                                final card = await isar.cards
-                                                    .get(cardId);
-                                                if (mounted) {
-                                                  await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute<
-                                                        CardDetailsView>(
-                                                      builder: (context) =>
-                                                          CardDetailsView(
-                                                        card: card!,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                              trailing: IconButton.filled(
-                                                onPressed: () async {
-                                                  var accountId = (-1, -1);
-                                                  final controller =
-                                                      TextEditingController();
-                                                  final accounts =
-                                                      await getAttributes(
-                                                    Isar.getInstance()!,
-                                                    AttributeType.account,
-                                                    context: context,
-                                                  ).then((value) {
-                                                    value.removeWhere(
-                                                      (_, value) =>
-                                                          value.isEmpty,
-                                                    );
-                                                    return value;
-                                                  });
-                                                  if (mounted) {
-                                                    await showModalBottomSheet<
-                                                        (String, (int, int))>(
-                                                      context: context,
-                                                      constraints:
-                                                          BoxConstraints(
-                                                        minHeight:
-                                                            MediaQuery.of(
-                                                                  context,
-                                                                ).size.height /
-                                                                3,
-                                                      ),
-                                                      enableDrag: false,
-                                                      builder: (context) {
-                                                        return StatefulBuilder(
-                                                          builder: (
-                                                            context,
-                                                            setState,
-                                                          ) {
-                                                            return Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              children: [
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .fromLTRB(
-                                                                    20,
-                                                                    20,
-                                                                    20,
-                                                                    0,
-                                                                  ),
-                                                                  child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      Text(
-                                                                        AppLocalizations.of(context)!
-                                                                            .selectAccount,
-                                                                        style: Theme.of(context)
-                                                                            .textTheme
-                                                                            .titleLarge,
-                                                                      ),
-                                                                      TextButton
-                                                                          .icon(
-                                                                        onPressed:
-                                                                            () =>
-                                                                                showAttributeDialog<void>(
-                                                                          context:
-                                                                              context,
-                                                                          attributeType:
-                                                                              AttributeType.account,
-                                                                          attributeRole:
-                                                                              AttributeRole.child,
-                                                                          controller:
-                                                                              controller,
-                                                                        ).then(
-                                                                          (_) =>
-                                                                              controller.clear(),
-                                                                        ),
-                                                                        icon:
-                                                                            const Icon(
-                                                                          Icons
-                                                                              .add,
-                                                                        ),
-                                                                        label:
-                                                                            Text(
-                                                                          AppLocalizations.of(context)!
-                                                                              .add,
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                ListChoice(
-                                                                  groupValue:
-                                                                      accountId,
-                                                                  onChanged: (
-                                                                    name,
-                                                                    value,
-                                                                  ) {
-                                                                    accountId =
-                                                                        value!
-                                                                            as (
-                                                                      int,
-                                                                      int
-                                                                    );
-                                                                    Navigator
-                                                                        .pop(
-                                                                      context,
-                                                                      (
-                                                                        name,
-                                                                        accountId
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                  attributeMap:
-                                                                      accounts,
-                                                                ),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                                    ).then(
-                                                      (accountRecord) async =>
-                                                          accountRecord != null
-                                                              ? await showDialog<
-                                                                  void>(
-                                                                  context:
-                                                                      context,
-                                                                  builder:
-                                                                      (context) {
-                                                                    return AlertDialog(
-                                                                      title:
-                                                                          Text(
-                                                                        AppLocalizations.of(context)!
-                                                                            .confirmPayQuestion,
-                                                                      ),
-                                                                      content:
-                                                                          Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        mainAxisSize:
-                                                                            MainAxisSize.min,
-                                                                        children: [
-                                                                          Text(
-                                                                            AppLocalizations.of(context)!.irreversibleAction,
-                                                                            style:
-                                                                                Theme.of(context).textTheme.bodyLarge,
-                                                                          ),
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(top: 10),
-                                                                            child:
-                                                                                InputField(
-                                                                              label: AppLocalizations.of(context)!.account(1),
-                                                                              readOnly: true,
-                                                                              placeholder: accountRecord.$1,
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                      actions: [
-                                                                        TextButton(
-                                                                          onPressed: () =>
-                                                                              Navigator.pop(context),
-                                                                          child:
-                                                                              Text(AppLocalizations.of(context)!.cancel),
-                                                                        ),
-                                                                        TextButton(
-                                                                          onPressed:
-                                                                              () async {
-                                                                            final isar =
-                                                                                Isar.getInstance()!;
-                                                                            final cardId =
-                                                                                cardsValues.values.elementAt(index).last.toInt();
-                                                                            final bill =
-                                                                                await isar.cardBills.get(cardId);
-                                                                            final account =
-                                                                                accounts.entries.elementAt(accountRecord.$2.$1).value.elementAt(accountRecord.$2.$2);
-                                                                            if (bill !=
-                                                                                null) {
-                                                                              final newBill = bill.copyWith(accountId: account.id, confirmed: true);
-                                                                              await isar.writeTxn(() async {
-                                                                                await isar.cardBills.put(newBill);
-                                                                              }).then((_) => Navigator.pop(context));
-                                                                            }
-                                                                          },
-                                                                          child:
-                                                                              Text(AppLocalizations.of(context)!.confirm),
-                                                                        ),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                )
-                                                              : null,
-                                                    );
-                                                  }
-                                                },
-                                                icon: Icon(
-                                                  Icons.check,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onPrimary,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          separatorBuilder: (_, __) => Divider(
-                                            height: 2,
-                                            thickness: 1.5,
-                                            indent: 16,
-                                            endIndent: 16,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .outlineVariant,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  _pendingCardBills(cardsValues),
                               ],
                             ),
                           ),
@@ -571,21 +456,27 @@ class _HistoryPageState extends State<HistoryPage> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       if (_indexMap[_time]! != 0) {
-                        // This function separates the raw result of `getExchanges()` into days,
-                        // while doing the calculation for the total value of each day
+                        // This function separates the raw result of
+                        // `getExchanges()` into days, while doing the
+                        // calculation for the total value of each day
                         //
-                        // First it collects every day available from `getExchanges()` result
-                        // maping each day number to a dummy value, then it cycles through the
-                        // map (`days`) and the snapshot list finding which exchange was made in
-                        // each day and adding to the final list (`exchangeLists`) while summing
-                        // the exchange's value on top of the dummy value of `days`
+                        // First it collects every day available from
+                        // `getExchanges()` result maping each day number to a
+                        // dummy value, then it cycles through the map (`days`)
+                        // and the snapshot list finding which exchange was made
+                        // in each day and adding to the final list
+                        // (`exchangeLists`) while summing the exchange's value
+                        // on top of the dummy value of `days`
                         //
-                        // This approach can only be done for defined periods of time that will "reset"
-                        // like weeks and months
-                        // Also its (logicaly) limited to a max of `DateTime.now()`, so probably won't work on
-                        // dates on the future  (not tested)
-                        // The overhead for processing multiple exchanges with multiple days is presumed
-                        // to be high (not tested)
+                        // This approach can only be done for defined periods of
+                        // time that will "reset" like weeks and months
+                        //
+                        // Also its (logicaly) limited to a max of
+                        // `DateTime.now()`, so probably won't work on dates on
+                        // the future (not tested)
+                        //
+                        // The overhead for processing multiple exchanges with
+                        // multiple days is presumed to be high (not tested)
                         final days = <int, double>{};
                         final exchangeLists = <List<Exchange>>[];
                         for (final exchange in snapshot.data!) {
@@ -613,6 +504,24 @@ class _HistoryPageState extends State<HistoryPage> {
                             }
                           }
                         }
+                        DateTime date(int day) => DateTime(
+                              DateTime.now().year,
+                              DateTime.now().month,
+                              day,
+                            );
+                        String day(int index) =>
+                            days.keys.toList()[index] == DateTime.now().day
+                                ? localization.today
+                                : days.keys.toList()[index] ==
+                                        DateTime.now().day - 1
+                                    ? localization.yesterday
+                                    : _indexMap[_time]! == 1
+                                        ? DateFormat.EEEE(languageCode).format(
+                                            date(days.keys.toList()[index]),
+                                          )
+                                        : localization.historyListDayDate(
+                                            date(days.keys.toList()[index]),
+                                          );
                         return Card(
                           elevation: 0,
                           margin: const EdgeInsets.symmetric(horizontal: 22),
@@ -638,33 +547,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                   ),
-                                  day: days.keys.toList()[index] ==
-                                          DateTime.now().day
-                                      ? AppLocalizations.of(context)!.today
-                                      : days.keys.toList()[index] ==
-                                              DateTime.now().day - 1
-                                          ? AppLocalizations.of(context)!
-                                              .yesterday
-                                          : _indexMap[_time]! == 1
-                                              ? DateFormat.EEEE(
-                                                  Localizations.localeOf(
-                                                    context,
-                                                  ).languageCode,
-                                                ).format(
-                                                  DateTime(
-                                                    DateTime.now().year,
-                                                    DateTime.now().month,
-                                                    days.keys.toList()[index],
-                                                  ),
-                                                )
-                                              : AppLocalizations.of(context)!
-                                                  .historyListDayDate(
-                                                  DateTime(
-                                                    DateTime.now().year,
-                                                    DateTime.now().month,
-                                                    days.keys.toList()[index],
-                                                  ),
-                                                ),
+                                  day: day(index),
                                   dayTotal: days.values.toList()[index],
                                   items: exchangeLists[index],
                                 );

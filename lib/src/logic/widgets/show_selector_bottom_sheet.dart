@@ -8,6 +8,8 @@ Future<T?> showSelectorBottomSheet<T>({
   required Object groupValue,
   required String title,
   required void Function(String?, Object?)? onSelect,
+  (int, int)? hiddenIndex,
+  Widget? action,
   Map<Attribute, List<Attribute>>? attributeMap,
   bool attributeListBehavior = false,
   List<int>? intList,
@@ -25,9 +27,16 @@ Future<T?> showSelectorBottomSheet<T>({
             children: [
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleLarge,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    action ?? const SizedBox.shrink(),
+                  ],
                 ),
               ),
               ListChoice(
@@ -37,6 +46,7 @@ Future<T?> showSelectorBottomSheet<T>({
                 attributeListBehavior: attributeListBehavior,
                 intList: intList,
                 cardList: cardList,
+                hiddenIndex: hiddenIndex,
               )
             ],
           );

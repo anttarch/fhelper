@@ -30,7 +30,7 @@ class ExpandablePageView extends StatefulWidget {
   final void Function(int)? onPageChanged;
 
   @override
-  _ExpandablePageViewState createState() => _ExpandablePageViewState();
+  State<ExpandablePageView> createState() => _ExpandablePageViewState();
 }
 
 class _ExpandablePageViewState extends State<ExpandablePageView> {
@@ -87,7 +87,8 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
         (index, child) => MapEntry(
           index,
           OverflowBox(
-            //needed, so that parent won't impose its constraints on the children, thus skewing the measurement results.
+            //needed, so that parent won't impose its constraints on the
+            //children, thus skewing the measurement results.
             minHeight: 0,
             maxHeight: double.infinity,
             alignment: Alignment.topCenter,
@@ -113,7 +114,7 @@ class SizeReportingWidget extends StatefulWidget {
   final ValueChanged<Size> onSizeChange;
 
   @override
-  _SizeReportingWidgetState createState() => _SizeReportingWidgetState();
+  State<SizeReportingWidget> createState() => _SizeReportingWidgetState();
 }
 
 class _SizeReportingWidgetState extends State<SizeReportingWidget> {

@@ -10,7 +10,7 @@ extension IntFunctions on int {
   }
 }
 
-// TODO: add l10n to bills
+// TODO(anttarch): add l10n to bills
 Future<Exchange?> getLatest(
   Isar isar, {
   int? attributeId,

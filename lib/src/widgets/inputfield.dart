@@ -17,7 +17,10 @@ class InputField extends StatelessWidget {
     this.suffixStyle,
     this.textColor,
     this.validator,
-  }) : assert(!(controller != null && placeholder != null));
+  }) : assert(
+          !(controller != null && placeholder != null),
+          'Cannot handle a controller and a placeholder at the same time',
+        );
   final TextEditingController? controller;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType keyboardType;

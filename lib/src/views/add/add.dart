@@ -267,9 +267,7 @@ class _AddViewState extends State<AddView> {
                                     (_) => textController[3].clear(),
                                   ),
                                   icon: const Icon(Icons.add),
-                                  label: Text(
-                                    localization.add,
-                                  ),
+                                  label: Text(localization.add),
                                 ),
                               ).then(
                                 (name) => _typeId != (-1, -1) && name != null

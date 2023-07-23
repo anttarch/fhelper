@@ -29,7 +29,6 @@ Future<T?> showSelectorBottomSheet<T>({
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       title,

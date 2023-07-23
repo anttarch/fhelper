@@ -89,36 +89,33 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(
   final attributeMap = <Attribute, List<Attribute>>{};
   if (attributes.isNotEmpty) {
     for (final attribute in attributes) {
+      Attribute? l10nAttribute;
       // Handle l10n
       if (context != null) {
         // check if the attribute can be translated (default attribute)
         if (attribute.id.between(0, 23) &&
             context.mounted &&
             attribute.name.contains('#/str#/')) {
-          final index = attributes.indexOf(attribute);
-
           // replaces name with l10n string
-          final newAttribute = attribute.copyWith(
+          l10nAttribute = attribute.copyWith(
             name: translatedDefaultAttribute(context, attribute.id),
           );
-
-          // update list
-          attributes.replaceRange(index, index + 1, [newAttribute]);
         }
       }
 
       // Handle roles
       if (attribute.role == AttributeRole.parent) {
         // adds parent to map
-        attributeMap.addAll({attribute: []});
+        attributeMap.addAll({l10nAttribute ?? attribute: []});
       } else {
         // get parent
-        final parent = attributeMap.keys
-            .singleWhere((element) => element.id == attribute.parentId);
+        final parent = attributeMap.keys.singleWhere(
+          (element) => element.id == (l10nAttribute ?? attribute).parentId,
+        );
 
         // add child to parent's value on map
         attributeMap.update(parent, (value) {
-          final list = <Attribute>[...value, attribute]
+          final list = <Attribute>[...value, l10nAttribute ?? attribute]
             ..sort((a, b) => unorm.nfd(a.name).compareTo(unorm.nfd(b.name)));
           return value = list;
         });

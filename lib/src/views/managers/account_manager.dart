@@ -147,7 +147,7 @@ class _AccountManagerState extends State<AccountManager> {
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                   shape: wid_utils.getShapeBorder(
                     childIndex,
-                    attributes.length - 1,
+                    attributes.values.toList()[parentIndex].length - 1,
                   ),
                   tileColor: selectedIndex == (parentIndex, childIndex)
                       ? Theme.of(context).colorScheme.surfaceVariant

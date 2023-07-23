@@ -70,6 +70,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
         Isar.getInstance()!,
         attributeId: widget.attribute.id,
         attributeType: widget.attribute.type,
+        context: context,
       ).then((value) async {
         if (value != null && value.eType == EType.transfer) {
           final transfer = value.copyWith(

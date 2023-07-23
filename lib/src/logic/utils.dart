@@ -2,6 +2,8 @@ import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:isar/isar.dart';
 
 extension IntFunctions on int {
@@ -10,9 +12,9 @@ extension IntFunctions on int {
   }
 }
 
-// TODO(anttarch): add l10n to bills
 Future<Exchange?> getLatest(
   Isar isar, {
+  required BuildContext context,
   int? attributeId,
   AttributeType? attributeType,
 }) async {
@@ -95,10 +97,21 @@ Future<Exchange?> getLatest(
       }
       card = await fhelper.getCardFromId(isar, latestPaidCardBill.cardId);
       // returns an exchange with the cardbill values
+      if (context.mounted) {
+        return Exchange(
+          id: -1,
+          accountId: latestPaidCardBill.accountId,
+          description: AppLocalizations.of(context)!.cardBill(card!.name),
+          date: latestPaidCardBill.date,
+          eType: EType.expense,
+          typeId: latestPaidCardBill.id,
+          value: value,
+        );
+      }
       return Exchange(
         id: -1,
         accountId: latestPaidCardBill.accountId,
-        description: "${card!.name}'s bill",
+        description: card!.name,
         date: latestPaidCardBill.date,
         eType: EType.expense,
         typeId: latestPaidCardBill.id,

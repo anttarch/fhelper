@@ -10,6 +10,7 @@
     "billDescriptor": "Conta:",
     "cancel": "Cancelar",
     "card": "{count, plural, =1{Cartão} other{Cartões}}",
+    "cardBill": "Conta {name}",
     "cardHistory": "Histórico {name}",
     "clear": "Limpar",
     "confirm": "Confirmar",

@@ -53,7 +53,8 @@ class HomePage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               FutureBuilder(
-                future: getLatest(Isar.getInstance()!).then((value) async {
+                future: getLatest(Isar.getInstance()!, context: context)
+                    .then((value) async {
                   if (value != null && value.eType == EType.transfer) {
                     final transfer = value.copyWith(
                       description:

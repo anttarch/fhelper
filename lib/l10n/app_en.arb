@@ -34,6 +34,14 @@
             }
         }
     },
+    "cardBill": "{name}'s bill",
+    "@cardBill": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
     "cardHistory": "{name}'s history",
     "@cardHistory": {
         "placeholders": {

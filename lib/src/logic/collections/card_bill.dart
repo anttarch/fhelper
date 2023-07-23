@@ -1,6 +1,7 @@
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:isar/isar.dart';
 
 part 'card_bill.g.dart';
@@ -220,17 +221,19 @@ Future<List<Exchange>> getCardBillsAsExchanges(
         }
       }
       card = await fhelper.getCardFromId(isar, bill.cardId);
-      cardBillExchange.add(
-        Exchange(
-          id: -1,
-          accountId: bill.accountId,
-          description: "${card!.name}'s bill",
-          date: bill.date,
-          eType: EType.expense,
-          typeId: bill.id,
-          value: value,
-        ),
-      );
+      if (context.mounted) {
+        cardBillExchange.add(
+          Exchange(
+            id: -1,
+            accountId: bill.accountId,
+            description: AppLocalizations.of(context)!.cardBill(card!.name),
+            date: bill.date,
+            eType: EType.expense,
+            typeId: bill.id,
+            value: value,
+          ),
+        );
+      }
     }
   }
 

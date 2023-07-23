@@ -1,4 +1,4 @@
-package com.ynotnaZiul.fhelper
+package com.anttarch.fhelper
 
 import io.flutter.embedding.android.FlutterActivity
 

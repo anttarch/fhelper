@@ -10,6 +10,7 @@
 - Remove account dependency from cards (0d4d4685191442b2a0585876258f656dc1af5277)
 - Fixed an bug related to confirmed card bills (871d97a1a0b8a0f38d3c2279627fdf35ca1a8537)
 - UI tweaks (ab53d40c838058368e7b2f9c4e65febea1452ca1)
+- Add l10n for Card Bill strings (e7366b214145d62a48fd3e7e04b579e6cf0270b0)
 
 ## Release v1.1.0+1 (bugfix) (28/05/2023) - **Latest**  
 - Fixed week related actions (250cff726039041d98625182e195f85a94e7e920)

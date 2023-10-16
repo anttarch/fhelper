@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## Release v0.2.0 (16/10/2023) - **Latest**
 - Fixed some padding issues 
 - Fixed wrong bill value display
 - Show next bill value and history in card details 
@@ -12,7 +12,7 @@
 - UI tweaks 
 - Add l10n for Card Bill strings 
 
-## Release v0.1.0+1 (bugfix) (28/05/2023) - **Latest**  
+## Release v0.1.0+1 (bugfix) (28/05/2023)
 - Fixed week related actions 
 - Fixed non-translated string on Transfer page 
 - Fixed color display on installment price 

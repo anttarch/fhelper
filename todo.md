@@ -1,24 +1,6 @@
 # TODO - Next
 
 ## General UI
-- [x] Fix some padding issues
-
-## Cards Management
-- [x] Show next bill information on CardDetailsView (at least value)
-- [x] Ask for an account for payment
-  - [x] Remove account root dependency
-
-## Features
-- [x] Add subaccounts
-  - [x] Basic function
-- [x] Add subtypes
-  - [x] Type handling (update, delete)
-  - [x] Type display
-  - [x] Type adding
-
-# TODO - 0.x.x
-
-## General UI
 - [ ] Add multi-select
     - [ ] Add bulk delete
     - Allows for selecting more than one property at a time (mr. obivious)
@@ -31,9 +13,7 @@
 
 ## Cards Management
 - [ ] Add minimum payment support
-    - Right now (1.1.0), paying the minimum amount of a credit card bill is not supported, this feature will allow this
-
-# TODO - undefined
+    - Right now (latest), paying the minimum amount of a credit card bill is not supported, this feature will allow this
 
 ## Home Page
 - [ ] Add graph to today summary (optional)
@@ -42,7 +22,7 @@
 - [ ] Add migration (on delete action) for types and accounts
     - [ ] Handle transfers
     - Results in migration from accounts intended for deletion, it needs to handle transfers and cards, as well as the general exchange
-    - Right now (1.1.0), the default (and only) behavior is leaving this transactions on a kind of "limbo" where they have no account associated
+    - Right now (latest), the default (and only) behavior is leaving this transactions on a kind of "limbo" where they have no account associated
     (this allows for recovery, once this feature is implemented)
 
 ## Other

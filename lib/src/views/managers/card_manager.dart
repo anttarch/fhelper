@@ -82,7 +82,7 @@ class _CardManagerState extends State<CardManager> {
             }
           },
           child: Text(localization.proceed),
-        )
+        ),
       ],
     );
   }
@@ -124,7 +124,7 @@ class _CardManagerState extends State<CardManager> {
                             : null,
                       ),
                     ),
-                  )
+                  ),
               ],
             ),
             SliverToBoxAdapter(

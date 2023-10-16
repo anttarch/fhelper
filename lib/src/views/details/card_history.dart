@@ -116,7 +116,7 @@ class _CardHistoryState extends State<CardHistory> {
                               openIndex == index
                                   ? Icons.arrow_drop_down
                                   : Icons.arrow_drop_up,
-                            )
+                            ),
                           ],
                         ),
                         shape: RoundedRectangleBorder(

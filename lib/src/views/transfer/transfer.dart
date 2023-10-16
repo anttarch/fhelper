@@ -247,7 +247,7 @@ class _TransferViewState extends State<TransferView> {
                                 inputFormatters: [
                                   CurrencyInputFormatter(
                                     locale: languageCode,
-                                  )
+                                  ),
                                 ],
                                 validator: (value) {
                                   final numberValue =
@@ -319,7 +319,7 @@ class _TransferViewState extends State<TransferView> {
                       icon: const Icon(Icons.swap_horiz),
                       label: Text(localization.transfer),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

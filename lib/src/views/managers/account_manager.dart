@@ -114,7 +114,7 @@ class _AccountManagerState extends State<AccountManager> {
                                   });
                                 },
                                 child: Text(localization.delete),
-                              )
+                              ),
                             ],
                           );
                         },
@@ -123,7 +123,7 @@ class _AccountManagerState extends State<AccountManager> {
                     icon: const Icon(Icons.delete_forever),
                   ),
                 ],
-              )
+              ),
             ],
           ),
           Card(
@@ -270,7 +270,7 @@ class _AccountManagerState extends State<AccountManager> {
             }
           },
           child: Text(localization.proceed),
-        )
+        ),
       ],
     );
   }
@@ -318,7 +318,7 @@ class _AccountManagerState extends State<AccountManager> {
                             : null,
                       ),
                     ),
-                  )
+                  ),
               ],
             ),
             SliverToBoxAdapter(

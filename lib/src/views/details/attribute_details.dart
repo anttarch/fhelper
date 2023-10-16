@@ -176,7 +176,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                         child: Text(
                           localization.details,
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -250,7 +250,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }

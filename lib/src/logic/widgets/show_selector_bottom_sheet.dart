@@ -46,7 +46,7 @@ Future<T?> showSelectorBottomSheet<T>({
                 intList: intList,
                 cardList: cardList,
                 hiddenIndex: hiddenIndex,
-              )
+              ),
             ],
           );
         },

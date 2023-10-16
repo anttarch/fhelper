@@ -152,7 +152,7 @@ Future<Map<String, List<double>>> getPendingCardBills(
         }
       }
       nameValue.addAll({
-        card!.name: [value, card.id.toDouble()]
+        card!.name: [value, card.id.toDouble()],
       });
     }
   }

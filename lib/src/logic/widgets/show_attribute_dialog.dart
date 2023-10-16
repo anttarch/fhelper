@@ -128,7 +128,7 @@ Future<T?> showAttributeDialog<T>({
                                   .colorScheme
                                   .onErrorContainer,
                             ),
-                      )
+                      ),
                     ],
                   ),
                 ),

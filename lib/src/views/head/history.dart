@@ -299,7 +299,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       // async gaps
                       if (!mounted) {
                         return {
-                          '': [finalValue]
+                          '': [finalValue],
                         };
                       }
                       return {
@@ -308,7 +308,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           isar,
                           context,
                           time: _indexMap[_time]!,
-                        )
+                        ),
                       };
                     }
                     return {'': <double>[]};

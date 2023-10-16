@@ -119,7 +119,7 @@ class _TypeManagerState extends State<TypeManager> {
                                   });
                                 },
                                 child: Text(localization.delete),
-                              )
+                              ),
                             ],
                           );
                         },
@@ -128,7 +128,7 @@ class _TypeManagerState extends State<TypeManager> {
                     icon: const Icon(Icons.delete_forever),
                   ),
                 ],
-              )
+              ),
             ],
           ),
           Card(
@@ -270,7 +270,7 @@ class _TypeManagerState extends State<TypeManager> {
             }
           },
           child: Text(localization.proceed),
-        )
+        ),
       ],
     );
   }
@@ -333,7 +333,7 @@ class _TypeManagerState extends State<TypeManager> {
                               : null,
                         ),
                       ),
-                    )
+                    ),
                 ],
               ),
               SliverToBoxAdapter(

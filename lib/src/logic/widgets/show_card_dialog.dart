@@ -233,7 +233,7 @@ Future<void> showCardForm({
                                 CurrencyInputFormatter(
                                   locale: Localizations.localeOf(context)
                                       .languageCode,
-                                )
+                                ),
                               ],
                               validator: (value) {
                                 final parsedValue = value!.replaceAll(

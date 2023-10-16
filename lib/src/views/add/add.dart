@@ -157,7 +157,7 @@ class _AddViewState extends State<AddView> {
                           inputFormatters: [
                             CurrencyInputFormatter(
                               locale: languageCode,
-                            )
+                            ),
                           ],
                           validator: (value) {
                             final price = textController[1]
@@ -428,7 +428,7 @@ class _AddViewState extends State<AddView> {
                                       inputFormatters: [
                                         CurrencyInputFormatter(
                                           locale: languageCode,
-                                        )
+                                        ),
                                       ],
                                       validator: (value) {
                                         if (value!.isEmpty) {
@@ -603,7 +603,7 @@ class _AddViewState extends State<AddView> {
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

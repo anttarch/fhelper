@@ -163,7 +163,7 @@ class HomePage extends StatelessWidget {
                                 ),
                               ),
                               child: Text(localization.details),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -248,7 +248,7 @@ class HomePage extends StatelessWidget {
                                           ConnectionState.waiting)
                                     const CircularProgressIndicator.adaptive()
                                   else
-                                    const Text('OOPS')
+                                    const Text('OOPS'),
                                 ],
                               ),
                             ),

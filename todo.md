@@ -16,7 +16,7 @@
   - [x] Type display
   - [x] Type adding
 
-# TODO - 1.x.x
+# TODO - 0.x.x
 
 ## General UI
 - [ ] Add multi-select

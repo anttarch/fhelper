@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/utils.dart';
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -11,7 +12,7 @@ import 'package:isar/isar.dart';
 enum Period { today, allTime }
 
 class AttributeDetailsView extends StatefulWidget {
-  const AttributeDetailsView({super.key, required this.attribute});
+  const AttributeDetailsView({required this.attribute, super.key});
   final Attribute attribute;
 
   @override
@@ -23,7 +24,9 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
 
   Color _getColor(BuildContext context, Exchange? exchange) {
     if (exchange != null) {
-      Color valueColor = Color(exchange.value.isNegative ? 0xffbd1c1c : 0xff199225).harmonizeWith(Theme.of(context).colorScheme.primary);
+      var valueColor =
+          Color(exchange.value.isNegative ? 0xffbd1c1c : 0xff199225)
+              .harmonizeWith(Theme.of(context).colorScheme.primary);
       if (exchange.installments != null) {
         valueColor = Theme.of(context).colorScheme.inverseSurface;
       } else if (exchange.eType == EType.transfer) {
@@ -54,11 +57,207 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
     return Icons.trending_up;
   }
 
-  String _getTimeString() =>
-      switch (_time) { Period.allTime => AppLocalizations.of(context)!.totalDescription, _ => AppLocalizations.of(context)!.todayDescription };
+  String _getTimeString() => switch (_time) {
+        Period.allTime => AppLocalizations.of(context)!.totalDescription,
+        _ => AppLocalizations.of(context)!.todayDescription
+      };
+
+  Widget _latestExchange() {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    return FutureBuilder(
+      future: getLatest(
+        Isar.getInstance()!,
+        attributeId: widget.attribute.id,
+        attributeType: widget.attribute.type,
+        context: context,
+      ).then((value) async {
+        if (value != null && value.eType == EType.transfer) {
+          final transfer = value.copyWith(
+            description: await wid_utils.parseTransferName(context, value),
+          );
+          return transfer;
+        }
+        return value;
+      }),
+      builder: (context, snapshot) {
+        final exchange = snapshot.data;
+        return Visibility(
+          visible: exchange != null ||
+              (exchange != null && exchange.eType == EType.transfer),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Card(
+                elevation: 4,
+                margin: const EdgeInsets.only(top: 10),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        localization.latestDescriptor,
+                        textAlign: TextAlign.start,
+                        style: Theme.of(context).textTheme.titleLarge!.apply(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (exchange != null &&
+                                      (exchange.installments != null ||
+                                          exchange.id == -1 ||
+                                          exchange.eType == EType.transfer))
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        right: 5,
+                                      ),
+                                      child: _getLeadingIcon(
+                                        exchange,
+                                      ),
+                                    ),
+                                  Flexible(
+                                    child: Text(
+                                      exchange != null
+                                          ? exchange.description
+                                          : 'Placeholder',
+                                      textAlign: TextAlign.start,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .apply(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurfaceVariant,
+                                          ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15),
+                              child: Text(
+                                NumberFormat.simpleCurrency(
+                                  locale: languageCode,
+                                ).format(
+                                  exchange != null ? exchange.value : 0,
+                                ),
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .apply(color: _getColor(context, exchange)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      OutlinedButton(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute<ExchangeDetailsView>(
+                            builder: (context) => ExchangeDetailsView(
+                              item: exchange!,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          localization.details,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: exchange != null &&
+                    widget.attribute.type != AttributeType.account,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 15),
+                  child: Divider(
+                    height: 4,
+                    thickness: 2,
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _trendingWidget(num value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Icon(
+          _getTrendingIcon(value.toDouble()),
+          size: MediaQuery.sizeOf(context).longestSide / 11,
+          color: Color(
+            value.isNegative ? 0xffbd1c1c : 0xff199225,
+          ).harmonizeWith(
+            Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _getTimeString(),
+              style: Theme.of(context).textTheme.titleLarge!.apply(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+            ),
+            const SizedBox(width: 15),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
+                ),
+                child: Text(
+                  NumberFormat.simpleCurrency(
+                    locale: Localizations.localeOf(
+                      context,
+                    ).languageCode,
+                  ).format(value),
+                  style: Theme.of(context).textTheme.titleLarge!.apply(
+                        color: Color(
+                          value.isNegative ? 0xffbd1c1c : 0xff199225,
+                        ).harmonizeWith(
+                          Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -76,103 +275,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  FutureBuilder(
-                    future: getLatest(Isar.getInstance()!, attributeId: widget.attribute.id, attributeType: widget.attribute.type),
-                    builder: (context, snapshot) {
-                      final Exchange? exchange = snapshot.data;
-                      return Visibility(
-                        visible: exchange != null || (exchange != null && exchange.eType == EType.transfer),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Card(
-                              elevation: 4,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)!.latest,
-                                      textAlign: TextAlign.start,
-                                      style: Theme.of(context).textTheme.titleLarge!.apply(
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                          ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              if (exchange != null && (exchange.installments != null || exchange.id == -1 || exchange.eType == EType.transfer))
-                                                Padding(
-                                                  padding: const EdgeInsets.only(right: 5),
-                                                  child: _getLeadingIcon(exchange),
-                                                ),
-                                              Text(
-                                                exchange != null
-                                                    ? exchange.eType == EType.transfer
-                                                        ? AppLocalizations.of(context)!.transferDescription(
-                                                            exchange.description.split('#/spt#/')[0],
-                                                            exchange.description.split('#/spt#/')[1],
-                                                          )
-                                                        : exchange.description
-                                                    : 'Placeholder',
-                                                textAlign: TextAlign.start,
-                                                style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                          Text(
-                                            NumberFormat.simpleCurrency(
-                                              locale: Localizations.localeOf(context).languageCode,
-                                            ).format(
-                                              exchange != null ? exchange.value : 0,
-                                            ),
-                                            textAlign: TextAlign.start,
-                                            style: Theme.of(context).textTheme.bodyLarge!.apply(
-                                                  color: _getColor(context, exchange),
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    OutlinedButton(
-                                      onPressed: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute<ExchangeDetailsView>(
-                                          builder: (context) => ExchangeDetailsView(
-                                            item: exchange!,
-                                          ),
-                                        ),
-                                      ),
-                                      child: Text(AppLocalizations.of(context)!.details),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: exchange != null && widget.attribute.type != AttributeType.account,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 10, bottom: 15),
-                                child: Divider(
-                                  height: 4,
-                                  thickness: 2,
-                                  color: Theme.of(context).colorScheme.outlineVariant,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                  _latestExchange(),
                   Visibility(
                     visible: widget.attribute.type == AttributeType.account,
                     child: Card(
@@ -185,60 +288,31 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             FutureBuilder(
-                              future: getSumValueByAttribute(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, time: _time.index),
+                              future: getSumValueByAttribute(
+                                Isar.getInstance()!,
+                                widget.attribute.id,
+                                widget.attribute.type,
+                                time: _time.index,
+                              ),
                               builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.done) {
-                                  final double value = snapshot.hasData ? snapshot.data! : 0;
-                                  return Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Icon(
-                                        _getTrendingIcon(value),
-                                        size: MediaQuery.sizeOf(context).longestSide / 11,
-                                        color: Color(
-                                          value.isNegative ? 0xffbd1c1c : 0xff199225,
-                                        ).harmonizeWith(
-                                          Theme.of(context).colorScheme.primary,
-                                        ),
-                                      ),
-                                      Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            _getTimeString(),
-                                            style: Theme.of(context).textTheme.titleLarge!.apply(color: Theme.of(context).colorScheme.onSecondaryContainer),
-                                          ),
-                                          const SizedBox(width: 15),
-                                          DecoratedBox(
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context).colorScheme.surface,
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                              child: Text(
-                                                NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(value),
-                                                style: Theme.of(context).textTheme.titleLarge!.apply(
-                                                      color: Color(
-                                                        value.isNegative ? 0xffbd1c1c : 0xff199225,
-                                                      ).harmonizeWith(
-                                                        Theme.of(context).colorScheme.primary,
-                                                      ),
-                                                    ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    ],
-                                  );
+                                if (snapshot.connectionState ==
+                                    ConnectionState.done) {
+                                  final value =
+                                      snapshot.hasData ? snapshot.data! : 0;
+                                  return _trendingWidget(value);
                                 }
-                                if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
+                                if (snapshot.connectionState ==
+                                        ConnectionState.active ||
+                                    snapshot.connectionState ==
+                                        ConnectionState.waiting) {
                                   return SizedBox(
-                                    height: MediaQuery.sizeOf(context).longestSide / 11,
+                                    height:
+                                        MediaQuery.sizeOf(context).longestSide /
+                                            11,
                                     width: MediaQuery.sizeOf(context).width,
                                     child: const Center(
-                                      child: CircularProgressIndicator.adaptive(),
+                                      child:
+                                          CircularProgressIndicator.adaptive(),
                                     ),
                                   );
                                 }
@@ -251,10 +325,15 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 10),
                                   child: Text(
-                                    AppLocalizations.of(context)!.showOnly,
+                                    localization.showOnly,
                                     textAlign: TextAlign.start,
-                                    style: Theme.of(context).textTheme.labelMedium!.apply(
-                                          color: Theme.of(context).colorScheme.onSecondaryContainer,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .apply(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondaryContainer,
                                         ),
                                   ),
                                 ),
@@ -262,11 +341,15 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                   segments: [
                                     ButtonSegment(
                                       value: Period.today,
-                                      label: Text(AppLocalizations.of(context)!.today),
+                                      label: Text(
+                                        localization.today,
+                                      ),
                                     ),
                                     ButtonSegment(
                                       value: Period.allTime,
-                                      label: Text(AppLocalizations.of(context)!.all),
+                                      label: Text(
+                                        localization.all,
+                                      ),
                                     ),
                                   ],
                                   selected: {_time},
@@ -276,12 +359,18 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                                     });
                                   },
                                   style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        if (states.contains(MaterialState.selected)) {
-                                          return Theme.of(context).colorScheme.tertiaryContainer;
+                                        if (states
+                                            .contains(MaterialState.selected)) {
+                                          return Theme.of(context)
+                                              .colorScheme
+                                              .tertiaryContainer;
                                         }
-                                        return Theme.of(context).colorScheme.surface;
+                                        return Theme.of(context)
+                                            .colorScheme
+                                            .surface;
                                       },
                                     ),
                                   ),
@@ -310,7 +399,7 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                       Padding(
                         padding: const EdgeInsets.only(top: 12),
                         child: Text(
-                          AppLocalizations.of(context)!.statistics,
+                          localization.statistics,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ),
@@ -320,17 +409,30 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ConstrainedBox(
-                              constraints: BoxConstraints(maxWidth: (MediaQuery.sizeOf(context).width / 2) - 25),
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    (MediaQuery.sizeOf(context).width / 2) - 25,
+                              ),
                               child: Card(
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: FutureBuilder(
-                                    future: getAttributeUsage(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, 0),
+                                    future: getAttributeUsage(
+                                      Isar.getInstance()!,
+                                      widget.attribute.id,
+                                      widget.attribute.type,
+                                      0,
+                                    ),
                                     builder: (context, snapshot) {
-                                      final int percentage = snapshot.hasData ? snapshot.data! : 0;
+                                      final percentage =
+                                          snapshot.hasData ? snapshot.data! : 0;
                                       return Text(
-                                        AppLocalizations.of(context)!
-                                            .todayAttributeStatistics(percentage, (widget.attribute.type == AttributeType.account).toString()),
+                                        localization.todayAttributeStatistics(
+                                          percentage,
+                                          (widget.attribute.type ==
+                                                  AttributeType.account)
+                                              .toString(),
+                                        ),
                                       );
                                     },
                                   ),
@@ -339,17 +441,30 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                             ),
                             const SizedBox(width: 10),
                             ConstrainedBox(
-                              constraints: BoxConstraints(maxWidth: (MediaQuery.sizeOf(context).width / 2) - 25),
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    (MediaQuery.sizeOf(context).width / 2) - 25,
+                              ),
                               child: Card(
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: FutureBuilder(
-                                    future: getAttributeUsage(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, 1),
+                                    future: getAttributeUsage(
+                                      Isar.getInstance()!,
+                                      widget.attribute.id,
+                                      widget.attribute.type,
+                                      1,
+                                    ),
                                     builder: (context, snapshot) {
-                                      final int percentage = snapshot.hasData ? snapshot.data! : 0;
+                                      final percentage =
+                                          snapshot.hasData ? snapshot.data! : 0;
                                       return Text(
-                                        AppLocalizations.of(context)!
-                                            .allAttributeStatistics(percentage, (widget.attribute.type == AttributeType.account).toString()),
+                                        localization.allAttributeStatistics(
+                                          percentage,
+                                          (widget.attribute.type ==
+                                                  AttributeType.account)
+                                              .toString(),
+                                        ),
                                       );
                                     },
                                   ),
@@ -366,48 +481,76 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                           margin: const EdgeInsets.only(top: 10),
                           shape: RoundedRectangleBorder(
                             side: BorderSide(
-                              color: Theme.of(context).colorScheme.outlineVariant,
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant,
                             ),
-                            borderRadius: const BorderRadius.all(Radius.circular(12)),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(12)),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: [
-                                if (widget.attribute.type == AttributeType.account)
+                                if (widget.attribute.type ==
+                                    AttributeType.account)
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        AppLocalizations.of(context)!.relatedCardsDescription,
-                                        style: Theme.of(context).textTheme.titleMedium,
+                                        localization.relatedCardsDescription,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
                                       ),
                                       FutureBuilder(
-                                        future: checkForAttributeDependencies(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, dependency: 1),
+                                        future: checkForAttributeDependencies(
+                                          Isar.getInstance()!,
+                                          widget.attribute.id,
+                                          widget.attribute.type,
+                                          dependency: 1,
+                                        ),
                                         builder: (context, snapshot) {
-                                          final String count = snapshot.hasData ? snapshot.data!.toString() : '';
+                                          final count = snapshot.hasData
+                                              ? snapshot.data!.toString()
+                                              : '';
                                           return Text(
                                             count,
-                                            style: Theme.of(context).textTheme.titleMedium,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
                                           );
                                         },
                                       ),
                                     ],
                                   ),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      AppLocalizations.of(context)!.relatedTransactionsDescription,
-                                      style: Theme.of(context).textTheme.titleMedium,
+                                      localization
+                                          .relatedTransactionsDescription,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
                                     ),
                                     FutureBuilder(
-                                      future: checkForAttributeDependencies(Isar.getInstance()!, widget.attribute.id, widget.attribute.type, dependency: 0),
+                                      future: checkForAttributeDependencies(
+                                        Isar.getInstance()!,
+                                        widget.attribute.id,
+                                        widget.attribute.type,
+                                        dependency: 0,
+                                      ),
                                       builder: (context, snapshot) {
-                                        final String count = snapshot.hasData ? snapshot.data!.toString() : '';
+                                        final count = snapshot.hasData
+                                            ? snapshot.data!.toString()
+                                            : '';
                                         return Text(
                                           count,
-                                          style: Theme.of(context).textTheme.titleMedium,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
                                         );
                                       },
                                     ),

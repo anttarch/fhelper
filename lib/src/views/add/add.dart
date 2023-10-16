@@ -5,8 +5,8 @@ import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:fhelper/src/logic/widgets/show_card_dialog.dart';
+import 'package:fhelper/src/logic/widgets/show_selector_bottom_sheet.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
-import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -22,11 +22,10 @@ class AddView extends StatefulWidget {
 
 class _AddViewState extends State<AddView> {
   Set<EType> _eType = {EType.income};
-  int _typeId = -1;
-  int _accountId = -1;
+  (int parentIndex, int childIndex) _typeId = (-1, -1);
+  (int parentIndex, int childIndex) _accountId = (-1, -1);
   int _cardIndex = -1;
   int _installments = 0;
-  bool _accountFieldLock = false;
   double _availabeLimit = 0;
   final List<String?> displayText = [
     // Date
@@ -61,6 +60,8 @@ class _AddViewState extends State<AddView> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return Scaffold(
       body: GestureDetector(
         onHorizontalDragUpdate: (details) {
@@ -80,7 +81,7 @@ class _AddViewState extends State<AddView> {
               title: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  AppLocalizations.of(context)!.add,
+                  localization.add,
                 ),
               ),
             ),
@@ -92,11 +93,11 @@ class _AddViewState extends State<AddView> {
                   segments: [
                     ButtonSegment(
                       value: EType.income,
-                      label: Text(AppLocalizations.of(context)!.income),
+                      label: Text(localization.income),
                     ),
                     ButtonSegment(
                       value: EType.expense,
-                      label: Text(AppLocalizations.of(context)!.expense),
+                      label: Text(localization.expense),
                     ),
                   ],
                   selected: _eType,
@@ -104,8 +105,8 @@ class _AddViewState extends State<AddView> {
                     _formKey.currentState!.reset();
                     setState(() {
                       _eType = p0;
-                      _typeId = -1;
-                      _accountId = -1;
+                      _typeId = (-1, -1);
+                      _accountId = (-1, -1);
                       _cardIndex = -1;
                       displayText[0] = DateTime.now().toString();
                     });
@@ -129,17 +130,17 @@ class _AddViewState extends State<AddView> {
                         padding: const EdgeInsets.only(top: 24),
                         child: InputField(
                           controller: textController[0],
-                          label: AppLocalizations.of(context)!.description,
+                          label: localization.description,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(20),
                           ],
                           validator: (value) {
                             if (value!.isEmpty) {
-                              return AppLocalizations.of(context)!.emptyField;
+                              return localization.emptyField;
                             } else if (value.length < 3) {
-                              return AppLocalizations.of(context)!.threeCharactersMinimum;
+                              return localization.threeCharactersMinimum;
                             } else if (value.contains('#/spt#/')) {
-                              return AppLocalizations.of(context)!.invalidName;
+                              return localization.invalidName;
                             }
                             return null;
                           },
@@ -149,21 +150,27 @@ class _AddViewState extends State<AddView> {
                         padding: const EdgeInsets.only(top: 20),
                         child: InputField(
                           controller: textController[1],
-                          label: _eType.single == EType.income ? AppLocalizations.of(context)!.amount : AppLocalizations.of(context)!.price,
+                          label: _eType.single == EType.income
+                              ? localization.amount
+                              : localization.price,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
                             CurrencyInputFormatter(
-                              locale: Localizations.localeOf(context).languageCode,
-                            )
+                              locale: languageCode,
+                            ),
                           ],
                           validator: (value) {
-                            final String price = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
+                            final price = textController[1]
+                                .text
+                                .replaceAll(RegExp('[^0-9]'), '');
                             if (value!.isEmpty) {
-                              return AppLocalizations.of(context)!.emptyField;
-                            } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                              return AppLocalizations.of(context)!.invalidValue;
-                            } else if (_cardIndex != -1 && double.parse(price) / 100 > _availabeLimit) {
-                              return AppLocalizations.of(context)!.insufficientLimit;
+                              return localization.emptyField;
+                            } else if (value.replaceAll(RegExp('[^0-9]'), '') ==
+                                '000') {
+                              return localization.invalidValue;
+                            } else if (_cardIndex != -1 &&
+                                double.parse(price) / 100 > _availabeLimit) {
+                              return localization.insufficientLimit;
                             }
                             return null;
                           },
@@ -172,26 +179,39 @@ class _AddViewState extends State<AddView> {
                       Padding(
                         padding: const EdgeInsets.only(top: 20),
                         child: InputField(
-                          label: AppLocalizations.of(context)!.date,
+                          label: localization.date,
                           readOnly: true,
-                          placeholder: DateTime.now().difference(DateTime.parse(displayText[0]!)).inHours < 24
+                          placeholder: DateTime.now()
+                                      .difference(
+                                        DateTime.parse(displayText[0]!),
+                                      )
+                                      .inHours <
+                                  24
                               ? DateFormat.yMd(
-                                  Localizations.localeOf(context).languageCode,
-                                ).add_jm().format(DateTime.parse(displayText[0]!))
+                                  languageCode,
+                                )
+                                  .add_jm()
+                                  .format(DateTime.parse(displayText[0]!))
                               : DateFormat.yMd(
-                                  Localizations.localeOf(context).languageCode,
+                                  languageCode,
                                 ).format(DateTime.parse(displayText[0]!)),
                           onTap: () async {
-                            final DateTime? picked = await showDatePicker(
+                            final picked = await showDatePicker(
                               context: context,
                               initialDate: DateTime.parse(displayText[0]!),
-                              firstDate: DateTime(DateTime.now().year, DateTime.now().month),
+                              firstDate: DateTime(
+                                DateTime.now().year,
+                                DateTime.now().month,
+                              ),
                               lastDate: DateTime.now(),
                             );
                             if (picked != null) {
                               setState(
                                 () {
-                                  if (DateTime.now().difference(picked).inHours < 24) {
+                                  if (DateTime.now()
+                                          .difference(picked)
+                                          .inHours <
+                                      24) {
                                     displayText[0] = DateTime.now().toString();
                                   } else {
                                     displayText[0] = picked.toString();
@@ -205,76 +225,53 @@ class _AddViewState extends State<AddView> {
                       FutureBuilder(
                         future: getAttributes(
                           Isar.getInstance()!,
-                          _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType,
+                          _eType.single == EType.income
+                              ? AttributeType.incomeType
+                              : AttributeType.expenseType,
                           context: context,
                         ),
                         builder: (context, snapshot) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 20),
                             child: InputField(
-                              label: AppLocalizations.of(context)!.type(1),
+                              label: localization.type(1),
                               readOnly: true,
-                              placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
+                              placeholder:
+                                  displayText[1] ?? localization.select,
                               validator: (value) {
                                 if (value!.isEmpty || displayText[1] == null) {
-                                  return AppLocalizations.of(context)!.emptyField;
+                                  return localization.emptyField;
                                 }
                                 return null;
                               },
-                              onTap: () => showModalBottomSheet<void>(
+                              onTap: () => showSelectorBottomSheet<String?>(
                                 context: context,
-                                constraints: BoxConstraints(
-                                  minHeight: MediaQuery.of(context).size.height / 3,
-                                ),
-                                enableDrag: false,
-                                builder: (context) {
-                                  return StatefulBuilder(
-                                    builder: (context, setState) {
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!.selectType,
-                                                  style: Theme.of(context).textTheme.titleLarge,
-                                                ),
-                                                TextButton.icon(
-                                                  onPressed: () => showAttributeDialog<void>(
-                                                    context: context,
-                                                    attributeType: _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType,
-                                                    controller: textController[3],
-                                                  ).then((_) => textController[3].clear()),
-                                                  icon: const Icon(Icons.add),
-                                                  label: Text(AppLocalizations.of(context)!.add),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          ListChoice(
-                                            groupValue: _typeId,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _typeId = value!;
-                                              });
-                                              Navigator.pop(context);
-                                            },
-                                            attributeList: snapshot.hasData ? snapshot.data! : null,
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  );
+                                groupValue: _typeId,
+                                title: localization.selectType,
+                                onSelect: (name, value) {
+                                  setState(() {
+                                    _typeId = value! as (int, int);
+                                  });
+                                  Navigator.pop(context, name);
                                 },
+                                attributeMap: snapshot.data,
+                                action: TextButton.icon(
+                                  onPressed: () => showAttributeDialog<void>(
+                                    context: context,
+                                    attributeRole: AttributeRole.child,
+                                    attributeType: _eType.single == EType.income
+                                        ? AttributeType.incomeType
+                                        : AttributeType.expenseType,
+                                    controller: textController[3],
+                                  ).then(
+                                    (_) => textController[3].clear(),
+                                  ),
+                                  icon: const Icon(Icons.add),
+                                  label: Text(localization.add),
+                                ),
                               ).then(
-                                (_) => _typeId != -1
-                                    ? setState(
-                                        () => displayText[1] = snapshot.hasData ? snapshot.data![_typeId].name : null,
-                                      )
+                                (name) => _typeId != (-1, -1) && name != null
+                                    ? setState(() => displayText[1] = name)
                                     : null,
                               ),
                             ),
@@ -291,90 +288,64 @@ class _AddViewState extends State<AddView> {
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: InputField(
-                                    label: AppLocalizations.of(context)!.card(1),
+                                    label: localization.card(1),
                                     readOnly: true,
-                                    placeholder: displayText[3] ?? AppLocalizations.of(context)!.none,
-                                    onTap: () => showModalBottomSheet<void>(
+                                    placeholder:
+                                        displayText[3] ?? localization.none,
+                                    onTap: () => showSelectorBottomSheet<void>(
                                       context: context,
-                                      constraints: BoxConstraints(
-                                        minHeight: MediaQuery.of(context).size.height / 3,
-                                      ),
-                                      enableDrag: false,
-                                      builder: (context) {
-                                        return StatefulBuilder(
-                                          builder: (context, setState) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Padding(
-                                                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        AppLocalizations.of(context)!.selectCard,
-                                                        style: Theme.of(context).textTheme.titleLarge,
-                                                      ),
-                                                      if (_cardIndex == -1)
-                                                        TextButton.icon(
-                                                          onPressed: () => showCardForm(context: context),
-                                                          icon: const Icon(Icons.add),
-                                                          label: Text(AppLocalizations.of(context)!.add),
-                                                        )
-                                                      else
-                                                        TextButton.icon(
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              _cardIndex = -1;
-                                                            });
-                                                            Navigator.pop(context);
-                                                          },
-                                                          icon: const Icon(Icons.clear),
-                                                          label: Text(AppLocalizations.of(context)!.clear),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                ListChoice(
-                                                  groupValue: _cardIndex,
-                                                  onChanged: (value) async {
-                                                    setState(() {
-                                                      _cardIndex = value!;
-                                                    });
-                                                    await getAvailableLimit(
-                                                      Isar.getInstance()!,
-                                                      snapshot.data![_cardIndex],
-                                                    ).then((freeLimit) {
-                                                      setState(() => _availabeLimit = freeLimit);
-                                                      Navigator.pop(context);
-                                                    });
-                                                  },
-                                                  cardList: snapshot.hasData ? snapshot.data! : null,
-                                                )
-                                              ],
-                                            );
-                                          },
-                                        );
+                                      groupValue: _cardIndex,
+                                      title: localization.selectCard,
+                                      onSelect: (_, value) async {
+                                        setState(() {
+                                          _cardIndex = value! as int;
+                                        });
+                                        await getAvailableLimit(
+                                          Isar.getInstance()!,
+                                          snapshot.data![_cardIndex],
+                                        ).then((freeLimit) {
+                                          setState(
+                                            () => _availabeLimit = freeLimit,
+                                          );
+                                          Navigator.pop(context);
+                                        });
                                       },
+                                      cardList: snapshot.data,
+                                      action: TextButton.icon(
+                                        onPressed: () {
+                                          if (_cardIndex == -1) {
+                                            showCardForm(context: context);
+                                          } else {
+                                            setState(() {
+                                              _cardIndex = -1;
+                                            });
+                                            Navigator.pop(context);
+                                          }
+                                        },
+                                        icon: Icon(
+                                          _cardIndex == -1
+                                              ? Icons.add
+                                              : Icons.clear,
+                                        ),
+                                        label: Text(
+                                          _cardIndex == -1
+                                              ? localization.add
+                                              : localization.clear,
+                                        ),
+                                      ),
                                     ).then(
                                       (_) async {
                                         if (_cardIndex != -1) {
-                                          final Attribute? account =
-                                              await getAttributeFromId(Isar.getInstance()!, snapshot.data![_cardIndex].accountId, context: context);
+                                          final name = snapshot.hasData
+                                              ? snapshot.data![_cardIndex].name
+                                              : null;
                                           setState(
                                             () {
-                                              displayText[3] = snapshot.hasData ? snapshot.data![_cardIndex].name : null;
-                                              if (snapshot.hasData) {
-                                                displayText[2] = account!.name;
-                                                _accountFieldLock = true;
-                                              }
+                                              displayText[3] = name;
                                             },
                                           );
-                                        } else if (_accountFieldLock == true) {
+                                        } else {
                                           setState(() {
-                                            _accountFieldLock = false;
-                                            displayText[2] = null;
                                             displayText[3] = null;
                                           });
                                         }
@@ -387,57 +358,57 @@ class _AddViewState extends State<AddView> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 15),
                                     child: InputField(
-                                      label: AppLocalizations.of(context)!.installments,
+                                      label: localization.installments,
                                       readOnly: true,
                                       placeholder: displayText[4],
                                       validator: (value) {
                                         if (value!.isEmpty) {
-                                          return AppLocalizations.of(context)!.emptyField;
+                                          return localization.emptyField;
                                         }
                                         return null;
                                       },
-                                      onTap: () => showModalBottomSheet<void>(
+                                      onTap: () =>
+                                          showSelectorBottomSheet<void>(
                                         context: context,
-                                        enableDrag: false,
-                                        builder: (context) {
-                                          return StatefulBuilder(
-                                            builder: (context, setState) {
-                                              return Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.all(20),
-                                                    child: Text(
-                                                      AppLocalizations.of(context)!.installments,
-                                                      style: Theme.of(context).textTheme.titleLarge,
-                                                    ),
-                                                  ),
-                                                  ListChoice(
-                                                    groupValue: _installments,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        _installments = value!;
-                                                      });
-                                                      Navigator.pop(context);
-                                                    },
-                                                    intList: List.generate(48, (index) => index + 1),
-                                                  )
-                                                ],
-                                              );
-                                            },
-                                          );
+                                        groupValue: _installments,
+                                        title: localization.installments,
+                                        onSelect: (_, value) {
+                                          setState(() {
+                                            _installments = value! as int;
+                                          });
+                                          Navigator.pop(context);
                                         },
+                                        intList: List.generate(
+                                          48,
+                                          (index) => index + 1,
+                                        ),
                                       ).then(
                                         (_) {
                                           if (_installments >= 0) {
-                                            setState(() => displayText[4] = '${_installments + 1}');
-                                            final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
-                                            if (_installments > 0 && (value != '000' || value.isNotEmpty)) {
-                                              final double price = double.parse(value) / 100;
+                                            setState(
+                                              () => displayText[4] =
+                                                  '${_installments + 1}',
+                                            );
+                                            final value = textController[1]
+                                                .text
+                                                .replaceAll(
+                                                  RegExp('[^0-9]'),
+                                                  '',
+                                                );
+                                            if (_installments > 0 &&
+                                                (value != '000' ||
+                                                    value.isNotEmpty)) {
+                                              final price =
+                                                  double.parse(value) / 100;
+                                              final formatter =
+                                                  NumberFormat.simpleCurrency(
+                                                locale: languageCode,
+                                              );
                                               setState(
-                                                () => textController[2].text = NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode)
-                                                    .format(price / (_installments + 1)),
+                                                () => textController[2].text =
+                                                    formatter.format(
+                                                  price / (_installments + 1),
+                                                ),
                                               );
                                             }
                                           }
@@ -452,18 +423,22 @@ class _AddViewState extends State<AddView> {
                                     padding: const EdgeInsets.only(top: 15),
                                     child: InputField(
                                       controller: textController[2],
-                                      label: AppLocalizations.of(context)!.perInstallmentValue,
+                                      label: localization.perInstallmentValue,
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
                                         CurrencyInputFormatter(
-                                          locale: Localizations.localeOf(context).languageCode,
-                                        )
+                                          locale: languageCode,
+                                        ),
                                       ],
                                       validator: (value) {
                                         if (value!.isEmpty) {
-                                          return AppLocalizations.of(context)!.emptyField;
-                                        } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                          return AppLocalizations.of(context)!.invalidValue;
+                                          return localization.emptyField;
+                                        } else if (value.replaceAll(
+                                              RegExp('[^0-9]'),
+                                              '',
+                                            ) ==
+                                            '000') {
+                                          return localization.invalidValue;
                                         }
                                         return null;
                                       },
@@ -475,82 +450,64 @@ class _AddViewState extends State<AddView> {
                           },
                         ),
                       ),
-                      FutureBuilder(
-                        future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context),
-                        builder: (context, snapshot) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            child: InputField(
-                              label: AppLocalizations.of(context)!.account(1),
-                              locked: _accountFieldLock,
-                              readOnly: true,
-                              placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
-                              validator: (value) {
-                                if (value!.isEmpty || displayText[2] == null) {
-                                  return AppLocalizations.of(context)!.emptyField;
-                                }
-                                return null;
-                              },
-                              onTap: () => showModalBottomSheet<void>(
-                                context: context,
-                                constraints: BoxConstraints(
-                                  minHeight: MediaQuery.of(context).size.height / 3,
-                                ),
-                                enableDrag: false,
-                                builder: (context) {
-                                  return StatefulBuilder(
-                                    builder: (context, setState) {
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(
-                                                  AppLocalizations.of(context)!.selectAccount,
-                                                  style: Theme.of(context).textTheme.titleLarge,
-                                                ),
-                                                TextButton.icon(
-                                                  onPressed: () => showAttributeDialog<void>(
-                                                    context: context,
-                                                    attributeType: AttributeType.account,
-                                                    controller: textController[3],
-                                                  ).then((_) => textController[3].clear()),
-                                                  icon: const Icon(Icons.add),
-                                                  label: Text(AppLocalizations.of(context)!.add),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          ListChoice(
-                                            groupValue: _accountId,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                _accountId = value!;
-                                              });
-                                              Navigator.pop(context);
-                                            },
-                                            attributeList: snapshot.hasData ? snapshot.data! : [],
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                      if (_cardIndex == -1)
+                        FutureBuilder(
+                          future: getAttributes(
+                            Isar.getInstance()!,
+                            AttributeType.account,
+                            context: context,
+                          ).then((value) {
+                            value.removeWhere((_, value) => value.isEmpty);
+                            return value;
+                          }),
+                          builder: (context, snapshot) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: InputField(
+                                label: localization.account(1),
+                                readOnly: true,
+                                placeholder:
+                                    displayText[2] ?? localization.select,
+                                validator: (value) {
+                                  if (value!.isEmpty ||
+                                      displayText[2] == null) {
+                                    return localization.emptyField;
+                                  }
+                                  return null;
                                 },
-                              ).then(
-                                (_) => _accountId != -1
-                                    ? setState(
-                                        () => displayText[2] = snapshot.hasData ? snapshot.data![_accountId].name : null,
-                                      )
-                                    : null,
+                                onTap: () => showSelectorBottomSheet<String?>(
+                                  context: context,
+                                  groupValue: _accountId,
+                                  title: localization.selectAccount,
+                                  onSelect: (name, value) {
+                                    setState(() {
+                                      _accountId = value! as (int, int);
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                  attributeMap: snapshot.data,
+                                  action: TextButton.icon(
+                                    onPressed: () => showAttributeDialog<void>(
+                                      context: context,
+                                      attributeType: AttributeType.account,
+                                      attributeRole: AttributeRole.child,
+                                      controller: textController[3],
+                                    ).then(
+                                      (_) => textController[3].clear(),
+                                    ),
+                                    icon: const Icon(Icons.add),
+                                    label: Text(localization.add),
+                                  ),
+                                ).then(
+                                  (name) => _accountId != (-1, -1) &&
+                                          name != null
+                                      ? setState(() => displayText[2] = name)
+                                      : null,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 ),
@@ -568,7 +525,7 @@ class _AddViewState extends State<AddView> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context)!.cancel),
+                  child: Text(localization.cancel),
                 ),
               ),
               const SizedBox(width: 20),
@@ -576,20 +533,45 @@ class _AddViewState extends State<AddView> {
                 child: FilledButton.icon(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      final String value = textController[1].text.replaceAll(RegExp('[^0-9]'), '');
-                      final String installmentValue = textController[2].text.replaceAll(RegExp('[^0-9]'), '');
-                      final Isar isar = Isar.getInstance()!;
-                      final Exchange exchange = Exchange(
+                      final value = textController[1]
+                          .text
+                          .replaceAll(RegExp('[^0-9]'), '');
+                      final installmentValue = textController[2]
+                          .text
+                          .replaceAll(RegExp('[^0-9]'), '');
+                      final isar = Isar.getInstance()!;
+                      final types = await getAttributes(
+                        isar,
+                        _eType.single == EType.income
+                            ? AttributeType.incomeType
+                            : AttributeType.expenseType,
+                        context: context,
+                      );
+                      final exchange = Exchange(
                         eType: _eType.single,
                         description: textController[0].text,
-                        value: _eType.single == EType.income ? double.parse(value) / 100 : -double.parse(value) / 100,
+                        value: _eType.single == EType.income
+                            ? double.parse(value) / 100
+                            : -double.parse(value) / 100,
                         date: DateTime.parse(displayText[0]!),
-                        typeId: (await getAttributes(isar, _eType.single == EType.income ? AttributeType.incomeType : AttributeType.expenseType))[_typeId].id,
+                        typeId:
+                            types.values.toList()[_typeId.$1][_typeId.$2].id,
                         accountId: _cardIndex > -1
-                            ? (await fhelper.getCards(isar))[_cardIndex].accountId
-                            : (await getAttributes(isar, AttributeType.account))[_accountId].id,
-                        cardId: _eType.single == EType.expense && _cardIndex > -1 ? (await fhelper.getCards(isar))[_cardIndex].id : null,
-                        installments: _cardIndex > -1 ? _installments + 1 : null,
+                            ? -1
+                            : (await getAttributes(
+                                isar,
+                                AttributeType.account,
+                                context: mounted ? context : null,
+                              ))
+                                .values
+                                .toList()[_accountId.$1][_accountId.$2]
+                                .id,
+                        cardId:
+                            _eType.single == EType.expense && _cardIndex > -1
+                                ? (await fhelper.getCards(isar))[_cardIndex].id
+                                : null,
+                        installments:
+                            _cardIndex > -1 ? _installments + 1 : null,
                         installmentValue: _cardIndex > -1
                             ? _installments > 0
                                 ? -double.parse(installmentValue) / 100
@@ -605,7 +587,7 @@ class _AddViewState extends State<AddView> {
                     }
                   },
                   icon: const Icon(Icons.add),
-                  label: Text(AppLocalizations.of(context)!.add),
+                  label: Text(localization.add),
                   style: ButtonStyle(
                     backgroundColor: MaterialStatePropertyAll<Color>(
                       Color(
@@ -621,7 +603,7 @@ class _AddViewState extends State<AddView> {
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

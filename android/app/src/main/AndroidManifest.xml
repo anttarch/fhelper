@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ynotnaZiul.fhelper">
+    package="com.anttarch.fhelper">
    <application
         android:label="FHelper"
         android:name="${applicationName}"

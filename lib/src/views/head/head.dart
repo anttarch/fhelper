@@ -25,16 +25,17 @@ class _HeadViewState extends State<HeadView> {
   bool displayNavigationBar = true;
 
   static String _getHomeString(BuildContext context) {
-    final int hour = TimeOfDay.now().hour;
+    final localization = AppLocalizations.of(context)!;
+    final hour = TimeOfDay.now().hour;
     switch (hour) {
       case >= 5 && <= 11:
-        return AppLocalizations.of(context)!.goodMorning;
+        return localization.goodMorning;
       case >= 12 && <= 17:
-        return AppLocalizations.of(context)!.goodAfternoon;
+        return localization.goodAfternoon;
       case >= 0 && <= 4 || >= 18 && <= 23:
-        return AppLocalizations.of(context)!.goodEvening;
+        return localization.goodEvening;
       default:
-        return AppLocalizations.of(context)!.home;
+        return localization.home;
     }
   }
 
@@ -46,10 +47,11 @@ class _HeadViewState extends State<HeadView> {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> headline = [
+    final localization = AppLocalizations.of(context)!;
+    final headline = <String>[
       _getHomeString(context),
-      AppLocalizations.of(context)!.history,
-      AppLocalizations.of(context)!.settings,
+      localization.history,
+      localization.settings,
     ];
 
     return Scaffold(
@@ -92,12 +94,13 @@ class _HeadViewState extends State<HeadView> {
           ),
         ),
         label: Text(
-          AppLocalizations.of(context)!.add,
-          semanticsLabel: AppLocalizations.of(context)!.addTransactionFAB,
+          localization.add,
+          semanticsLabel: localization.addTransactionFAB,
         ),
         icon: Icon(
           Icons.add,
-          semanticLabel: _pageIndex == 0 ? null : AppLocalizations.of(context)!.addTransactionFAB,
+          semanticLabel:
+              _pageIndex == 0 ? null : localization.addTransactionFAB,
         ),
         isExtended: _pageIndex == 0,
       ),
@@ -106,15 +109,15 @@ class _HeadViewState extends State<HeadView> {
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.home),
-            label: AppLocalizations.of(context)!.home,
+            label: localization.home,
           ),
           NavigationDestination(
             icon: const Icon(Icons.history),
-            label: AppLocalizations.of(context)!.history,
+            label: localization.history,
           ),
           NavigationDestination(
             icon: const Icon(Icons.settings),
-            label: AppLocalizations.of(context)!.settings,
+            label: localization.settings,
           ),
         ],
         onDestinationSelected: (dest) {

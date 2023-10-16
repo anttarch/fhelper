@@ -4,11 +4,11 @@ import 'package:intl/intl.dart';
 
 class InputField extends StatelessWidget {
   const InputField({
+    required this.label,
     super.key,
     this.controller,
     this.inputFormatters,
     this.keyboardType = TextInputType.text,
-    required this.label,
     this.locked = false,
     this.onTap,
     this.placeholder,
@@ -17,7 +17,10 @@ class InputField extends StatelessWidget {
     this.suffixStyle,
     this.textColor,
     this.validator,
-  }) : assert(!(controller != null && placeholder != null));
+  }) : assert(
+          !(controller != null && placeholder != null),
+          'Cannot handle a controller and a placeholder at the same time',
+        );
   final TextEditingController? controller;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType keyboardType;
@@ -46,12 +49,15 @@ class InputField extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 4),
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.bodySmall!.apply(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                style: Theme.of(context).textTheme.bodySmall!.apply(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
             ),
             ExcludeSemantics(
               child: TextFormField(
-                controller: controller ?? TextEditingController(text: placeholder),
+                controller:
+                    controller ?? TextEditingController(text: placeholder),
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
                   contentPadding: const EdgeInsets.all(16),
@@ -95,11 +101,11 @@ class CurrencyInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    final String parsedValue = newValue.text.replaceAll(RegExp('[^0-9]'), '');
-    final double value = double.parse(parsedValue);
+    final parsedValue = newValue.text.replaceAll(RegExp('[^0-9]'), '');
+    final value = double.parse(parsedValue);
 
     final formatter = NumberFormat.simpleCurrency(locale: locale);
-    final String newText = formatter.format(value / 100);
+    final newText = formatter.format(value / 100);
 
     return newValue.copyWith(
       text: newText,

@@ -1,10 +1,15 @@
 import 'package:async/async.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/card_bill.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
+import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
+import 'package:fhelper/src/logic/widgets/show_selector_bottom_sheet.dart';
+import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/card_details.dart';
 import 'package:fhelper/src/widgets/historylist.dart';
+import 'package:fhelper/src/widgets/inputfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -26,6 +31,194 @@ class _HistoryPageState extends State<HistoryPage> {
 
   final Map<Time, int> _indexMap = {Time.today: 0, Time.week: 1, Time.month: 2};
 
+  Widget _pendingCardBills(Map<String, List<double>> cardsValues) {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Divider(
+            height: 4,
+            thickness: 2,
+            color: Theme.of(context).colorScheme.tertiary,
+          ),
+        ),
+        Card(
+          child: ListView.separated(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: cardsValues.entries.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                title: Text(
+                  cardsValues.keys.elementAt(index),
+                ),
+                subtitle: Text(
+                  NumberFormat.simpleCurrency(
+                    locale: languageCode,
+                  ).format(
+                    cardsValues.isNotEmpty
+                        ? cardsValues.values.elementAt(index).first
+                        : 0,
+                  ),
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                    color: const Color(0xffbd1c1c).harmonizeWith(
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+                onTap: () async {
+                  final isar = Isar.getInstance()!;
+                  final cardId =
+                      cardsValues.values.elementAt(index).last.toInt();
+                  final card = await isar.cards.get(cardId);
+                  if (mounted) {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute<CardDetailsView>(
+                        builder: (context) => CardDetailsView(
+                          card: card!,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                trailing: IconButton.filled(
+                  onPressed: () async {
+                    var accountId = (-1, -1);
+                    final controller = TextEditingController();
+                    final accounts = await getAttributes(
+                      Isar.getInstance()!,
+                      AttributeType.account,
+                      context: context,
+                    ).then((value) {
+                      value.removeWhere(
+                        (_, value) => value.isEmpty,
+                      );
+                      return value;
+                    });
+                    if (mounted) {
+                      await showSelectorBottomSheet<(String, (int, int))>(
+                        context: context,
+                        groupValue: accountId,
+                        title: localization.selectAccount,
+                        onSelect: (name, value) {
+                          accountId = value! as (int, int);
+                          Navigator.pop(context, (name, accountId));
+                        },
+                        attributeMap: accounts,
+                        action: TextButton.icon(
+                          onPressed: () => showAttributeDialog<void>(
+                            context: context,
+                            attributeType: AttributeType.account,
+                            attributeRole: AttributeRole.child,
+                            controller: controller,
+                          ).then((_) => controller.clear()),
+                          icon: const Icon(Icons.add),
+                          label: Text(localization.add),
+                        ),
+                      ).then(
+                        (accountRecord) async {
+                          if (accountRecord != null) {
+                            await showDialog<void>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    localization.confirmPayQuestion,
+                                  ),
+                                  content: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        localization.irreversibleAction,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: InputField(
+                                          label: localization.account(1),
+                                          readOnly: true,
+                                          placeholder: accountRecord.$1,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text(localization.cancel),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        final isar = Isar.getInstance()!;
+                                        final cardId = cardsValues.values
+                                            .elementAt(index)
+                                            .last
+                                            .toInt();
+                                        final bill =
+                                            await isar.cardBills.get(cardId);
+                                        final account = accounts.entries
+                                            .elementAt(accountRecord.$2.$1)
+                                            .value
+                                            .elementAt(accountRecord.$2.$2);
+                                        if (bill != null) {
+                                          final newBill = bill.copyWith(
+                                            accountId: account.id,
+                                            confirmed: true,
+                                          );
+                                          await isar.writeTxn(() async {
+                                            await isar.cardBills.put(newBill);
+                                          }).then(
+                                            (_) => Navigator.pop(context),
+                                          );
+                                        }
+                                      },
+                                      child: Text(localization.confirm),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
+                        },
+                      );
+                    }
+                  },
+                  icon: Icon(
+                    Icons.check,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              );
+            },
+            separatorBuilder: (_, __) => Divider(
+              height: 2,
+              thickness: 1.5,
+              indent: 16,
+              endIndent: 16,
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -34,6 +227,8 @@ class _HistoryPageState extends State<HistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+    final languageCode = Localizations.localeOf(context).languageCode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -45,7 +240,7 @@ class _HistoryPageState extends State<HistoryPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                 child: Text(
-                  AppLocalizations.of(context)!.showOnly,
+                  localization.showOnly,
                   textAlign: TextAlign.start,
                   style: Theme.of(context).textTheme.labelMedium,
                 ),
@@ -56,15 +251,15 @@ class _HistoryPageState extends State<HistoryPage> {
                   segments: [
                     ButtonSegment(
                       value: Time.today,
-                      label: Text(AppLocalizations.of(context)!.today),
+                      label: Text(localization.today),
                     ),
                     ButtonSegment(
                       value: Time.week,
-                      label: Text(AppLocalizations.of(context)!.week),
+                      label: Text(localization.week),
                     ),
                     ButtonSegment(
                       value: Time.month,
-                      label: Text(AppLocalizations.of(context)!.month),
+                      label: Text(localization.month),
                     ),
                   ],
                   selected: {_time},
@@ -79,35 +274,47 @@ class _HistoryPageState extends State<HistoryPage> {
           ),
         ),
         StreamBuilder(
-          stream: StreamGroup.merge([isar.exchanges.watchLazy(), isar.cardBills.watchLazy()]),
+          stream: StreamGroup.merge(
+            [isar.exchanges.watchLazy(), isar.cardBills.watchLazy()],
+          ),
           builder: (context, snapshot) {
             return Column(
               children: [
                 FutureBuilder(
-                  future: getSumValue(isar, context, time: _indexMap[_time]!).then((value) async {
+                  future: getSumValue(isar, context, time: _indexMap[_time]!)
+                      .then((value) async {
                     if (mounted) {
-                      final List<Exchange> billsAsExchange = await getCardBillsAsExchanges(isar, context, time: _indexMap[_time]!);
-                      double finalValue = value;
+                      final billsAsExchange = await getCardBillsAsExchanges(
+                        isar,
+                        context,
+                        time: _indexMap[_time]!,
+                      );
+                      var finalValue = value;
                       if (billsAsExchange.isNotEmpty) {
                         for (final bill in billsAsExchange) {
                           finalValue += bill.value;
                         }
                       }
-                      // This still is necessary to avoid calling context across async gaps
+                      // This still is necessary to avoid calling context across
+                      // async gaps
                       if (!mounted) {
                         return {
-                          '': [finalValue]
+                          '': [finalValue],
                         };
                       }
                       return {
                         '': [finalValue],
-                        ...await getPendingCardBills(isar, context, time: _indexMap[_time]!)
+                        ...await getPendingCardBills(
+                          isar,
+                          context,
+                          time: _indexMap[_time]!,
+                        ),
                       };
                     }
                     return {'': <double>[]};
                   }),
                   builder: (context, snapshot) {
-                    final Map<String, List<double>> cardsValues = {};
+                    final cardsValues = <String, List<double>>{};
                     if (snapshot.hasData) {
                       cardsValues
                         ..addAll(snapshot.data!)
@@ -121,52 +328,82 @@ class _HistoryPageState extends State<HistoryPage> {
                         duration: const Duration(milliseconds: 100),
                         curve: Curves.easeInOut,
                         child: Card(
-                          color: Theme.of(context).colorScheme.tertiaryContainer,
+                          color:
+                              Theme.of(context).colorScheme.tertiaryContainer,
                           margin: const EdgeInsets.only(bottom: 15),
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               children: [
                                 Semantics(
-                                  label: AppLocalizations.of(context)!.totalValueHistoryCard(
-                                    AppLocalizations.of(context)!.dateSelector(_indexMap[_time]!),
-                                    snapshot.hasData ? snapshot.data!.values.first.first : 0,
+                                  label: localization.totalValueHistoryCard(
+                                    localization
+                                        .dateSelector(_indexMap[_time]!),
+                                    snapshot.hasData
+                                        ? snapshot.data!.values.first.first
+                                        : 0,
                                   ),
                                   readOnly: true,
                                   excludeSemantics: true,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        AppLocalizations.of(context)!.dateSelector(_indexMap[_time]!),
+                                        localization
+                                            .dateSelector(_indexMap[_time]!),
                                         textAlign: TextAlign.start,
-                                        style: Theme.of(context).textTheme.titleLarge!.apply(
-                                              color: Theme.of(context).colorScheme.onTertiaryContainer,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .apply(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onTertiaryContainer,
                                             ),
                                       ),
                                       DecoratedBox(
                                         decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.surface,
-                                          borderRadius: BorderRadius.circular(12),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surface,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
                                           child: Text(
                                             NumberFormat.simpleCurrency(
-                                              locale: Localizations.localeOf(context).languageCode,
+                                              locale: languageCode,
                                             ).format(
-                                              snapshot.hasData ? snapshot.data!.values.first.first : 0,
+                                              snapshot.hasData
+                                                  ? snapshot
+                                                      .data!.values.first.first
+                                                  : 0,
                                             ),
                                             textAlign: TextAlign.start,
-                                            style: Theme.of(context).textTheme.titleLarge!.apply(
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge!
+                                                .apply(
                                                   color: Color(
                                                     snapshot.hasData
-                                                        ? snapshot.data!.values.first.first.isNegative
+                                                        ? snapshot
+                                                                .data!
+                                                                .values
+                                                                .first
+                                                                .first
+                                                                .isNegative
                                                             ? 0xffbd1c1c
                                                             : 0xff199225
                                                         : 0xff000000,
                                                   ).harmonizeWith(
-                                                    Theme.of(context).colorScheme.primary,
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
                                                   ),
                                                 ),
                                           ),
@@ -176,106 +413,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                   ),
                                 ),
                                 if (cardsValues.isNotEmpty)
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Divider(
-                                          height: 4,
-                                          thickness: 2,
-                                          color: Theme.of(context).colorScheme.tertiary,
-                                        ),
-                                      ),
-                                      Card(
-                                        child: ListView.separated(
-                                          shrinkWrap: true,
-                                          padding: EdgeInsets.zero,
-                                          physics: const NeverScrollableScrollPhysics(),
-                                          itemCount: cardsValues.entries.length,
-                                          itemBuilder: (context, index) {
-                                            return ListTile(
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              title: Text(cardsValues.keys.elementAt(index)),
-                                              subtitle: Text(
-                                                NumberFormat.simpleCurrency(
-                                                  locale: Localizations.localeOf(context).languageCode,
-                                                ).format(
-                                                  snapshot.hasData ? cardsValues.values.elementAt(index).first : 0,
-                                                ),
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                  color: const Color(0xffbd1c1c).harmonizeWith(
-                                                    Theme.of(context).colorScheme.primary,
-                                                  ),
-                                                ),
-                                              ),
-                                              onTap: () async {
-                                                final Isar isar = Isar.getInstance()!;
-                                                final int cardId = cardsValues.values.elementAt(index).last.toInt();
-                                                final fhelper.Card? card = await isar.cards.get(cardId);
-                                                if (mounted) {
-                                                  await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute<CardDetailsView>(
-                                                      builder: (context) => CardDetailsView(
-                                                        card: card!,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                              trailing: IconButton.filled(
-                                                onPressed: () => showDialog<void>(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return AlertDialog(
-                                                      title: Text(AppLocalizations.of(context)!.confirmPayQuestion),
-                                                      content: Text(AppLocalizations.of(context)!.irreversibleAction),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () => Navigator.pop(context),
-                                                          child: Text(AppLocalizations.of(context)!.cancel),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () async {
-                                                            final Isar isar = Isar.getInstance()!;
-                                                            final int cardId = cardsValues.values.elementAt(index).last.toInt();
-                                                            final CardBill? bill = await isar.cardBills.get(cardId);
-                                                            if (bill != null) {
-                                                              final CardBill newBill = bill.copyWith(confirmed: true);
-                                                              await isar.writeTxn(() async {
-                                                                await isar.cardBills.put(newBill);
-                                                              }).then((_) => Navigator.pop(context));
-                                                            }
-                                                          },
-                                                          child: Text(AppLocalizations.of(context)!.confirm),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  },
-                                                ),
-                                                icon: Icon(
-                                                  Icons.check,
-                                                  color: Theme.of(context).colorScheme.onPrimary,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          separatorBuilder: (_, __) => Divider(
-                                            height: 2,
-                                            thickness: 1.5,
-                                            indent: 16,
-                                            endIndent: 16,
-                                            color: Theme.of(context).colorScheme.outlineVariant,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  _pendingCardBills(cardsValues),
                               ],
                             ),
                           ),
@@ -285,39 +423,62 @@ class _HistoryPageState extends State<HistoryPage> {
                   },
                 ),
                 FutureBuilder(
-                  future: getExchanges(isar, context, time: _indexMap[_time]!).then((value) async {
+                  future: getExchanges(isar, context, time: _indexMap[_time]!)
+                      .then((value) async {
                     if (mounted) {
-                      final List<Exchange> billExchange = await getCardBillsAsExchanges(isar, context, time: _indexMap[_time]!);
+                      final billExchange = await getCardBillsAsExchanges(
+                        isar,
+                        context,
+                        time: _indexMap[_time]!,
+                      );
                       if (billExchange.isNotEmpty) {
-                        final List<Exchange> list = [...value, ...billExchange]..sort(
+                        final list = <Exchange>[...value, ...billExchange]
+                          ..sort(
                             (a, b) => b.date.compareTo(a.date),
                           );
                         return list;
                       }
-                      return value;
                     }
-                    return <Exchange>[];
+                    for (final exchange in value) {
+                      if (exchange.eType == EType.transfer && context.mounted) {
+                        final index = value.indexOf(exchange);
+                        final transfer = exchange.copyWith(
+                          description: await wid_utils.parseTransferName(
+                            context,
+                            exchange,
+                          ),
+                        );
+                        value.replaceRange(index, index + 1, [transfer]);
+                      }
+                    }
+                    return value;
                   }),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       if (_indexMap[_time]! != 0) {
-                        // This function separates the raw result of `getExchanges()` into days,
-                        // while doing the calculation for the total value of each day
+                        // This function separates the raw result of
+                        // `getExchanges()` into days, while doing the
+                        // calculation for the total value of each day
                         //
-                        // First it collects every day available from `getExchanges()` result
-                        // maping each day number to a dummy value, then it cycles through the
-                        // map (`days`) and the snapshot list finding which exchange was made in
-                        // each day and adding to the final list (`exchangeLists`) while summing
-                        // the exchange's value on top of the dummy value of `days`
+                        // First it collects every day available from
+                        // `getExchanges()` result maping each day number to a
+                        // dummy value, then it cycles through the map (`days`)
+                        // and the snapshot list finding which exchange was made
+                        // in each day and adding to the final list
+                        // (`exchangeLists`) while summing the exchange's value
+                        // on top of the dummy value of `days`
                         //
-                        // This approach can only be done for defined periods of time that will "reset"
-                        // like weeks and months
-                        // Also its (logicaly) limited to a max of `DateTime.now()`, so probably won't work on
-                        // dates on the future  (not tested)
-                        // The overhead for processing multiple exchanges with multiple days is presumed
-                        // to be high (not tested)
-                        final Map<int, double> days = {};
-                        final List<List<Exchange>> exchangeLists = [];
+                        // This approach can only be done for defined periods of
+                        // time that will "reset" like weeks and months
+                        //
+                        // Also its (logicaly) limited to a max of
+                        // `DateTime.now()`, so probably won't work on dates on
+                        // the future (not tested)
+                        //
+                        // The overhead for processing multiple exchanges with
+                        // multiple days is presumed to be high (not tested)
+                        final days = <int, double>{};
+                        final exchangeLists = <List<Exchange>>[];
                         for (final exchange in snapshot.data!) {
                           if (!days.keys.contains(exchange.date.day)) {
                             days.addAll({exchange.date.day: 0});
@@ -326,12 +487,15 @@ class _HistoryPageState extends State<HistoryPage> {
                         for (final day in days.keys) {
                           for (final element in snapshot.data!) {
                             if (element.date.day == day) {
-                              if (exchangeLists.length > days.keys.toList().indexOf(day)) {
-                                exchangeLists[days.keys.toList().indexOf(day)].add(element);
+                              if (exchangeLists.length >
+                                  days.keys.toList().indexOf(day)) {
+                                exchangeLists[days.keys.toList().indexOf(day)]
+                                    .add(element);
                               } else {
                                 exchangeLists.add([element]);
                               }
-                              if (element.eType != EType.transfer && element.installments == null) {
+                              if (element.eType != EType.transfer &&
+                                  element.installments == null) {
                                 days.update(
                                   day,
                                   (value) => value += element.value,
@@ -340,18 +504,39 @@ class _HistoryPageState extends State<HistoryPage> {
                             }
                           }
                         }
+                        DateTime date(int day) => DateTime(
+                              DateTime.now().year,
+                              DateTime.now().month,
+                              day,
+                            );
+                        String day(int index) =>
+                            days.keys.toList()[index] == DateTime.now().day
+                                ? localization.today
+                                : days.keys.toList()[index] ==
+                                        DateTime.now().day - 1
+                                    ? localization.yesterday
+                                    : _indexMap[_time]! == 1
+                                        ? DateFormat.EEEE(languageCode).format(
+                                            date(days.keys.toList()[index]),
+                                          )
+                                        : localization.historyListDayDate(
+                                            date(days.keys.toList()[index]),
+                                          );
                         return Card(
                           elevation: 0,
                           margin: const EdgeInsets.symmetric(horizontal: 22),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                             side: BorderSide(
-                              color: Theme.of(context).colorScheme.outlineVariant,
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant,
                             ),
                           ),
                           clipBehavior: Clip.antiAliasWithSaveLayer,
                           child: Padding(
-                            padding: exchangeLists.isNotEmpty ? const EdgeInsets.only(top: 16) : EdgeInsets.zero,
+                            padding: exchangeLists.isNotEmpty
+                                ? const EdgeInsets.only(top: 16)
+                                : EdgeInsets.zero,
                             child: ListView.separated(
                               shrinkWrap: true,
                               padding: EdgeInsets.zero,
@@ -359,30 +544,10 @@ class _HistoryPageState extends State<HistoryPage> {
                               itemCount: exchangeLists.length,
                               itemBuilder: (context, index) {
                                 return HistoryList(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                                  day: days.keys.toList()[index] == DateTime.now().day
-                                      ? AppLocalizations.of(context)!.today
-                                      : days.keys.toList()[index] == DateTime.now().day - 1
-                                          ? AppLocalizations.of(context)!.yesterday
-                                          : _indexMap[_time]! == 1
-                                              ? DateFormat.EEEE(
-                                                  Localizations.localeOf(
-                                                    context,
-                                                  ).languageCode,
-                                                ).format(
-                                                  DateTime(
-                                                    DateTime.now().year,
-                                                    DateTime.now().month,
-                                                    days.keys.toList()[index],
-                                                  ),
-                                                )
-                                              : AppLocalizations.of(context)!.historyListDayDate(
-                                                  DateTime(
-                                                    DateTime.now().year,
-                                                    DateTime.now().month,
-                                                    days.keys.toList()[index],
-                                                  ),
-                                                ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  day: day(index),
                                   dayTotal: days.values.toList()[index],
                                   items: exchangeLists[index],
                                 );
@@ -392,7 +557,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                 child: Divider(
                                   height: 2,
                                   thickness: 1.5,
-                                  color: Theme.of(context).colorScheme.outlineVariant,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .outlineVariant,
                                 ),
                               ),
                             ),
@@ -419,7 +586,8 @@ class _HistoryPageState extends State<HistoryPage> {
                         ),
                       );
                     } else {
-                      if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
+                      if (snapshot.connectionState == ConnectionState.active ||
+                          snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator.adaptive();
                       }
                       return const Text('OOPS');
@@ -430,6 +598,7 @@ class _HistoryPageState extends State<HistoryPage> {
             );
           },
         ),
+        const SizedBox(height: 15),
       ],
     );
   }

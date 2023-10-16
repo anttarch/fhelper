@@ -1,8 +1,6 @@
-import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
-import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
+import 'package:fhelper/src/logic/widgets/show_selector_bottom_sheet.dart';
 import 'package:fhelper/src/widgets/inputfield.dart';
-import 'package:fhelper/src/widgets/listchoice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -12,48 +10,46 @@ import 'package:isar/isar.dart';
 Future<void> showCardForm({
   required BuildContext context,
   fhelper.Card? card,
-  Attribute? cardAttribute,
   bool editMode = false,
 }) {
-  assert(editMode ? card != null : card == null);
-  final List<TextEditingController> controller = [
+  assert(
+    editMode ? card != null : card == null,
+    editMode ? 'Need a card to edit' : 'Cannot add an existing card',
+  );
+  final controller = <TextEditingController>[
     TextEditingController(),
     TextEditingController(),
 
     // controller for dialog
     TextEditingController(),
   ];
-  final List<String?> displayText = [
+  final displayText = <String?>[
     // Statement Closing Date
     null,
     // Payment Due Date,
     null,
-    // Account,
-    null,
   ];
-  int accountId = -1;
-  int pdDate = -1;
-  int stcDate = -1;
+  var pdDate = -1;
+  var stcDate = -1;
+  final localization = AppLocalizations.of(context)!;
 
   void cleanForm() {
-    accountId = -1;
     stcDate = -1;
     pdDate = -1;
-    displayText.fillRange(0, 3, null);
+    displayText.fillRange(0, 2, null);
     for (final element in controller) {
       element.clear();
     }
   }
 
   Future<void> addCard() async {
-    final String value = controller[1].text.replaceAll(RegExp('[^0-9]'), '');
-    final Isar isar = Isar.getInstance()!;
-    final fhelper.Card card = fhelper.Card(
+    final value = controller[1].text.replaceAll(RegExp('[^0-9]'), '');
+    final isar = Isar.getInstance()!;
+    final card = fhelper.Card(
       name: controller[0].text,
       statementClosure: stcDate + 1,
       paymentDue: pdDate + 1,
       limit: double.parse(value) / 100,
-      accountId: (await getAttributes(isar, AttributeType.account))[accountId].id,
     );
     await isar.writeTxn(() async {
       await isar.cards.put(card);
@@ -62,14 +58,13 @@ Future<void> showCardForm({
   }
 
   Future<void> editCard(fhelper.Card originalCard) async {
-    final Isar isar = Isar.getInstance()!;
-    final String value = controller[1].text.replaceAll(RegExp('[^0-9]'), '');
-    final fhelper.Card newCard = originalCard.copyWith(
+    final isar = Isar.getInstance()!;
+    final value = controller[1].text.replaceAll(RegExp('[^0-9]'), '');
+    final newCard = originalCard.copyWith(
       name: controller[0].text,
       statementClosure: stcDate + 1,
       paymentDue: pdDate + 1,
       limit: double.parse(value) / 100,
-      accountId: accountId == -1 ? null : (await getAttributes(isar, AttributeType.account))[accountId].id,
     );
     await isar.writeTxn(() async {
       await isar.cards.put(newCard);
@@ -82,11 +77,12 @@ Future<void> showCardForm({
   if (card != null && editMode) {
     stcDate = card.statementClosure - 1;
     pdDate = card.paymentDue - 1;
-    displayText[0] = AppLocalizations.of(context)!.dayOfMonth(card.statementClosure);
-    displayText[1] = AppLocalizations.of(context)!.dayOfMonth(card.paymentDue);
-    displayText[2] = cardAttribute!.name;
+    displayText[0] = localization.dayOfMonth(card.statementClosure);
+    displayText[1] = localization.dayOfMonth(card.paymentDue);
     controller[0].text = card.name;
-    controller[1].text = NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).languageCode).format(card.limit);
+    controller[1].text = NumberFormat.simpleCurrency(
+      locale: Localizations.localeOf(context).languageCode,
+    ).format(card.limit);
   }
   return showDialog<void>(
     context: context,
@@ -101,7 +97,9 @@ Future<void> showCardForm({
                 SliverAppBar(
                   pinned: true,
                   forceElevated: true,
-                  title: Text(editMode ? AppLocalizations.of(context)!.edit : AppLocalizations.of(context)!.addCard),
+                  title: Text(
+                    editMode ? localization.edit : localization.addCard,
+                  ),
                   leading: IconButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -120,7 +118,9 @@ Future<void> showCardForm({
                           }
                         }
                       },
-                      child: Text(editMode ? AppLocalizations.of(context)!.save : AppLocalizations.of(context)!.add),
+                      child: Text(
+                        editMode ? localization.save : localization.add,
+                      ),
                     ),
                   ],
                 ),
@@ -135,15 +135,15 @@ Future<void> showCardForm({
                             padding: const EdgeInsets.only(top: 15),
                             child: InputField(
                               controller: controller[0],
-                              label: AppLocalizations.of(context)!.name,
+                              label: localization.name,
                               inputFormatters: [
                                 LengthLimitingTextInputFormatter(15),
                               ],
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  return AppLocalizations.of(context)!.emptyField;
+                                  return localization.emptyField;
                                 } else if (value.length < 3) {
-                                  return AppLocalizations.of(context)!.threeCharactersMinimum;
+                                  return localization.threeCharactersMinimum;
                                 }
                                 return null;
                               },
@@ -152,106 +152,74 @@ Future<void> showCardForm({
                           Padding(
                             padding: const EdgeInsets.only(top: 15),
                             child: InputField(
-                              label: AppLocalizations.of(context)!.statementClosing,
+                              label: localization.statementClosing,
                               readOnly: true,
-                              placeholder: displayText[0] ?? AppLocalizations.of(context)!.select,
+                              placeholder:
+                                  displayText[0] ?? localization.select,
                               validator: (value) {
                                 if (value!.isEmpty || displayText[0] == null) {
-                                  return AppLocalizations.of(context)!.emptyField;
+                                  return localization.emptyField;
                                 }
                                 return null;
                               },
-                              onTap: () => showModalBottomSheet<void>(
+                              onTap: () => showSelectorBottomSheet<void>(
                                 context: context,
-                                enableDrag: false,
-                                builder: (context) {
-                                  return StatefulBuilder(
-                                    builder: (context, setState) {
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(20),
-                                            child: Text(
-                                              AppLocalizations.of(context)!.selectDay,
-                                              style: Theme.of(context).textTheme.titleLarge,
-                                            ),
-                                          ),
-                                          ListChoice(
-                                            groupValue: stcDate,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                stcDate = value!;
-                                              });
-                                              Navigator.pop(context);
-                                            },
-                                            intList: List.generate(31, (index) => index + 1),
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  );
+                                groupValue: stcDate,
+                                title: localization.selectDay,
+                                onSelect: (_, value) {
+                                  setState(() {
+                                    stcDate = value! as int;
+                                  });
+                                  Navigator.pop(context);
                                 },
+                                intList:
+                                    List.generate(31, (index) => index + 1),
                               ).then(
-                                (_) => stcDate != -1
-                                    ? setState(
-                                        () => displayText[0] = AppLocalizations.of(context)!.dayOfMonth(stcDate + 1),
-                                      )
-                                    : null,
+                                (_) {
+                                  if (stcDate != -1) {
+                                    setState(
+                                      () => displayText[0] =
+                                          localization.dayOfMonth(stcDate + 1),
+                                    );
+                                  }
+                                },
                               ),
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 15),
                             child: InputField(
-                              label: AppLocalizations.of(context)!.paymentDue,
+                              label: localization.paymentDue,
                               readOnly: true,
-                              placeholder: displayText[1] ?? AppLocalizations.of(context)!.select,
+                              placeholder:
+                                  displayText[1] ?? localization.select,
                               validator: (value) {
                                 if (value!.isEmpty || displayText[1] == null) {
-                                  return AppLocalizations.of(context)!.emptyField;
+                                  return localization.emptyField;
                                 }
                                 return null;
                               },
-                              onTap: () => showModalBottomSheet<void>(
+                              onTap: () => showSelectorBottomSheet<void>(
                                 context: context,
-                                enableDrag: false,
-                                builder: (context) {
-                                  return StatefulBuilder(
-                                    builder: (context, setState) {
-                                      return Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(20),
-                                            child: Text(
-                                              AppLocalizations.of(context)!.selectDay,
-                                              style: Theme.of(context).textTheme.titleLarge,
-                                            ),
-                                          ),
-                                          ListChoice(
-                                            groupValue: pdDate,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                pdDate = value!;
-                                              });
-                                              Navigator.pop(context);
-                                            },
-                                            intList: List.generate(31, (index) => index + 1),
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  );
+                                groupValue: pdDate,
+                                title: localization.selectDay,
+                                onSelect: (_, value) {
+                                  setState(() {
+                                    pdDate = value! as int;
+                                  });
+                                  Navigator.pop(context);
                                 },
+                                intList:
+                                    List.generate(31, (index) => index + 1),
                               ).then(
-                                (_) => pdDate != -1
-                                    ? setState(
-                                        () => displayText[1] = AppLocalizations.of(context)!.dayOfMonth(pdDate + 1),
-                                      )
-                                    : null,
+                                (_) {
+                                  if (pdDate != -1) {
+                                    setState(
+                                      () => displayText[1] =
+                                          localization.dayOfMonth(pdDate + 1),
+                                    );
+                                  }
+                                },
                               ),
                             ),
                           ),
@@ -259,101 +227,27 @@ Future<void> showCardForm({
                             padding: const EdgeInsets.only(top: 15),
                             child: InputField(
                               controller: controller[1],
-                              label: AppLocalizations.of(context)!.limit,
+                              label: localization.limit,
                               keyboardType: TextInputType.number,
                               inputFormatters: [
                                 CurrencyInputFormatter(
-                                  locale: Localizations.localeOf(context).languageCode,
-                                )
+                                  locale: Localizations.localeOf(context)
+                                      .languageCode,
+                                ),
                               ],
                               validator: (value) {
-                                if (value!.isEmpty) {
-                                  return AppLocalizations.of(context)!.emptyField;
-                                } else if (value.replaceAll(RegExp('[^0-9]'), '') == '000') {
-                                  return AppLocalizations.of(context)!.invalidValue;
+                                final parsedValue = value!.replaceAll(
+                                  RegExp('[^0-9]'),
+                                  '',
+                                );
+                                if (value.isEmpty) {
+                                  return localization.emptyField;
+                                } else if (parsedValue == '000') {
+                                  return localization.invalidValue;
                                 }
                                 return null;
                               },
                             ),
-                          ),
-                          FutureBuilder(
-                            future: getAttributes(Isar.getInstance()!, AttributeType.account, context: context),
-                            builder: (context, snapshot) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 15, bottom: 15),
-                                child: InputField(
-                                  label: AppLocalizations.of(context)!.account(1),
-                                  readOnly: true,
-                                  placeholder: displayText[2] ?? AppLocalizations.of(context)!.select,
-                                  validator: (value) {
-                                    if (value!.isEmpty || displayText[2] == null) {
-                                      return AppLocalizations.of(context)!.emptyField;
-                                    }
-                                    return null;
-                                  },
-                                  onTap: () => showModalBottomSheet<void>(
-                                    context: context,
-                                    constraints: BoxConstraints(
-                                      minHeight: MediaQuery.of(context).size.height / 3,
-                                    ),
-                                    enableDrag: false,
-                                    builder: (context) {
-                                      int accountIndex = editMode && snapshot.hasData ? snapshot.data!.indexOf(cardAttribute!) : -1;
-                                      return StatefulBuilder(
-                                        builder: (context, setState) {
-                                          return Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      AppLocalizations.of(context)!.selectAccount,
-                                                      style: Theme.of(context).textTheme.titleLarge,
-                                                    ),
-                                                    TextButton.icon(
-                                                      onPressed: () => showAttributeDialog<void>(
-                                                        context: context,
-                                                        attributeType: AttributeType.account,
-                                                        controller: controller[2],
-                                                      ).then((_) => controller[2].clear()),
-                                                      icon: const Icon(Icons.add),
-                                                      label: Text(AppLocalizations.of(context)!.add),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              ListChoice(
-                                                groupValue: editMode ? accountIndex : accountId,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    if (editMode) {
-                                                      accountIndex = value!;
-                                                    }
-                                                    accountId = value!;
-                                                  });
-                                                  Navigator.pop(context);
-                                                },
-                                                attributeList: snapshot.hasData ? snapshot.data! : [],
-                                              )
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ).then(
-                                    (_) => accountId != -1
-                                        ? setState(
-                                            () => displayText[2] = snapshot.hasData ? snapshot.data![accountId].name : null,
-                                          )
-                                        : null,
-                                  ),
-                                ),
-                              );
-                            },
                           ),
                         ],
                       ),

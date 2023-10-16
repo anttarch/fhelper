@@ -1,5 +1,3 @@
-import 'package:animations/animations.dart';
-import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/card.dart' as fhelper;
 import 'package:fhelper/src/logic/collections/exchange.dart';
 import 'package:fhelper/src/logic/widgets/show_card_dialog.dart';
@@ -30,8 +28,68 @@ class _CardManagerState extends State<CardManager> {
     );
   }
 
+  SnackBar _undoSnackBar(int backupIndex, fhelper.Card? backup, Isar isar) {
+    final localization = AppLocalizations.of(context)!;
+    return SnackBar(
+      content: Text(
+        localization.deletedSnackBar(backup!.name),
+      ),
+      action: SnackBarAction(
+        label: localization.undo,
+        onPressed: () async {
+          await isar.writeTxn(() async {
+            await isar.cards.put(backup);
+          }).then((_) {
+            if (!cards.contains(backup)) {
+              if (cards.length + 1 == backupIndex) {
+                cards.add(backup);
+              } else if (backupIndex < cards.length + 1) {
+                cards.insert(backupIndex, backup);
+              }
+            }
+            setState(() => selectedIndex = backupIndex);
+          });
+        },
+      ),
+      behavior: SnackBarBehavior.floating,
+    );
+  }
+
+  Widget _dependencyDialog(int value, Isar isar) {
+    final localization = AppLocalizations.of(context)!;
+    return AlertDialog(
+      title: Text(localization.proceedQuestion),
+      icon: const Icon(Icons.warning),
+      content: Text(localization.dependencyPhrase(value)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(localization.cancel),
+        ),
+        FilledButton.tonal(
+          onPressed: () async {
+            final backupIndex = selectedIndex;
+            final backup = await isar.cards.get(cards[selectedIndex].id);
+            await isar.writeTxn(() async {
+              await isar.cards.delete(cards[selectedIndex].id);
+            }).then((_) {
+              setState(() => selectedIndex = -1);
+              Navigator.pop(context);
+            });
+            if (mounted) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(_undoSnackBar(backupIndex, backup, isar));
+            }
+          },
+          child: Text(localization.proceed),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
     return WillPopScope(
       onWillPop: () {
         if (selectedIndex > -1) {
@@ -48,7 +106,9 @@ class _CardManagerState extends State<CardManager> {
               title: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  selectedIndex > -1 ? AppLocalizations.of(context)!.select : AppLocalizations.of(context)!.card(-1),
+                  selectedIndex > -1
+                      ? localization.select
+                      : localization.card(-1),
                 ),
               ),
               actions: [
@@ -59,10 +119,12 @@ class _CardManagerState extends State<CardManager> {
                       onPressed: () => setState(() => selectedIndex = -1),
                       icon: Icon(
                         Icons.deselect,
-                        semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deselectIconButton : null,
+                        semanticLabel: selectedIndex > -1
+                            ? localization.deselectIconButton
+                            : null,
                       ),
                     ),
-                  )
+                  ),
               ],
             ),
             SliverToBoxAdapter(
@@ -80,7 +142,8 @@ class _CardManagerState extends State<CardManager> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                             side: BorderSide(
-                              color: Theme.of(context).colorScheme.outlineVariant,
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant,
                             ),
                           ),
                           child: ListView.separated(
@@ -89,55 +152,60 @@ class _CardManagerState extends State<CardManager> {
                             padding: EdgeInsets.zero,
                             itemCount: cards.length,
                             itemBuilder: (context, index) {
-                              return OpenContainer(
-                                closedElevation: 0,
-                                closedColor: Colors.transparent,
-                                openElevation: 0,
-                                transitionDuration: const Duration(milliseconds: 250),
-                                closedBuilder: (context, action) {
-                                  return ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                                    shape: wid_utils.getShapeBorder(index, cards.length - 1),
-                                    tileColor: selectedIndex == index ? Theme.of(context).colorScheme.surfaceVariant : null,
-                                    title: Text(
-                                      cards[index].name,
-                                      style: Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                    trailing: selectedIndex == -1
-                                        ? Icon(
-                                            Icons.arrow_right,
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                          )
-                                        : _selectedIndicator(index),
-                                    onTap: () {
-                                      if (selectedIndex > -1) {
-                                        if (selectedIndex != index) {
-                                          setState(() {
-                                            selectedIndex = index;
-                                          });
-                                        }
-                                      } else {
-                                        action();
-                                      }
-                                    },
-                                    onLongPress: () {
+                              return ListTile(
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                shape: wid_utils.getShapeBorder(
+                                  index,
+                                  cards.length - 1,
+                                ),
+                                tileColor: selectedIndex == index
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .surfaceVariant
+                                    : null,
+                                title: Text(
+                                  cards[index].name,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                trailing: selectedIndex == -1
+                                    ? Icon(
+                                        Icons.arrow_right,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      )
+                                    : _selectedIndicator(index),
+                                onTap: () {
+                                  if (selectedIndex > -1) {
+                                    if (selectedIndex != index) {
                                       setState(() {
                                         selectedIndex = index;
                                       });
-                                    },
-                                  );
+                                    }
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute<CardDetailsView>(
+                                        builder: (context) => CardDetailsView(
+                                          card: cards[index],
+                                        ),
+                                      ),
+                                    );
+                                  }
                                 },
-                                openBuilder: (context, action) {
-                                  return CardDetailsView(
-                                    card: cards[index],
-                                  );
+                                onLongPress: () {
+                                  setState(() {
+                                    selectedIndex = index;
+                                  });
                                 },
                               );
                             },
                             separatorBuilder: (_, __) => Divider(
                               height: 2,
                               thickness: 1.5,
-                              color: Theme.of(context).colorScheme.outlineVariant,
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant,
                             ),
                           ),
                         );
@@ -150,18 +218,23 @@ class _CardManagerState extends State<CardManager> {
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => showCardForm(context: context).then((_) => setState(() => selectedIndex = -1)),
+          onPressed: () => showCardForm(context: context)
+              .then((_) => setState(() => selectedIndex = -1)),
           label: Text(
-            AppLocalizations.of(context)!.card(1),
-            semanticsLabel: AppLocalizations.of(context)!.addCardFAB,
+            localization.card(1),
+            semanticsLabel: localization.addCardFAB,
           ),
           icon: const Icon(Icons.add),
           elevation: selectedIndex > -1 ? 0 : null,
         ),
-        floatingActionButtonLocation: selectedIndex > -1 ? FloatingActionButtonLocation.endContained : null,
+        floatingActionButtonLocation: selectedIndex > -1
+            ? FloatingActionButtonLocation.endContained
+            : null,
         bottomNavigationBar: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          height: selectedIndex > -1 ? 80 + MediaQuery.paddingOf(context).bottom : 0,
+          height: selectedIndex > -1
+              ? 80 + MediaQuery.paddingOf(context).bottom
+              : 0,
           child: BottomAppBar(
             child: Row(
               children: [
@@ -176,100 +249,36 @@ class _CardManagerState extends State<CardManager> {
                   ),
                   icon: Icon(
                     Icons.info,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.infoIconButton(cards[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex > -1
+                        ? localization.infoIconButton(cards[selectedIndex].name)
+                        : null,
                   ),
                 ),
                 IconButton(
                   onPressed: () async {
-                    await checkForAttributeDependencies(Isar.getInstance()!, cards[selectedIndex].id, null).then(
+                    await checkForAttributeDependencies(
+                      Isar.getInstance()!,
+                      cards[selectedIndex].id,
+                      null,
+                    ).then(
                       (value) async {
-                        final Isar isar = Isar.getInstance()!;
+                        final isar = Isar.getInstance()!;
                         if (value > 0) {
                           await showDialog<void>(
                             context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text(AppLocalizations.of(context)!.proceedQuestion),
-                                icon: const Icon(Icons.warning),
-                                content: Text(AppLocalizations.of(context)!.dependencyPhrase(value)),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text(
-                                      AppLocalizations.of(context)!.cancel,
-                                    ),
-                                  ),
-                                  FilledButton.tonal(
-                                    onPressed: () async {
-                                      final backupIndex = selectedIndex;
-                                      final backup = await isar.cards.get(cards[selectedIndex].id);
-                                      await isar.writeTxn(() async {
-                                        await isar.cards.delete(cards[selectedIndex].id);
-                                      }).then((_) {
-                                        setState(() => selectedIndex = -1);
-                                        Navigator.pop(context);
-                                      });
-                                      if (mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(AppLocalizations.of(context)!.deletedSnackBar(backup!.name)),
-                                            action: SnackBarAction(
-                                              label: AppLocalizations.of(context)!.undo,
-                                              onPressed: () async {
-                                                await isar.writeTxn(() async {
-                                                  await isar.cards.put(backup);
-                                                }).then((_) {
-                                                  if (!cards.contains(backup)) {
-                                                    if (cards.length + 1 == backupIndex) {
-                                                      cards.add(backup);
-                                                    } else if (backupIndex < cards.length + 1) {
-                                                      cards.insert(backupIndex, backup);
-                                                    }
-                                                  }
-                                                  setState(() => selectedIndex = backupIndex);
-                                                });
-                                              },
-                                            ),
-                                            behavior: SnackBarBehavior.floating,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    child: Text(AppLocalizations.of(context)!.proceed),
-                                  )
-                                ],
-                              );
-                            },
+                            builder: (context) =>
+                                _dependencyDialog(value, isar),
                           );
                         } else {
                           final backupIndex = selectedIndex;
-                          final backup = await isar.cards.get(cards[selectedIndex].id);
+                          final backup =
+                              await isar.cards.get(cards[selectedIndex].id);
                           await isar.writeTxn(() async {
                             await isar.cards.delete(cards[selectedIndex].id);
                           }).then((_) => setState(() => selectedIndex = -1));
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(AppLocalizations.of(context)!.deletedSnackBar(backup!.name)),
-                                action: SnackBarAction(
-                                  label: AppLocalizations.of(context)!.undo,
-                                  onPressed: () async {
-                                    await isar.writeTxn(() async {
-                                      await isar.cards.put(backup);
-                                    }).then((_) {
-                                      if (!cards.contains(backup)) {
-                                        if (cards.length + 1 == backupIndex) {
-                                          cards.add(backup);
-                                        } else if (backupIndex < cards.length + 1) {
-                                          cards.insert(backupIndex, backup);
-                                        }
-                                      }
-                                      setState(() => selectedIndex = backupIndex);
-                                    });
-                                  },
-                                ),
-                                behavior: SnackBarBehavior.floating,
-                              ),
+                              _undoSnackBar(backupIndex, backup, isar),
                             );
                           }
                         }
@@ -278,20 +287,27 @@ class _CardManagerState extends State<CardManager> {
                   },
                   icon: Icon(
                     Icons.delete,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.deleteIconButton(cards[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex > -1
+                        ? localization
+                            .deleteIconButton(cards[selectedIndex].name)
+                        : null,
                   ),
                 ),
                 IconButton(
                   onPressed: () async {
-                    final Attribute? attribute = await getAttributeFromId(Isar.getInstance()!, cards[selectedIndex].accountId, context: context);
                     if (mounted) {
-                      await showCardForm(context: context, editMode: true, card: cards[selectedIndex], cardAttribute: attribute)
-                          .then((_) => setState(() => selectedIndex = -1));
+                      await showCardForm(
+                        context: context,
+                        editMode: true,
+                        card: cards[selectedIndex],
+                      ).then((_) => setState(() => selectedIndex = -1));
                     }
                   },
                   icon: Icon(
                     Icons.edit,
-                    semanticLabel: selectedIndex > -1 ? AppLocalizations.of(context)!.editIconButton(cards[selectedIndex].name) : null,
+                    semanticLabel: selectedIndex > -1
+                        ? localization.editIconButton(cards[selectedIndex].name)
+                        : null,
                   ),
                 ),
               ],

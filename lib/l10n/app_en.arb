@@ -34,6 +34,22 @@
             }
         }
     },
+    "cardBill": "{name}'s bill",
+    "@cardBill": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
+    "cardHistory": "{name}'s history",
+    "@cardHistory": {
+        "placeholders": {
+            "name": {
+                "type": "String"
+            }
+        }
+    },
     "clear": "Clear",
     "confirm": "Confirm",
     "confirmPayQuestion": "Confirm pay?",
@@ -54,6 +70,7 @@
             }
         }
     },
+    "defaultSubaccounts": "Default subaccounts",
     "delete": "Delete",
     "deleted": "Deleted",
     "deletedSnackBar": "\"{name}\" deleted",
@@ -61,6 +78,15 @@
         "placeholders": {
             "name": {
                 "type": "String"
+            }
+        }
+    },
+    "deletePermanentlyQuestion": "Permanently delete?",
+    "deleteContentDescription": "All related data and related {count, plural, =1{subtypes} other{subaccounts}} are also being deleted.",
+    "@deleteContentDescription": {
+        "placeholders": {
+            "count": {
+                "type": "num"
             }
         }
     },
@@ -101,12 +127,17 @@
     "invalidName": "Invalid name",
     "invalidValue": "Invalid value",
     "irreversibleAction": "This action is irreversible",
-    "latest": "Latest:",
+    "latest": "Latest",
+    "latestDescriptor": "Latest:",
     "latestBill": "Latest bill",
     "limit": "Limit",
     "month": "Month",
     "name": "Name",
+    "next": "Next",
+    "nextBillDescriptor": "Next bill:",
     "none": "None",
+    "noSubaccountWarning": "An account can't be used without a subaccount.",
+    "past": "Past",
     "paymentDue": "Payment Due",
     "perInstallmentValue": "Per-installment value",
     "price": "Price",
@@ -117,6 +148,7 @@
     "relatedTransactionsDescription": "Related transactions:",
     "save": "Save",
     "security": "Security",
+    "seeHistory": "See history",
     "select": "Select",
     "selectAccount": "Select Account",
     "selectCard": "Select Card",
@@ -126,6 +158,8 @@
     "showOnly": "Show only:",
     "statementClosing": "Statement Closing",
     "statistics": "Statistics",
+    "subaccount": "Subaccount",
+    "subtype": "Subtype",
     "theme": "Theme",
     "thisMonth": "This Month",
     "thisWeek": "This Week",
@@ -216,8 +250,12 @@
     },
 
 
-    "mainBankAccountAccount": "Main bank account",
-    "walletAccount": "Wallet",
+    "mainBankAccount": "Bank",
+    "othersAccount": "Others",
+
+    "checkingSubaccount": "Checking account",
+    "savingsSubaccount": "Savings account",
+    "walletSubaccount": "Wallet",
 
     "benefitsIncomeType": "Benefits",
     "giftsIncomeType": "Gifts",
@@ -225,10 +263,23 @@
     "salaryIncomeType": "Salary",
     "othersIncomeType": "Others",
 
-    "billsExpenseType": "Bills",
     "foodExpenseType": "Food",
-    "healthExpenseType": "Health",
+    "marketFOOD": "Market",
+    "streetMarketFOOD": "Street Market",
+    "bakeryFOOD": "Bakery",
+    "restaurantFOOD": "Restaurant",
+
     "homeExpenseType": "Home",
+    "housePaymentHOME": "House payment",
+    "cleaningHOME": "Cleaning services",
+    "waterBillHOME": "Water bill",
+    "electricityBillHOME": "Electricity bill",
+    "propertyTaxHOME": "Property Tax",
+    "internetTVHOME": "Internet/TV",
+
+
+    "billsExpenseType": "Bills",
+    "healthExpenseType": "Health",
     "personalExpenseType": "Personal",
     "recreationExpenseType": "Recreation",
     "transportsExpenseType": "Transports",

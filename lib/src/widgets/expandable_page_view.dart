@@ -16,8 +16,8 @@ import 'package:flutter/material.dart';
 /// Available at: https://gist.github.com/andrzejchm/02c1728b6f31a69fde2fb4e10b636060
 class ExpandablePageView extends StatefulWidget {
   const ExpandablePageView({
-    super.key,
     required this.children,
+    super.key,
     this.controller,
     this.minHeight,
     this.physics = const PageScrollPhysics(),
@@ -30,7 +30,7 @@ class ExpandablePageView extends StatefulWidget {
   final void Function(int)? onPageChanged;
 
   @override
-  _ExpandablePageViewState createState() => _ExpandablePageViewState();
+  State<ExpandablePageView> createState() => _ExpandablePageViewState();
 }
 
 class _ExpandablePageViewState extends State<ExpandablePageView> {
@@ -40,7 +40,7 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
   // get current height based on current page
   double _getCurrentHeight() {
     if (_pageController.positions.isNotEmpty) {
-      final double currentHeight = _heights[_pageController.page!.round()];
+      final currentHeight = _heights[_pageController.page!.round()];
       if (widget.minHeight != null && widget.minHeight! > currentHeight) {
         return widget.minHeight!;
       }
@@ -87,12 +87,14 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
         (index, child) => MapEntry(
           index,
           OverflowBox(
-            //needed, so that parent won't impose its constraints on the children, thus skewing the measurement results.
+            //needed, so that parent won't impose its constraints on the
+            //children, thus skewing the measurement results.
             minHeight: 0,
             maxHeight: double.infinity,
             alignment: Alignment.topCenter,
             child: SizeReportingWidget(
-              onSizeChange: (size) => setState(() => _heights[index] = size.height),
+              onSizeChange: (size) =>
+                  setState(() => _heights[index] = size.height),
               child: child,
             ),
           ),
@@ -104,15 +106,15 @@ class _ExpandablePageViewState extends State<ExpandablePageView> {
 
 class SizeReportingWidget extends StatefulWidget {
   const SizeReportingWidget({
-    super.key,
     required this.child,
     required this.onSizeChange,
+    super.key,
   });
   final Widget child;
   final ValueChanged<Size> onSizeChange;
 
   @override
-  _SizeReportingWidgetState createState() => _SizeReportingWidgetState();
+  State<SizeReportingWidget> createState() => _SizeReportingWidgetState();
 }
 
 class _SizeReportingWidgetState extends State<SizeReportingWidget> {

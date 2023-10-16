@@ -10,15 +10,16 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> elements = [
-      AppLocalizations.of(context)!.account(-1),
-      AppLocalizations.of(context)!.card(-1),
-      //AppLocalizations.of(context)!.theme,
-      AppLocalizations.of(context)!.type(-1),
-      //AppLocalizations.of(context)!.privacy,
-      //AppLocalizations.of(context)!.security,
+    final localization = AppLocalizations.of(context)!;
+    final elements = <String>[
+      localization.account(-1),
+      localization.card(-1),
+      //localization.theme,
+      localization.type(-1),
+      //localization.privacy,
+      //localization.security,
     ];
-    final List<VoidCallback> callbacks = [
+    final callbacks = <VoidCallback>[
       // Accounts
       () => Navigator.push(
             context,
@@ -49,7 +50,7 @@ class SettingsPage extends StatelessWidget {
     ];
     return Card(
       elevation: 0,
-      margin: const EdgeInsets.fromLTRB(22, 12, 22, 0),
+      margin: const EdgeInsets.fromLTRB(22, 12, 22, 15),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
@@ -62,22 +63,18 @@ class SettingsPage extends StatelessWidget {
         padding: EdgeInsets.zero,
         itemCount: elements.length,
         itemBuilder: (context, index) {
-          return Column(
-            children: [
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-                shape: wid_utils.getShapeBorder(index, elements.length - 1),
-                title: Text(
-                  elements[index],
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                trailing: Icon(
-                  Icons.arrow_right,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                onTap: callbacks[index],
-              ),
-            ],
+          return ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+            shape: wid_utils.getShapeBorder(index, elements.length - 1),
+            title: Text(
+              elements[index],
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            trailing: Icon(
+              Icons.arrow_right,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            onTap: callbacks[index],
           );
         },
         separatorBuilder: (_, __) => Divider(

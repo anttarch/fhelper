@@ -9,9 +9,9 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  animations: ^2.0.7
+  animations: ^2.0.8
   async: ^2.11.0
-  dynamic_color: ^1.6.6
+  dynamic_color: ^1.6.7
   flex_seed_scheme: ^1.4.0
   flutter:
     sdk: flutter
@@ -20,8 +20,8 @@ dependencies:
   intl: ^0.18.1
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
-  path_provider: ^2.0.15
-  shared_preferences: ^2.2.0
+  path_provider: ^2.1.1
+  shared_preferences: ^2.2.2
   unorm_dart: ^0.2.0
 
 dev_dependencies:
@@ -29,7 +29,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   isar_generator: ^3.1.0+1
-  very_good_analysis: ^5.0.0+1
+  very_good_analysis: ^5.1.0
 
 flutter:
   generate: true

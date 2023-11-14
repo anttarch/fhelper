@@ -64,20 +64,20 @@ class MyApp extends StatelessWidget {
           tones: FlexTones.highContrast(Brightness.light),
         );
         final darkTheme = SeedColorScheme.fromSeeds(
-          primaryKey: darkDynamic?.primary ?? const ColorScheme.light().primary,
+          primaryKey: darkDynamic?.primary ?? const ColorScheme.dark().primary,
           secondaryKey:
-              darkDynamic?.secondary ?? const ColorScheme.light().secondary,
+              darkDynamic?.secondary ?? const ColorScheme.dark().secondary,
           tertiaryKey:
-              darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+              darkDynamic?.tertiary ?? const ColorScheme.dark().tertiary,
           tones: FlexTones.vivid(Brightness.dark),
           brightness: Brightness.dark,
         );
         final darkThemeHc = SeedColorScheme.fromSeeds(
-          primaryKey: darkDynamic?.primary ?? const ColorScheme.light().primary,
+          primaryKey: darkDynamic?.primary ?? const ColorScheme.dark().primary,
           secondaryKey:
-              darkDynamic?.secondary ?? const ColorScheme.light().secondary,
+              darkDynamic?.secondary ?? const ColorScheme.dark().secondary,
           tertiaryKey:
-              darkDynamic?.tertiary ?? const ColorScheme.light().tertiary,
+              darkDynamic?.tertiary ?? const ColorScheme.dark().tertiary,
           tones: FlexTones.ultraContrast(Brightness.dark),
           brightness: Brightness.dark,
         );

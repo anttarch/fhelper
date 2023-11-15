@@ -284,14 +284,13 @@ class _TypeManagerState extends State<TypeManager> {
   @override
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
-    return WillPopScope(
-      onWillPop: () {
+    return PopScope(
+      canPop: selectedIndex.$2 == -1,
+      onPopInvoked: (_) {
         if (selectedIndex.$2 > -1) {
           setState(() => selectedIndex = (-1, -1));
-          return Future<bool>.value(false);
         }
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        return Future<bool>.value(true);
       },
       child: Scaffold(
         body: GestureDetector(

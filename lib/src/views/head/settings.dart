@@ -50,7 +50,7 @@ class SettingsPage extends StatelessWidget {
     ];
     return Card(
       elevation: 0,
-      margin: const EdgeInsets.fromLTRB(22, 12, 22, 15),
+      margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(

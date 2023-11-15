@@ -152,7 +152,7 @@ class _TransferViewState extends State<TransferView> {
           padding: const EdgeInsets.only(top: 20),
           child: InputField(
             label: localization.to,
-            locked: _accountId == (-1, -1),
+            enabled: _accountId == (-1, -1),
             readOnly: true,
             placeholder: displayText[1] ?? localization.select,
             validator: (value) {

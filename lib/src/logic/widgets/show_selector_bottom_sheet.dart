@@ -17,35 +17,43 @@ Future<T?> showSelectorBottomSheet<T>({
 }) {
   return showModalBottomSheet<T>(
     context: context,
-    enableDrag: false,
+    showDragHandle: true,
+    isScrollControlled: true,
     builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleLarge,
+      return DraggableScrollableSheet(
+        maxChildSize: 0.9,
+        minChildSize: 0.5,
+        expand: false,
+        snap: true,
+        builder: (context, scrollController) {
+          return CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              // TODO(antarch): integrate search
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _PersistentSearchBar(
+                  height: 76,
+                  searchBar: const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 0, 16, 20),
+                    child: SearchBar(
+                      // TODO(antarch): l10n and commonize
+                      hintText: 'Search accounts',
+                      leading: Icon(Icons.search),
                     ),
-                    action ?? const SizedBox.shrink(),
-                  ],
+                  ),
                 ),
               ),
-              ListChoice(
-                groupValue: groupValue,
-                onChanged: onSelect,
-                attributeMap: attributeMap,
-                attributeListBehavior: attributeListBehavior,
-                intList: intList,
-                cardList: cardList,
-                hiddenIndex: hiddenIndex,
+              SliverToBoxAdapter(
+                child: ListChoice(
+                  groupValue: groupValue,
+                  onChanged: onSelect,
+                  attributeMap: attributeMap,
+                  attributeListBehavior: attributeListBehavior,
+                  intList: intList,
+                  cardList: cardList,
+                  hiddenIndex: hiddenIndex,
+                ),
               ),
             ],
           );
@@ -53,4 +61,34 @@ Future<T?> showSelectorBottomSheet<T>({
       );
     },
   );
+}
+
+class _PersistentSearchBar extends SliverPersistentHeaderDelegate {
+  _PersistentSearchBar({
+    required this.searchBar,
+    required this.height,
+  });
+
+  final Widget searchBar;
+  final double height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return searchBar;
+  }
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
+    return true;
+  }
 }

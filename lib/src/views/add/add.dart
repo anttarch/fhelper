@@ -68,9 +68,7 @@ class _AddViewState extends State<AddView> {
           SliverAppBar.medium(
             title: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(
-                localization.add,
-              ),
+              child: Text(localization.add),
             ),
           ),
           SliverToBoxAdapter(
@@ -143,9 +141,7 @@ class _AddViewState extends State<AddView> {
                             : localization.price,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          CurrencyInputFormatter(
-                            locale: languageCode,
-                          ),
+                          CurrencyInputFormatter(locale: languageCode),
                         ],
                         validator: (value) {
                           final price = textController[1]
@@ -170,9 +166,7 @@ class _AddViewState extends State<AddView> {
                         label: localization.date,
                         readOnly: true,
                         placeholder: DateTime.now()
-                                    .difference(
-                                      DateTime.parse(displayText[0]!),
-                                    )
+                                    .difference(DateTime.parse(displayText[0]!))
                                     .inHours <
                                 24
                             ? DateFormat.yMd(
@@ -232,25 +226,20 @@ class _AddViewState extends State<AddView> {
                               groupValue: _typeId,
                               title: localization.selectType,
                               onSelect: (name, value) {
-                                setState(() {
-                                  _typeId = value! as (int, int);
-                                });
+                                setState(() => _typeId = value! as (int, int));
                                 Navigator.pop(context, name);
                               },
                               attributeMap: snapshot.data,
-                              action: TextButton.icon(
-                                onPressed: () => showAttributeDialog<void>(
-                                  context: context,
-                                  attributeRole: AttributeRole.child,
-                                  attributeType: _eType.single == EType.income
-                                      ? AttributeType.incomeType
-                                      : AttributeType.expenseType,
-                                  controller: textController[3],
-                                ).then(
-                                  (_) => textController[3].clear(),
-                                ),
-                                icon: const Icon(Icons.add),
-                                label: Text(localization.add),
+                              actionLabel: localization.add,
+                              onActionTap: () => showAttributeDialog<void>(
+                                context: context,
+                                attributeRole: AttributeRole.child,
+                                attributeType: _eType.single == EType.income
+                                    ? AttributeType.incomeType
+                                    : AttributeType.expenseType,
+                                controller: textController[3],
+                              ).then(
+                                (_) => textController[3].clear(),
                               ),
                             ).then(
                               (name) => _typeId != (-1, -1) && name != null
@@ -280,9 +269,9 @@ class _AddViewState extends State<AddView> {
                                     groupValue: _cardIndex,
                                     title: localization.selectCard,
                                     onSelect: (_, value) async {
-                                      setState(() {
-                                        _cardIndex = value! as int;
-                                      });
+                                      setState(
+                                        () => _cardIndex = value! as int,
+                                      );
                                       await getAvailableLimit(
                                         Isar.getInstance()!,
                                         snapshot.data![_cardIndex],
@@ -294,43 +283,26 @@ class _AddViewState extends State<AddView> {
                                       });
                                     },
                                     cardList: snapshot.data,
-                                    action: TextButton.icon(
-                                      onPressed: () {
-                                        if (_cardIndex == -1) {
-                                          showCardForm(context: context);
-                                        } else {
-                                          setState(() {
-                                            _cardIndex = -1;
-                                          });
-                                          Navigator.pop(context);
-                                        }
-                                      },
-                                      icon: Icon(
-                                        _cardIndex == -1
-                                            ? Icons.add
-                                            : Icons.clear,
-                                      ),
-                                      label: Text(
-                                        _cardIndex == -1
-                                            ? localization.add
-                                            : localization.clear,
-                                      ),
-                                    ),
+                                    // TODO(antarch): add clearing function to
+                                    // input field
+                                    actionLabel: localization.add,
+                                    onActionTap: () {
+                                      if (_cardIndex == -1) {
+                                        showCardForm(context: context);
+                                      } else {
+                                        setState(() => _cardIndex = -1);
+                                        Navigator.pop(context);
+                                      }
+                                    },
                                   ).then(
                                     (_) async {
                                       if (_cardIndex != -1) {
                                         final name = snapshot.hasData
                                             ? snapshot.data![_cardIndex].name
                                             : null;
-                                        setState(
-                                          () {
-                                            displayText[3] = name;
-                                          },
-                                        );
+                                        setState(() => displayText[3] = name);
                                       } else {
-                                        setState(() {
-                                          displayText[3] = null;
-                                        });
+                                        setState(() => displayText[3] = null);
                                       }
                                     },
                                   ),
@@ -463,21 +435,16 @@ class _AddViewState extends State<AddView> {
                                   setState(() {
                                     _accountId = value! as (int, int);
                                   });
-                                  Navigator.pop(context);
+                                  Navigator.pop(context, name);
                                 },
                                 attributeMap: snapshot.data,
-                                action: TextButton.icon(
-                                  onPressed: () => showAttributeDialog<void>(
-                                    context: context,
-                                    attributeType: AttributeType.account,
-                                    attributeRole: AttributeRole.child,
-                                    controller: textController[3],
-                                  ).then(
-                                    (_) => textController[3].clear(),
-                                  ),
-                                  icon: const Icon(Icons.add),
-                                  label: Text(localization.add),
-                                ),
+                                actionLabel: localization.add,
+                                onActionTap: () => showAttributeDialog<void>(
+                                  context: context,
+                                  attributeType: AttributeType.account,
+                                  attributeRole: AttributeRole.child,
+                                  controller: textController[3],
+                                ).then((_) => textController[3].clear()),
                               ).then(
                                 (name) => _accountId != (-1, -1) && name != null
                                     ? setState(() => displayText[2] = name)

@@ -8,6 +8,9 @@ class ListChoice extends StatefulWidget {
   const ListChoice({
     required this.groupValue,
     required this.onChanged,
+    this.actionLabel = '',
+    this.onActionTap,
+    this.title,
     super.key,
     this.attributeMap,
     this.attributeListBehavior = false,
@@ -33,6 +36,9 @@ class ListChoice extends StatefulWidget {
   final void Function(String? name, Object? value)? onChanged;
   // TODO(antarch): remove it
   final List<int>? intList;
+  final VoidCallback? onActionTap;
+  final String actionLabel;
+  final String? title;
 
   @override
   State<ListChoice> createState() => _ListChoiceState();
@@ -42,6 +48,7 @@ class _ListChoiceState extends State<ListChoice> {
   late Widget _selectedChild;
   late int _childIndex = 0;
   late Widget _attributeParent;
+  late Attribute _parentAttribute;
 
   @override
   void initState() {
@@ -75,6 +82,7 @@ class _ListChoiceState extends State<ListChoice> {
           setState(() {
             _selectedChild = childView;
             _childIndex = 1;
+            _parentAttribute = parentList[parentIndex];
           });
         },
       );
@@ -100,36 +108,71 @@ class _ListChoiceState extends State<ListChoice> {
     }
   }
 
+  String _getTitle() {
+    if (_childIndex == 0 || widget.attributeListBehavior) {
+      return widget.title ?? '';
+    }
+    return _parentAttribute.name;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: _childIndex == 0,
-      onPopInvoked: (didPop) {
-        if (!didPop) {
-          setState(() {
-            _selectedChild = _attributeParent;
-            _childIndex = 0;
-          });
-        }
-      },
-      child: PageTransitionSwitcher(
-        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
-          return SharedAxisTransition(
-            animation: primaryAnimation,
-            secondaryAnimation: secondaryAnimation,
-            transitionType: SharedAxisTransitionType.horizontal,
-            fillColor: Colors.transparent,
-            child: child,
-          );
-        },
-        layoutBuilder: (entries) {
-          return Stack(
-            alignment: Alignment.topCenter,
-            children: entries,
-          );
-        },
-        child: _selectedChild,
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_childIndex == 1) const BackButton(),
+                  Text(
+                    _getTitle(),
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ],
+              ),
+              FilledButton.tonalIcon(
+                onPressed: widget.onActionTap,
+                icon: const Icon(Icons.add),
+                label: Text(widget.actionLabel),
+              ),
+            ],
+          ),
+        ),
+        PopScope(
+          canPop: _childIndex == 0,
+          onPopInvoked: (didPop) {
+            if (!didPop) {
+              setState(() {
+                _selectedChild = _attributeParent;
+                _childIndex = 0;
+              });
+            }
+          },
+          child: PageTransitionSwitcher(
+            transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+              return SharedAxisTransition(
+                animation: primaryAnimation,
+                secondaryAnimation: secondaryAnimation,
+                transitionType: SharedAxisTransitionType.horizontal,
+                fillColor: Colors.transparent,
+                child: child,
+              );
+            },
+            layoutBuilder: (entries) {
+              return Stack(
+                alignment: Alignment.topCenter,
+                children: entries,
+              );
+            },
+            child: _selectedChild,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -171,9 +214,7 @@ class _AttributeParentListView extends StatelessWidget {
             onTap: () => onParentTap(index),
           );
         },
-        separatorBuilder: (_, __) => const Divider(
-          height: 0,
-        ),
+        separatorBuilder: (_, __) => const Divider(height: 0),
       ),
     );
   }
@@ -202,20 +243,6 @@ class _AttributeChildListView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (!attributeListBehavior)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const BackButton(),
-                Text(
-                  parentName,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ],
-            ),
-          ),
         Card(
           elevation: 0,
           color: Theme.of(context).colorScheme.surface,
@@ -225,7 +252,7 @@ class _AttributeChildListView extends StatelessWidget {
             ),
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
-          margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
           child: ListView.separated(
             itemCount: childAttributes.length,
             padding: EdgeInsets.zero,
@@ -250,9 +277,7 @@ class _AttributeChildListView extends StatelessWidget {
                 controlAffinity: ListTileControlAffinity.trailing,
               );
             },
-            separatorBuilder: (_, __) => const Divider(
-              height: 0,
-            ),
+            separatorBuilder: (_, __) => const Divider(height: 0),
           ),
         ),
       ],
@@ -293,14 +318,10 @@ class _CardListView extends StatelessWidget {
             title: Text(cards[index].name),
             value: index,
             groupValue: groupValue,
-            onChanged: (value) {
-              onChanged!('', value);
-            },
+            onChanged: (value) => onChanged!('', value),
           );
         },
-        separatorBuilder: (_, __) => const Divider(
-          height: 0,
-        ),
+        separatorBuilder: (_, __) => const Divider(height: 0),
       ),
     );
   }

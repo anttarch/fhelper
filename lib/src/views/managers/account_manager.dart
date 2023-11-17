@@ -333,17 +333,62 @@ class _AccountManagerState extends State<AccountManager> {
                       ),
                       builder: (context, snapshot) {
                         attributes = snapshot.hasData ? snapshot.data! : {};
-                        return ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: EdgeInsets.zero,
-                          itemCount: attributes.length,
-                          itemBuilder: (context, parentIndex) =>
-                              _accounts(parentIndex),
-                          separatorBuilder: (_, __) => Divider(
-                            height: 2,
-                            thickness: 1.5,
-                            color: Theme.of(context).colorScheme.outlineVariant,
+                        // return ListView.separated(
+                        //   shrinkWrap: true,
+                        //   physics: const NeverScrollableScrollPhysics(),
+                        //   padding: EdgeInsets.zero,
+                        //   itemCount: attributes.length,
+                        //   itemBuilder: (context, parentIndex) =>
+                        //       _accounts(parentIndex),
+                        //   separatorBuilder: (_, __) => Divider(
+                        //     height: 2,
+                        //     thickness: 1.5,
+                        //     color: Theme.of(context).colorScheme.outlineVariant,
+                        //   ),
+                        // );
+                        return Card(
+                          elevation: 0,
+                          color: Theme.of(context).colorScheme.surface,
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color:
+                                  Theme.of(context).colorScheme.outlineVariant,
+                            ),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(12)),
+                          ),
+                          margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                          child: ListView.separated(
+                            itemCount: attributes.length,
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                shape: wid_utils.getShapeBorder(
+                                  index,
+                                  attributes.length - 1,
+                                ),
+                                title:
+                                    Text(attributes.keys.toList()[index].name),
+                                trailing: Icon(
+                                  Icons.arrow_right,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                ),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute<AttributeDetailsView>(
+                                    builder: (context) => AttributeDetailsView(
+                                      attribute:
+                                          attributes.keys.toList()[index],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            separatorBuilder: (_, __) =>
+                                const Divider(height: 0),
                           ),
                         );
                       },
@@ -354,141 +399,138 @@ class _AccountManagerState extends State<AccountManager> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: FloatingActionButton(
           onPressed: () => showAttributeDialog<void>(
             context: context,
-            attributeRole: AttributeRole.child,
+            attributeRole: AttributeRole.parent,
             attributeType: AttributeType.account,
             controller: _controller,
           ).then((_) {
             _controller.clear();
             setState(() => selectedIndex = (-1, -1));
           }),
-          label: Text(
-            localization.account(1),
-            semanticsLabel: localization.addAccountFAB,
-          ),
-          icon: const Icon(Icons.add),
-          elevation: selectedIndex.$2 > -1 ? 0 : null,
+          elevation: 0,
+          child: const Icon(Icons.add),
         ),
-        floatingActionButtonLocation: selectedIndex.$2 > -1
-            ? FloatingActionButtonLocation.endContained
-            : null,
-        bottomNavigationBar: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          height: selectedIndex.$2 > -1
-              ? 80 + MediaQuery.paddingOf(context).bottom
-              : 0,
-          child: BottomAppBar(
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<AttributeDetailsView>(
-                      builder: (context) => AttributeDetailsView(
-                        attribute: attributes.values.toList()[selectedIndex.$1]
-                            [selectedIndex.$2],
-                      ),
-                    ),
-                  ),
-                  icon: Icon(
-                    Icons.info,
-                    semanticLabel: selectedIndex.$2 > -1
-                        ? localization.infoIconButton(
-                            attributes.values
-                                .toList()[selectedIndex.$1][selectedIndex.$2]
-                                .name,
-                          )
-                        : null,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    await checkForAttributeDependencies(
-                      Isar.getInstance()!,
-                      attributes.values
-                          .toList()[selectedIndex.$1][selectedIndex.$2]
-                          .id,
-                      AttributeType.account,
-                    ).then(
-                      (value) async {
-                        final isar = Isar.getInstance()!;
-                        if (value > 0) {
-                          await showDialog<void>(
-                            context: context,
-                            builder: (context) =>
-                                _dependencyDialog(value, isar),
-                          );
-                        } else {
-                          final backupIndex = selectedIndex;
-                          final backup = await getAttributeFromId(
-                            isar,
-                            attributes.values
-                                .toList()[selectedIndex.$1][selectedIndex.$2]
-                                .id,
-                            context: context,
-                          );
-                          await isar.writeTxn(() async {
-                            await isar.attributes.delete(
-                              attributes.values
-                                  .toList()[selectedIndex.$1][selectedIndex.$2]
-                                  .id,
-                            );
-                          }).then(
-                            (_) => setState(() => selectedIndex = (-1, -1)),
-                          );
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              _undoSnackBar(backupIndex, backup, isar),
-                            );
-                          }
-                        }
-                      },
-                    );
-                  },
-                  icon: Icon(
-                    Icons.delete,
-                    semanticLabel: selectedIndex.$2 > -1
-                        ? localization.deleteIconButton(
-                            attributes.values
-                                .toList()[selectedIndex.$1][selectedIndex.$2]
-                                .name,
-                          )
-                        : null,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    if (_controller.text.isEmpty) {
-                      _controller.text = attributes.values
-                          .toList()[selectedIndex.$1][selectedIndex.$2]
-                          .name;
-                    }
-                    await showAttributeDialog<void>(
-                      context: context,
-                      attribute: attributes.values.toList()[selectedIndex.$1]
-                          [selectedIndex.$2],
-                      controller: _controller,
-                      editMode: true,
-                    ).then((_) {
-                      _controller.clear();
-                      setState(() => selectedIndex = (-1, -1));
-                    });
-                  },
-                  icon: Icon(
-                    Icons.edit,
-                    semanticLabel: selectedIndex.$2 > -1
-                        ? localization.editIconButton(
-                            attributes.values
-                                .toList()[selectedIndex.$1][selectedIndex.$2]
-                                .name,
-                          )
-                        : null,
-                  ),
-                ),
-              ],
-            ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
+            children: [
+              IconButton(
+                // TODO(antarch): implement search
+                onPressed: () {},
+                icon: const Icon(Icons.search),
+              ),
+              IconButton(
+                // TODO(antarch): implement sort
+                onPressed: () {},
+                icon: const Icon(Icons.sort),
+              ),
+              // IconButton(
+              //   onPressed: () => Navigator.push(
+              //     context,
+              //     MaterialPageRoute<AttributeDetailsView>(
+              //       builder: (context) => AttributeDetailsView(
+              //         attribute: attributes.values.toList()[selectedIndex.$1]
+              //             [selectedIndex.$2],
+              //       ),
+              //     ),
+              //   ),
+              //   icon: Icon(
+              //     Icons.info,
+              //     semanticLabel: selectedIndex.$2 > -1
+              //         ? localization.infoIconButton(
+              //             attributes.values
+              //                 .toList()[selectedIndex.$1][selectedIndex.$2]
+              //                 .name,
+              //           )
+              //         : null,
+              //   ),
+              // ),
+              // IconButton(
+              //   onPressed: () async {
+              //     await checkForAttributeDependencies(
+              //       Isar.getInstance()!,
+              //       attributes.values
+              //           .toList()[selectedIndex.$1][selectedIndex.$2]
+              //           .id,
+              //       AttributeType.account,
+              //     ).then(
+              //       (value) async {
+              //         final isar = Isar.getInstance()!;
+              //         if (value > 0) {
+              //           await showDialog<void>(
+              //             context: context,
+              //             builder: (context) => _dependencyDialog(value, isar),
+              //           );
+              //         } else {
+              //           final backupIndex = selectedIndex;
+              //           final backup = await getAttributeFromId(
+              //             isar,
+              //             attributes.values
+              //                 .toList()[selectedIndex.$1][selectedIndex.$2]
+              //                 .id,
+              //             context: context,
+              //           );
+              //           await isar.writeTxn(() async {
+              //             await isar.attributes.delete(
+              //               attributes.values
+              //                   .toList()[selectedIndex.$1][selectedIndex.$2]
+              //                   .id,
+              //             );
+              //           }).then(
+              //             (_) => setState(() => selectedIndex = (-1, -1)),
+              //           );
+              //           if (mounted) {
+              //             ScaffoldMessenger.of(context).showSnackBar(
+              //               _undoSnackBar(backupIndex, backup, isar),
+              //             );
+              //           }
+              //         }
+              //       },
+              //     );
+              //   },
+              //   icon: Icon(
+              //     Icons.delete,
+              //     semanticLabel: selectedIndex.$2 > -1
+              //         ? localization.deleteIconButton(
+              //             attributes.values
+              //                 .toList()[selectedIndex.$1][selectedIndex.$2]
+              //                 .name,
+              //           )
+              //         : null,
+              //   ),
+              // ),
+              // IconButton(
+              //   onPressed: () async {
+              //     if (_controller.text.isEmpty) {
+              //       _controller.text = attributes.values
+              //           .toList()[selectedIndex.$1][selectedIndex.$2]
+              //           .name;
+              //     }
+              //     await showAttributeDialog<void>(
+              //       context: context,
+              //       attribute: attributes.values.toList()[selectedIndex.$1]
+              //           [selectedIndex.$2],
+              //       controller: _controller,
+              //       editMode: true,
+              //     ).then((_) {
+              //       _controller.clear();
+              //       setState(() => selectedIndex = (-1, -1));
+              //     });
+              //   },
+              //   icon: Icon(
+              //     Icons.edit,
+              //     semanticLabel: selectedIndex.$2 > -1
+              //         ? localization.editIconButton(
+              //             attributes.values
+              //                 .toList()[selectedIndex.$1][selectedIndex.$2]
+              //                 .name,
+              //           )
+              //         : null,
+              //   ),
+              // ),
+            ],
           ),
         ),
       ),

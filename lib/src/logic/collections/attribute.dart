@@ -93,6 +93,7 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(
       // Handle l10n
       if (context != null) {
         // check if the attribute can be translated (default attribute)
+        // TODO(antarch): map '#/str#/' attributes correctly
         if (attribute.id.between(0, 23) &&
             context.mounted &&
             attribute.name.contains('#/str#/')) {

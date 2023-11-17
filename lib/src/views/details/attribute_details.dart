@@ -1,7 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
-import 'package:fhelper/src/logic/utils.dart';
 import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/exchange_details.dart';
@@ -19,169 +18,6 @@ class AttributeDetailsView extends StatefulWidget {
 }
 
 class _AttributeDetailsViewState extends State<AttributeDetailsView> {
-  Color _getColor(BuildContext context, Exchange? exchange) {
-    if (exchange != null) {
-      var valueColor =
-          Color(exchange.value.isNegative ? 0xffbd1c1c : 0xff199225)
-              .harmonizeWith(Theme.of(context).colorScheme.primary);
-      if (exchange.installments != null) {
-        valueColor = Theme.of(context).colorScheme.inverseSurface;
-      } else if (exchange.eType == EType.transfer) {
-        valueColor = Theme.of(context).colorScheme.tertiary;
-      }
-      return valueColor;
-    }
-    return Theme.of(context).colorScheme.inverseSurface;
-  }
-
-  Icon? _getLeadingIcon(Exchange exchange) {
-    if (exchange.installments != null) {
-      return const Icon(Icons.credit_card);
-    } else if (exchange.eType == EType.transfer) {
-      return const Icon(Icons.swap_horiz);
-    } else if (exchange.id == -1) {
-      return const Icon(Icons.receipt_long);
-    }
-    return null;
-  }
-
-  Widget _latestExchange() {
-    final localization = AppLocalizations.of(context)!;
-    final languageCode = Localizations.localeOf(context).languageCode;
-    return FutureBuilder(
-      future: getLatest(
-        Isar.getInstance()!,
-        attributeId: widget.attribute.id,
-        attributeType: widget.attribute.type,
-        context: context,
-      ).then((value) async {
-        if (value != null && value.eType == EType.transfer) {
-          final transfer = value.copyWith(
-            description: await wid_utils.parseTransferName(context, value),
-          );
-          return transfer;
-        }
-        return value;
-      }),
-      builder: (context, snapshot) {
-        final exchange = snapshot.data;
-        return Visibility(
-          visible: exchange != null ||
-              (exchange != null && exchange.eType == EType.transfer),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Card(
-                elevation: 4,
-                margin: const EdgeInsets.only(top: 10),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        localization.latestDescriptor,
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.titleLarge!.apply(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (exchange != null &&
-                                      (exchange.installments != null ||
-                                          exchange.id == -1 ||
-                                          exchange.eType == EType.transfer))
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 5,
-                                      ),
-                                      child: _getLeadingIcon(
-                                        exchange,
-                                      ),
-                                    ),
-                                  Flexible(
-                                    child: Text(
-                                      exchange != null
-                                          ? exchange.description
-                                          : 'Placeholder',
-                                      textAlign: TextAlign.start,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .apply(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
-                                          ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 15),
-                              child: Text(
-                                NumberFormat.simpleCurrency(
-                                  locale: languageCode,
-                                ).format(
-                                  exchange != null ? exchange.value : 0,
-                                ),
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .apply(color: _getColor(context, exchange)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      OutlinedButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute<ExchangeDetailsView>(
-                            builder: (context) => ExchangeDetailsView(
-                              item: exchange!,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          localization.details,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: exchange != null &&
-                    widget.attribute.type != AttributeType.account,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 15),
-                  child: Divider(
-                    height: 4,
-                    thickness: 2,
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
@@ -204,7 +40,6 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _latestExchange(),
                   Card(
                     elevation: 0,
                     color: Theme.of(context).colorScheme.surface,
@@ -413,86 +248,48 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
                     ),
                   ),
                   if (widget.attribute.role == AttributeRole.parent)
-                    _ParentChildren(
-                      attribute: widget.attribute,
-                      title: widget.attribute.type == AttributeType.account
-                          ? localization.subaccount
-                          : localization.subtype,
+                    StreamBuilder(
+                      stream: Isar.getInstance()!.attributes.watchLazy(),
+                      builder: (context, snapshot) {
+                        return FutureBuilder(
+                          future: getAttributes(
+                            Isar.getInstance()!,
+                            widget.attribute.type,
+                            context: context,
+                          ).then(
+                            (value) => value.entries
+                                .singleWhere(
+                                  (e) => e.key.id == widget.attribute.id,
+                                )
+                                .value,
+                          ),
+                          builder: (context, snapshot) {
+                            final childList = snapshot.hasData
+                                ? snapshot.data!
+                                : <Attribute>[];
+                            return _ParentChildren(
+                              children: childList,
+                              title:
+                                  widget.attribute.type == AttributeType.account
+                                      ? localization.subaccount
+                                      : localization.subtype,
+                            );
+                          },
+                        );
+                      },
                     )
                   else
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Text(
-                            'Recent',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ),
-                        Card(
-                          elevation: 0,
-                          color: Theme.of(context).colorScheme.surface,
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              color:
-                                  Theme.of(context).colorScheme.outlineVariant,
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(12),
-                            ),
-                          ),
-                          margin: const EdgeInsets.only(top: 16),
-                          child: FutureBuilder(
-                            // TODO(antarch): work this for types
-                            future: Isar.getInstance()!
-                                .exchanges
-                                .filter()
-                                .accountIdEndEqualTo(widget.attribute.id)
-                                .accountIdEqualTo(widget.attribute.id)
-                                .findAll(),
-                            builder: (context, snapshot) {
-                              final exchanges = snapshot.hasData
-                                  ? snapshot.data!
-                                  : <Exchange>[];
-                              return ListView.separated(
-                                itemCount: exchanges.length,
-                                padding: EdgeInsets.zero,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
-                                  return ListTile(
-                                    shape: wid_utils.getShapeBorder(
-                                      index,
-                                      exchanges.length - 1,
-                                    ),
-                                    title: Text(
-                                      exchanges[index].description,
-                                    ),
-                                    trailing: Icon(
-                                      Icons.arrow_right,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                    onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute<ExchangeDetailsView>(
-                                        builder: (context) =>
-                                            ExchangeDetailsView(
-                                          item: exchanges[index],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                                separatorBuilder: (_, __) =>
-                                    const Divider(height: 0),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
+                    FutureBuilder(
+                      future: getExchangesByAttribute(
+                        Isar.getInstance()!,
+                        widget.attribute.id,
+                        widget.attribute.type,
+                      ),
+                      builder: (context, snapshot) {
+                        final exchanges =
+                            snapshot.hasData ? snapshot.data! : <Exchange>[];
+                        return _ChildExchanges(exchanges: exchanges);
+                      },
                     ),
                 ],
               ),
@@ -561,44 +358,97 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
               ),
             IconButton(
               onPressed: () async {
-                await checkForAttributeDependencies(
-                  Isar.getInstance()!,
-                  widget.attribute.id,
-                  AttributeType.account,
-                ).then(
-                  (value) async {
-                    final isar = Isar.getInstance()!;
-                    if (value > 0) {
-                      // await showDialog<void>(
-                      //   context: context,
-                      //   builder: (context) => _dependencyDialog(value, isar),
-                      // );
-                    } else {
-                      // final backupIndex = selectedIndex;
-                      // final backup = await getAttributeFromId(
-                      //   isar,
-                      //   attributes.values
-                      //       .toList()[selectedIndex.$1][selectedIndex.$2]
-                      //       .id,
-                      //   context: context,
-                      // );
-                      // await isar.writeTxn(() async {
-                      //   await isar.attributes.delete(
-                      //     attributes.values
-                      //         .toList()[selectedIndex.$1][selectedIndex.$2]
-                      //         .id,
-                      //   );
-                      // }).then(
-                      //   (_) => setState(() => selectedIndex = (-1, -1)),
-                      // );
-                      if (mounted) {
-                        // ScaffoldMessenger.of(context).showSnackBar(
-                        //   _undoSnackBar(backupIndex, backup, isar),
-                        // );
+                final isar = Isar.getInstance()!;
+                Future<void> isarDelete() async {
+                  await isar.writeTxn(() async {
+                    await isar.attributes.delete(widget.attribute.id);
+                  });
+                }
+
+                if (widget.attribute.role == AttributeRole.parent) {
+                  final selection =
+                      widget.attribute.type == AttributeType.account ? 2 : 1;
+                  await showDialog<void>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        icon: const Icon(Icons.delete_forever),
+                        title: Text(
+                          localization.deletePermanentlyQuestion,
+                        ),
+                        content: Text(
+                          localization.deleteContentDescription(selection),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(localization.cancel),
+                          ),
+                          FilledButton.tonal(
+                            onPressed: () async => isarDelete().then(
+                              (_) {
+                                Navigator.pop<Attribute>(
+                                  context,
+                                  widget.attribute,
+                                );
+                                Navigator.pop<Attribute>(
+                                  context,
+                                  widget.attribute,
+                                );
+                              },
+                            ),
+                            child: Text(localization.delete),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  await checkForAttributeDependencies(
+                    isar,
+                    widget.attribute.id,
+                    AttributeType.account,
+                  ).then(
+                    (value) async {
+                      if (value > 0) {
+                        await showDialog<void>(
+                          context: context,
+                          builder: (context) {
+                            final localization = AppLocalizations.of(context)!;
+                            return AlertDialog(
+                              title: Text(localization.proceedQuestion),
+                              icon: const Icon(Icons.warning),
+                              content:
+                                  Text(localization.dependencyPhrase(value)),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(localization.cancel),
+                                ),
+                                FilledButton.tonal(
+                                  onPressed: () async => isarDelete().then(
+                                    (_) => Navigator.pop<Attribute>(
+                                      context,
+                                      widget.attribute,
+                                    ),
+                                  ),
+                                  child: Text(localization.proceed),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        await isarDelete().then(
+                          (_) => Navigator.pop<Attribute>(
+                            context,
+                            widget.attribute,
+                          ),
+                        );
                       }
-                    }
-                  },
-                );
+                    },
+                  );
+                }
               },
               icon: Icon(
                 Icons.delete,
@@ -635,12 +485,42 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
 
 class _ParentChildren extends StatelessWidget {
   const _ParentChildren({
-    required this.attribute,
+    required this.children,
     required this.title,
   });
 
-  final Attribute attribute;
+  final List<Attribute> children;
   final String title;
+
+  SnackBar _undoSnackBar(
+    int backupIndex,
+    Attribute? backupAttribute,
+    Isar isar,
+    BuildContext context,
+  ) {
+    final localization = AppLocalizations.of(context)!;
+
+    return SnackBar(
+      content: Text(
+        localization.deletedSnackBar(backupAttribute!.name),
+      ),
+      action: SnackBarAction(
+        label: localization.undo,
+        onPressed: () async {
+          await isar.writeTxn(() async {
+            await isar.attributes.put(backupAttribute);
+          }).then((_) {
+            if (backupIndex == children.length + 1) {
+              children.add(backupAttribute);
+            } else if (backupIndex < children.length + 1) {
+              children.insert(backupIndex, backupAttribute);
+            }
+          });
+        },
+      ),
+      behavior: SnackBarBehavior.floating,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -664,46 +544,143 @@ class _ParentChildren extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           margin: const EdgeInsets.only(top: 16),
-          child: FutureBuilder(
-            future: getAttributes(
-              Isar.getInstance()!,
-              attribute.type,
-              context: context,
-            ).then(
-              (value) => value.entries
-                  .singleWhere((e) => e.key.id == attribute.id)
-                  .value,
-            ),
-            builder: (context, snapshot) {
-              final childList =
-                  snapshot.hasData ? snapshot.data! : <Attribute>[];
-              return ListView.separated(
-                itemCount: childList.length,
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    shape:
-                        wid_utils.getShapeBorder(index, childList.length - 1),
-                    title: Text(childList[index].name),
-                    trailing: Icon(
-                      Icons.arrow_right,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<AttributeDetailsView>(
-                        builder: (context) => AttributeDetailsView(
-                          attribute: childList[index],
-                        ),
+          child: ListView.separated(
+            itemCount: children.length,
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return ListTile(
+                shape: wid_utils.getShapeBorder(index, children.length - 1),
+                title: Text(children[index].name),
+                trailing: Icon(
+                  Icons.arrow_right,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onTap: () async {
+                  final backupAttribute = await Navigator.push(
+                    context,
+                    MaterialPageRoute<Attribute>(
+                      builder: (context) => AttributeDetailsView(
+                        attribute: children[index],
                       ),
                     ),
                   );
+
+                  if (backupAttribute != null && context.mounted) {
+                    final backupIndex = children.indexOf(backupAttribute);
+                    children.removeAt(backupIndex);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      _undoSnackBar(
+                        backupIndex,
+                        backupAttribute,
+                        Isar.getInstance()!,
+                        context,
+                      ),
+                    );
+                  }
                 },
-                separatorBuilder: (_, __) => const Divider(height: 0),
               );
             },
+            separatorBuilder: (_, __) => const Divider(height: 0),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChildExchanges extends StatelessWidget {
+  const _ChildExchanges({required this.exchanges});
+
+  final List<Exchange> exchanges;
+
+  Icon? _getLeadingIcon(Exchange exchange) {
+    if (exchange.installments != null) {
+      return const Icon(Icons.credit_card);
+    } else if (exchange.eType == EType.transfer) {
+      return const Icon(Icons.swap_horiz);
+    } else if (exchange.id == -1) {
+      return const Icon(Icons.receipt_long);
+    }
+    return null;
+  }
+
+  Color _getColor(BuildContext context, Exchange? exchange) {
+    if (exchange != null) {
+      var valueColor =
+          Color(exchange.value.isNegative ? 0xffbd1c1c : 0xff199225)
+              .harmonizeWith(Theme.of(context).colorScheme.primary);
+      if (exchange.installments != null) {
+        valueColor = Theme.of(context).colorScheme.inverseSurface;
+      } else if (exchange.eType == EType.transfer) {
+        valueColor = Theme.of(context).colorScheme.tertiary;
+      }
+      return valueColor;
+    }
+    return Theme.of(context).colorScheme.inverseSurface;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Text(
+            'Recent',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+        Card(
+          elevation: 0,
+          color: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(12),
+            ),
+          ),
+          margin: const EdgeInsets.only(top: 16),
+          child: ListView.separated(
+            itemCount: exchanges.length,
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return ListTile(
+                shape: wid_utils.getShapeBorder(index, exchanges.length - 1),
+                leading: _getLeadingIcon(exchanges[index]),
+                title: Text(
+                  exchanges[index].description,
+                ),
+                subtitle: Text(
+                  NumberFormat.simpleCurrency(
+                    locale: Localizations.localeOf(context).languageCode,
+                  ).format(exchanges[index].value),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .apply(color: _getColor(context, exchanges[index])),
+                ),
+                trailing: Icon(
+                  Icons.arrow_right,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<ExchangeDetailsView>(
+                    builder: (context) => ExchangeDetailsView(
+                      item: exchanges[index],
+                    ),
+                  ),
+                ),
+              );
+            },
+            separatorBuilder: (_, __) => const Divider(height: 0),
           ),
         ),
       ],

@@ -412,3 +412,23 @@ Future<double> getAvailableLimit(Isar isar, fhelper.Card card) async {
   final usedLimit = (await getSumValueByAttribute(isar, card.id, null)) * (-1);
   return card.limit - usedLimit;
 }
+
+Future<List<Exchange>> getExchangesByAttribute(
+  Isar isar,
+  int attributeId,
+  AttributeType attributeType,
+) async {
+  if (attributeType == AttributeType.account) {
+    final exchanges = await isar.exchanges
+        .filter()
+        .accountIdEqualTo(attributeId)
+        .or()
+        .accountIdEndEqualTo(attributeId)
+        .findAll();
+
+    return exchanges;
+  }
+  final exchanges =
+      await isar.exchanges.filter().typeIdEqualTo(attributeId).findAll();
+  return exchanges;
+}

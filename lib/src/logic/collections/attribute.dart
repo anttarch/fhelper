@@ -108,7 +108,8 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(
       if (attribute.role == AttributeRole.parent) {
         // adds parent to map
         attributeMap.addAll({l10nAttribute ?? attribute: []});
-      } else {
+      } else if (attributeMap.keys
+          .any((element) => element.id == attribute.parentId)) {
         // get parent
         final parent = attributeMap.keys.singleWhere(
           (element) => element.id == (l10nAttribute ?? attribute).parentId,

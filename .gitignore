@@ -49,3 +49,6 @@ pubspec.lock
 
 # isar generated
 *.g.dart
+
+# FVM related
+.fvm

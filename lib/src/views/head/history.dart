@@ -117,16 +117,13 @@ class _HistoryPageState extends State<HistoryPage> {
                           Navigator.pop(context, (name, accountId));
                         },
                         attributeMap: accounts,
-                        action: TextButton.icon(
-                          onPressed: () => showAttributeDialog<void>(
-                            context: context,
-                            attributeType: AttributeType.account,
-                            attributeRole: AttributeRole.child,
-                            controller: controller,
-                          ).then((_) => controller.clear()),
-                          icon: const Icon(Icons.add),
-                          label: Text(localization.add),
-                        ),
+                        actionLabel: localization.add,
+                        onActionTap: () => showAttributeDialog<void>(
+                          context: context,
+                          attributeType: AttributeType.account,
+                          attributeRole: AttributeRole.child,
+                          controller: controller,
+                        ).then((_) => controller.clear()),
                       ).then(
                         (accountRecord) async {
                           if (accountRecord != null) {

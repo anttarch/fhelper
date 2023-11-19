@@ -109,18 +109,13 @@ class _TransferViewState extends State<TransferView> {
                       Navigator.pop(context, name);
                     });
                   },
-                  action: TextButton.icon(
-                    onPressed: () => showAttributeDialog<void>(
-                      context: context,
-                      attributeRole: AttributeRole.child,
-                      attributeType: AttributeType.account,
-                      controller: _controller[1],
-                    ).then(
-                      (_) => _controller[1].clear(),
-                    ),
-                    icon: const Icon(Icons.add),
-                    label: Text(localization.add),
-                  ),
+                  actionLabel: localization.add,
+                  onActionTap: () => showAttributeDialog<void>(
+                    context: context,
+                    attributeRole: AttributeRole.child,
+                    attributeType: AttributeType.account,
+                    controller: _controller[1],
+                  ).then((_) => _controller[1].clear()),
                 ).then(
                   (name) {
                     if (_accountId != (-1, -1) && name != null) {
@@ -152,7 +147,7 @@ class _TransferViewState extends State<TransferView> {
           padding: const EdgeInsets.only(top: 20),
           child: InputField(
             label: localization.to,
-            locked: _accountId == (-1, -1),
+            enabled: _accountId == (-1, -1),
             readOnly: true,
             placeholder: displayText[1] ?? localization.select,
             validator: (value) {
@@ -171,18 +166,13 @@ class _TransferViewState extends State<TransferView> {
                 });
                 Navigator.pop(context, name);
               },
-              action: TextButton.icon(
-                onPressed: () => showAttributeDialog<void>(
-                  context: context,
-                  attributeRole: AttributeRole.child,
-                  attributeType: AttributeType.account,
-                  controller: _controller[1],
-                ).then(
-                  (_) => _controller[1].clear(),
-                ),
-                icon: const Icon(Icons.add),
-                label: Text(localization.add),
-              ),
+              actionLabel: localization.add,
+              onActionTap: () => showAttributeDialog<void>(
+                context: context,
+                attributeRole: AttributeRole.child,
+                attributeType: AttributeType.account,
+                controller: _controller[1],
+              ).then((_) => _controller[1].clear()),
             ).then(
               (name) {
                 if (_accountIdEnd != (-1, -1) && name != null) {

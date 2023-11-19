@@ -45,13 +45,14 @@ class HomePage extends StatelessWidget {
     final localization = AppLocalizations.of(context)!;
     final languageCode = Localizations.localeOf(context).languageCode;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: StreamBuilder(
         stream: Isar.getInstance()!.exchanges.watchLazy(),
         builder: (context, _) {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 20),
               FutureBuilder(
                 future: getLatest(Isar.getInstance()!, context: context)
                     .then((value) async {
@@ -70,8 +71,12 @@ class HomePage extends StatelessWidget {
                     visible: exchange != null ||
                         exchange != null && exchange.eType == EType.transfer,
                     child: Card(
-                      elevation: 4,
-                      margin: const EdgeInsets.only(top: 12),
+                      elevation: 1,
+                      // TODO(antarch): update to 'surface-container-low'
+                      color: Theme.of(context).colorScheme.surface,
+                      surfaceTintColor:
+                          Theme.of(context).colorScheme.surfaceTint,
+                      margin: const EdgeInsets.only(bottom: 8),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
@@ -176,8 +181,14 @@ class HomePage extends StatelessWidget {
                 builder: (context, snapshot) {
                   return Card(
                     elevation: 0,
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    margin: const EdgeInsets.only(top: 10),
+                    color: Theme.of(context).colorScheme.surface,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    ),
+                    margin: EdgeInsets.zero,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -204,7 +215,7 @@ class HomePage extends StatelessWidget {
                                         .apply(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .onSecondaryContainer,
+                                              .onSurface,
                                         ),
                                   ),
                                   if (snapshot.hasData)
@@ -276,13 +287,10 @@ class HomePage extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 15),
                 child: Card(
                   elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  ),
-                  margin: const EdgeInsets.only(top: 10),
+                  // TODO(antarch): update to 'surface-container-highest'
+                  color: Theme.of(context).colorScheme.surface,
+                  surfaceTintColor: Theme.of(context).colorScheme.surfaceTint,
+                  margin: const EdgeInsets.only(top: 8),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -339,7 +347,7 @@ class HomePage extends StatelessWidget {
                                 ),
                                 Semantics(
                                   button: true,
-                                  child: FilledButton.tonalIcon(
+                                  child: ElevatedButton.icon(
                                     onPressed: enabled
                                         ? () => Navigator.push(
                                               context,

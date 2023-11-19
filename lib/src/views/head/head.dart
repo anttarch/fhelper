@@ -58,13 +58,23 @@ class _HeadViewState extends State<HeadView> {
       body: CustomScrollView(
         controller: _scrollCtrl,
         slivers: [
-          SliverAppBar.large(
-            title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(
-                headline[_pageIndex],
+          SliverAppBar(
+            centerTitle: true,
+            title: const Text('FHelper'),
+            actions: [
+              SearchAnchor(
+                builder: (context, controller) {
+                  return IconButton(
+                    onPressed: () => controller.openView(),
+                    icon: const Icon(Icons.search),
+                  );
+                },
+                suggestionsBuilder: (context, controller) {
+                  // TODO(antarch): populate
+                  return [];
+                },
               ),
-            ),
+            ],
           ),
           SliverToBoxAdapter(
             child: PageTransitionSwitcher(
@@ -103,6 +113,9 @@ class _HeadViewState extends State<HeadView> {
               _pageIndex == 0 ? null : localization.addTransactionFAB,
         ),
         isExtended: _pageIndex == 0,
+        extendedPadding: _pageIndex == 0
+            ? null
+            : const EdgeInsetsDirectional.only(start: 16, end: 16),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _pageIndex,

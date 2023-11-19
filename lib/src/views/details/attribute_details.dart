@@ -1,15 +1,13 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:fhelper/src/logic/collections/attribute.dart';
 import 'package:fhelper/src/logic/collections/exchange.dart';
-import 'package:fhelper/src/logic/utils.dart';
+import 'package:fhelper/src/logic/widgets/show_attribute_dialog.dart';
 import 'package:fhelper/src/logic/widgets/utils.dart' as wid_utils;
 import 'package:fhelper/src/views/details/exchange_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
-
-enum Period { today, allTime }
 
 class AttributeDetailsView extends StatefulWidget {
   const AttributeDetailsView({required this.attribute, super.key});
@@ -20,7 +18,593 @@ class AttributeDetailsView extends StatefulWidget {
 }
 
 class _AttributeDetailsViewState extends State<AttributeDetailsView> {
-  Period _time = Period.today;
+  @override
+  Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.medium(
+            title: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                // TODO(antarch): update name when edit
+                widget.attribute.name,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Card(
+                    elevation: 0,
+                    color: Theme.of(context).colorScheme.surface,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                      borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    ),
+                    margin: const EdgeInsets.only(top: 20),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                localization.today,
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              FutureBuilder(
+                                future: getSumValueByAttribute(
+                                  Isar.getInstance()!,
+                                  widget.attribute.id,
+                                  widget.attribute.type,
+                                ),
+                                builder: (context, snapshot) {
+                                  final value =
+                                      snapshot.hasData ? snapshot.data! : 0;
+                                  return Text(
+                                    NumberFormat.simpleCurrency(
+                                      locale: Localizations.localeOf(
+                                        context,
+                                      ).languageCode,
+                                    ).format(value),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge!
+                                        .apply(
+                                          color: Color(
+                                            value.isNegative
+                                                ? 0xffbd1c1c
+                                                : 0xff199225,
+                                          ).harmonizeWith(
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                          ),
+                                        ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(height: 0),
+                        // TODO(antarch): implement income and expense details
+                        IntrinsicHeight(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    CircularProgressIndicator(
+                                      value: .75,
+                                      color:
+                                          const Color(0xffbd1c1c).harmonizeWith(
+                                        Theme.of(context).colorScheme.primary,
+                                      ),
+                                      backgroundColor:
+                                          const Color(0xff199225).harmonizeWith(
+                                        Theme.of(context).colorScheme.primary,
+                                      ),
+                                      strokeWidth: 10,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '25%',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall!
+                                              .apply(
+                                                color: const Color(0xff199225)
+                                                    .harmonizeWith(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                ),
+                                              ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          '75%',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall!
+                                              .apply(
+                                                color: const Color(0xffbd1c1c)
+                                                    .harmonizeWith(
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                ),
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const VerticalDivider(
+                                width: 0,
+                                indent: 16,
+                                endIndent: 16,
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            localization.income,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge,
+                                          ),
+                                          Text(
+                                            NumberFormat.simpleCurrency(
+                                              locale: Localizations.localeOf(
+                                                context,
+                                              ).languageCode,
+                                            ).format(56546),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge!
+                                                .apply(
+                                                  color: Color(
+                                                    56546.isNegative
+                                                        ? 0xffbd1c1c
+                                                        : 0xff199225,
+                                                  ).harmonizeWith(
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
+                                                  ),
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            localization.expense,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge,
+                                          ),
+                                          Text(
+                                            NumberFormat.simpleCurrency(
+                                              locale: Localizations.localeOf(
+                                                context,
+                                              ).languageCode,
+                                            ).format(56546),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge!
+                                                .apply(
+                                                  color: Color(
+                                                    56546.isNegative
+                                                        ? 0xffbd1c1c
+                                                        : 0xff199225,
+                                                  ).harmonizeWith(
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .primary,
+                                                  ),
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (widget.attribute.role == AttributeRole.parent)
+                    StreamBuilder(
+                      stream: Isar.getInstance()!.attributes.watchLazy(),
+                      builder: (context, snapshot) {
+                        return FutureBuilder(
+                          future: getAttributes(
+                            Isar.getInstance()!,
+                            widget.attribute.type,
+                            context: context,
+                          ).then(
+                            (value) => value.entries
+                                .singleWhere(
+                                  (e) => e.key.id == widget.attribute.id,
+                                )
+                                .value,
+                          ),
+                          builder: (context, snapshot) {
+                            final childList = snapshot.hasData
+                                ? snapshot.data!
+                                : <Attribute>[];
+                            return _ParentChildren(
+                              children: childList,
+                              title:
+                                  widget.attribute.type == AttributeType.account
+                                      ? localization.subaccount
+                                      : localization.subtype,
+                            );
+                          },
+                        );
+                      },
+                    )
+                  else
+                    FutureBuilder(
+                      future: getExchangesByAttribute(
+                        Isar.getInstance()!,
+                        widget.attribute.id,
+                        widget.attribute.type,
+                      ),
+                      builder: (context, snapshot) {
+                        final exchanges =
+                            snapshot.hasData ? snapshot.data! : <Exchange>[];
+                        return _ChildExchanges(exchanges: exchanges);
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final controller = TextEditingController();
+          if (widget.attribute.role == AttributeRole.parent) {
+            await showAttributeDialog<void>(
+              context: context,
+              attributeRole: AttributeRole.child,
+              attributeType: AttributeType.account,
+              controller: controller,
+              parentId: widget.attribute.id,
+            ).then((_) => controller.clear());
+          } else {
+            if (controller.text.isEmpty) {
+              controller.text = widget.attribute.name;
+            }
+            await showAttributeDialog<void>(
+              context: context,
+              attribute: widget.attribute,
+              controller: controller,
+              editMode: true,
+            ).then((_) => controller.clear());
+          }
+        },
+        elevation: 0,
+        child: Icon(
+          widget.attribute.role == AttributeRole.parent
+              ? Icons.add
+              : Icons.edit,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          children: [
+            if (widget.attribute.role == AttributeRole.parent)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    // TODO(antarch): implement search
+                    onPressed: () {},
+                    icon: const Icon(Icons.search),
+                  ),
+                  IconButton(
+                    // TODO(antarch): implement sort
+                    onPressed: () {},
+                    icon: const Icon(Icons.sort),
+                  ),
+                ],
+              )
+            else
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.info,
+                  semanticLabel:
+                      localization.infoIconButton(widget.attribute.name),
+                ),
+              ),
+            IconButton(
+              onPressed: () async {
+                final isar = Isar.getInstance()!;
+                Future<void> isarDelete() async {
+                  await isar.writeTxn(() async {
+                    await isar.attributes.delete(widget.attribute.id);
+                  });
+                }
+
+                if (widget.attribute.role == AttributeRole.parent) {
+                  final selection =
+                      widget.attribute.type == AttributeType.account ? 2 : 1;
+                  await showDialog<void>(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        icon: const Icon(Icons.delete_forever),
+                        title: Text(
+                          localization.deletePermanentlyQuestion,
+                        ),
+                        content: Text(
+                          localization.deleteContentDescription(selection),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(localization.cancel),
+                          ),
+                          FilledButton.tonal(
+                            onPressed: () async => isarDelete().then(
+                              (_) {
+                                Navigator.pop<Attribute>(
+                                  context,
+                                  widget.attribute,
+                                );
+                                Navigator.pop<Attribute>(
+                                  context,
+                                  widget.attribute,
+                                );
+                              },
+                            ),
+                            child: Text(localization.delete),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  await checkForAttributeDependencies(
+                    isar,
+                    widget.attribute.id,
+                    AttributeType.account,
+                  ).then(
+                    (value) async {
+                      if (value > 0) {
+                        await showDialog<void>(
+                          context: context,
+                          builder: (context) {
+                            final localization = AppLocalizations.of(context)!;
+                            return AlertDialog(
+                              title: Text(localization.proceedQuestion),
+                              icon: const Icon(Icons.warning),
+                              content:
+                                  Text(localization.dependencyPhrase(value)),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(localization.cancel),
+                                ),
+                                FilledButton.tonal(
+                                  onPressed: () async => isarDelete().then(
+                                    (_) => Navigator.pop<Attribute>(
+                                      context,
+                                      widget.attribute,
+                                    ),
+                                  ),
+                                  child: Text(localization.proceed),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        await isarDelete().then(
+                          (_) => Navigator.pop<Attribute>(
+                            context,
+                            widget.attribute,
+                          ),
+                        );
+                      }
+                    },
+                  );
+                }
+              },
+              icon: Icon(
+                Icons.delete,
+                semanticLabel:
+                    localization.deleteIconButton(widget.attribute.name),
+              ),
+            ),
+            if (widget.attribute.role == AttributeRole.parent)
+              IconButton(
+                onPressed: () async {
+                  final controller = TextEditingController();
+                  if (controller.text.isEmpty) {
+                    controller.text = widget.attribute.name;
+                  }
+                  await showAttributeDialog<void>(
+                    context: context,
+                    attribute: widget.attribute,
+                    controller: controller,
+                    editMode: true,
+                  ).then((_) => controller.clear());
+                },
+                icon: Icon(
+                  Icons.edit,
+                  semanticLabel:
+                      localization.editIconButton(widget.attribute.name),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ParentChildren extends StatelessWidget {
+  const _ParentChildren({
+    required this.children,
+    required this.title,
+  });
+
+  final List<Attribute> children;
+  final String title;
+
+  SnackBar _undoSnackBar(
+    int backupIndex,
+    Attribute? backupAttribute,
+    Isar isar,
+    BuildContext context,
+  ) {
+    final localization = AppLocalizations.of(context)!;
+
+    return SnackBar(
+      content: Text(
+        localization.deletedSnackBar(backupAttribute!.name),
+      ),
+      action: SnackBarAction(
+        label: localization.undo,
+        onPressed: () async {
+          await isar.writeTxn(() async {
+            await isar.attributes.put(backupAttribute);
+          }).then((_) {
+            if (backupIndex == children.length + 1) {
+              children.add(backupAttribute);
+            } else if (backupIndex < children.length + 1) {
+              children.insert(backupIndex, backupAttribute);
+            }
+          });
+        },
+      ),
+      behavior: SnackBarBehavior.floating,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+        Card(
+          elevation: 0,
+          color: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+          ),
+          margin: const EdgeInsets.only(top: 16),
+          child: ListView.separated(
+            itemCount: children.length,
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return ListTile(
+                shape: wid_utils.getShapeBorder(index, children.length - 1),
+                title: Text(children[index].name),
+                trailing: Icon(
+                  Icons.arrow_right,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onTap: () async {
+                  final backupAttribute = await Navigator.push(
+                    context,
+                    MaterialPageRoute<Attribute>(
+                      builder: (context) => AttributeDetailsView(
+                        attribute: children[index],
+                      ),
+                    ),
+                  );
+
+                  if (backupAttribute != null && context.mounted) {
+                    final backupIndex = children.indexOf(backupAttribute);
+                    children.removeAt(backupIndex);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      _undoSnackBar(
+                        backupIndex,
+                        backupAttribute,
+                        Isar.getInstance()!,
+                        context,
+                      ),
+                    );
+                  }
+                },
+              );
+            },
+            separatorBuilder: (_, __) => const Divider(height: 0),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChildExchanges extends StatelessWidget {
+  const _ChildExchanges({required this.exchanges});
+
+  final List<Exchange> exchanges;
+
+  Icon? _getLeadingIcon(Exchange exchange) {
+    if (exchange.installments != null) {
+      return const Icon(Icons.credit_card);
+    } else if (exchange.eType == EType.transfer) {
+      return const Icon(Icons.swap_horiz);
+    } else if (exchange.id == -1) {
+      return const Icon(Icons.receipt_long);
+    }
+    return null;
+  }
 
   Color _getColor(BuildContext context, Exchange? exchange) {
     if (exchange != null) {
@@ -37,538 +621,69 @@ class _AttributeDetailsViewState extends State<AttributeDetailsView> {
     return Theme.of(context).colorScheme.inverseSurface;
   }
 
-  Icon? _getLeadingIcon(Exchange exchange) {
-    if (exchange.installments != null) {
-      return const Icon(Icons.credit_card);
-    } else if (exchange.eType == EType.transfer) {
-      return const Icon(Icons.swap_horiz);
-    } else if (exchange.id == -1) {
-      return const Icon(Icons.receipt_long);
-    }
-    return null;
-  }
-
-  IconData _getTrendingIcon(double value) {
-    if (value.isNegative) {
-      return Icons.trending_down;
-    } else if (value == 0) {
-      return Icons.trending_flat;
-    }
-    return Icons.trending_up;
-  }
-
-  String _getTimeString() => switch (_time) {
-        Period.allTime => AppLocalizations.of(context)!.totalDescription,
-        _ => AppLocalizations.of(context)!.todayDescription
-      };
-
-  Widget _latestExchange() {
-    final localization = AppLocalizations.of(context)!;
-    final languageCode = Localizations.localeOf(context).languageCode;
-    return FutureBuilder(
-      future: getLatest(
-        Isar.getInstance()!,
-        attributeId: widget.attribute.id,
-        attributeType: widget.attribute.type,
-        context: context,
-      ).then((value) async {
-        if (value != null && value.eType == EType.transfer) {
-          final transfer = value.copyWith(
-            description: await wid_utils.parseTransferName(context, value),
-          );
-          return transfer;
-        }
-        return value;
-      }),
-      builder: (context, snapshot) {
-        final exchange = snapshot.data;
-        return Visibility(
-          visible: exchange != null ||
-              (exchange != null && exchange.eType == EType.transfer),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Card(
-                elevation: 4,
-                margin: const EdgeInsets.only(top: 10),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        localization.latestDescriptor,
-                        textAlign: TextAlign.start,
-                        style: Theme.of(context).textTheme.titleLarge!.apply(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (exchange != null &&
-                                      (exchange.installments != null ||
-                                          exchange.id == -1 ||
-                                          exchange.eType == EType.transfer))
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        right: 5,
-                                      ),
-                                      child: _getLeadingIcon(
-                                        exchange,
-                                      ),
-                                    ),
-                                  Flexible(
-                                    child: Text(
-                                      exchange != null
-                                          ? exchange.description
-                                          : 'Placeholder',
-                                      textAlign: TextAlign.start,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge!
-                                          .apply(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
-                                          ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 15),
-                              child: Text(
-                                NumberFormat.simpleCurrency(
-                                  locale: languageCode,
-                                ).format(
-                                  exchange != null ? exchange.value : 0,
-                                ),
-                                textAlign: TextAlign.start,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge!
-                                    .apply(color: _getColor(context, exchange)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      OutlinedButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute<ExchangeDetailsView>(
-                            builder: (context) => ExchangeDetailsView(
-                              item: exchange!,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          localization.details,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: exchange != null &&
-                    widget.attribute.type != AttributeType.account,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10, bottom: 15),
-                  child: Divider(
-                    height: 4,
-                    thickness: 2,
-                    color: Theme.of(context).colorScheme.outlineVariant,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _trendingWidget(num value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Icon(
-          _getTrendingIcon(value.toDouble()),
-          size: MediaQuery.sizeOf(context).longestSide / 11,
-          color: Color(
-            value.isNegative ? 0xffbd1c1c : 0xff199225,
-          ).harmonizeWith(
-            Theme.of(context).colorScheme.primary,
-          ),
-        ),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              _getTimeString(),
-              style: Theme.of(context).textTheme.titleLarge!.apply(
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  ),
-            ),
-            const SizedBox(width: 15),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 2,
-                ),
-                child: Text(
-                  NumberFormat.simpleCurrency(
-                    locale: Localizations.localeOf(
-                      context,
-                    ).languageCode,
-                  ).format(value),
-                  style: Theme.of(context).textTheme.titleLarge!.apply(
-                        color: Color(
-                          value.isNegative ? 0xffbd1c1c : 0xff199225,
-                        ).harmonizeWith(
-                          Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final localization = AppLocalizations.of(context)!;
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.medium(
-            title: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(
-                widget.attribute.name,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Text(
+            'Recent',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+        Card(
+          elevation: 0,
+          color: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(12),
             ),
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _latestExchange(),
-                  Visibility(
-                    visible: widget.attribute.type == AttributeType.account,
-                    child: Card(
-                      elevation: 0,
-                      color: Theme.of(context).colorScheme.secondaryContainer,
-                      margin: const EdgeInsets.only(top: 10),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            FutureBuilder(
-                              future: getSumValueByAttribute(
-                                Isar.getInstance()!,
-                                widget.attribute.id,
-                                widget.attribute.type,
-                                time: _time.index,
-                              ),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.done) {
-                                  final value =
-                                      snapshot.hasData ? snapshot.data! : 0;
-                                  return _trendingWidget(value);
-                                }
-                                if (snapshot.connectionState ==
-                                        ConnectionState.active ||
-                                    snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                  return SizedBox(
-                                    height:
-                                        MediaQuery.sizeOf(context).longestSide /
-                                            11,
-                                    width: MediaQuery.sizeOf(context).width,
-                                    child: const Center(
-                                      child:
-                                          CircularProgressIndicator.adaptive(),
-                                    ),
-                                  );
-                                }
-                                return const Text('OOPS');
-                              },
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: Text(
-                                    localization.showOnly,
-                                    textAlign: TextAlign.start,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium!
-                                        .apply(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondaryContainer,
-                                        ),
-                                  ),
-                                ),
-                                SegmentedButton(
-                                  segments: [
-                                    ButtonSegment(
-                                      value: Period.today,
-                                      label: Text(
-                                        localization.today,
-                                      ),
-                                    ),
-                                    ButtonSegment(
-                                      value: Period.allTime,
-                                      label: Text(
-                                        localization.all,
-                                      ),
-                                    ),
-                                  ],
-                                  selected: {_time},
-                                  onSelectionChanged: (p0) {
-                                    setState(() {
-                                      _time = p0.single;
-                                    });
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty
-                                        .resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                        if (states
-                                            .contains(MaterialState.selected)) {
-                                          return Theme.of(context)
-                                              .colorScheme
-                                              .tertiaryContainer;
-                                        }
-                                        return Theme.of(context)
-                                            .colorScheme
-                                            .surface;
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+          margin: const EdgeInsets.only(top: 16),
+          child: ListView.separated(
+            itemCount: exchanges.length,
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return ListTile(
+                shape: wid_utils.getShapeBorder(index, exchanges.length - 1),
+                leading: _getLeadingIcon(exchanges[index]),
+                title: Text(
+                  exchanges[index].description,
+                ),
+                subtitle: Text(
+                  NumberFormat.simpleCurrency(
+                    locale: Localizations.localeOf(context).languageCode,
+                  ).format(exchanges[index].value),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .apply(color: _getColor(context, exchanges[index])),
+                ),
+                trailing: Icon(
+                  Icons.arrow_right,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<ExchangeDetailsView>(
+                    builder: (context) => ExchangeDetailsView(
+                      item: exchanges[index],
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Visibility(
-                        visible: widget.attribute.type == AttributeType.account,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 15),
-                          child: Divider(
-                            height: 4,
-                            thickness: 2,
-                            color: Theme.of(context).colorScheme.outlineVariant,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: Text(
-                          localization.statistics,
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                    (MediaQuery.sizeOf(context).width / 2) - 25,
-                              ),
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: FutureBuilder(
-                                    future: getAttributeUsage(
-                                      Isar.getInstance()!,
-                                      widget.attribute.id,
-                                      widget.attribute.type,
-                                      0,
-                                    ),
-                                    builder: (context, snapshot) {
-                                      final percentage =
-                                          snapshot.hasData ? snapshot.data! : 0;
-                                      return Text(
-                                        localization.todayAttributeStatistics(
-                                          percentage,
-                                          (widget.attribute.type ==
-                                                  AttributeType.account)
-                                              .toString(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth:
-                                    (MediaQuery.sizeOf(context).width / 2) - 25,
-                              ),
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: FutureBuilder(
-                                    future: getAttributeUsage(
-                                      Isar.getInstance()!,
-                                      widget.attribute.id,
-                                      widget.attribute.type,
-                                      1,
-                                    ),
-                                    builder: (context, snapshot) {
-                                      final percentage =
-                                          snapshot.hasData ? snapshot.data! : 0;
-                                      return Text(
-                                        localization.allAttributeStatistics(
-                                          percentage,
-                                          (widget.attribute.type ==
-                                                  AttributeType.account)
-                                              .toString(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SafeArea(
-                        top: false,
-                        child: Card(
-                          elevation: 0,
-                          margin: const EdgeInsets.only(top: 10),
-                          shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                              color:
-                                  Theme.of(context).colorScheme.outlineVariant,
-                            ),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              children: [
-                                if (widget.attribute.type ==
-                                    AttributeType.account)
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        localization.relatedCardsDescription,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
-                                      FutureBuilder(
-                                        future: checkForAttributeDependencies(
-                                          Isar.getInstance()!,
-                                          widget.attribute.id,
-                                          widget.attribute.type,
-                                          dependency: 1,
-                                        ),
-                                        builder: (context, snapshot) {
-                                          final count = snapshot.hasData
-                                              ? snapshot.data!.toString()
-                                              : '';
-                                          return Text(
-                                            count,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      localization
-                                          .relatedTransactionsDescription,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                    FutureBuilder(
-                                      future: checkForAttributeDependencies(
-                                        Isar.getInstance()!,
-                                        widget.attribute.id,
-                                        widget.attribute.type,
-                                        dependency: 0,
-                                      ),
-                                      builder: (context, snapshot) {
-                                        final count = snapshot.hasData
-                                            ? snapshot.data!.toString()
-                                            : '';
-                                        return Text(
-                                          count,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium,
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
+            separatorBuilder: (_, __) => const Divider(height: 0),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

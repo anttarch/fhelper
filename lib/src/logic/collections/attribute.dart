@@ -93,6 +93,7 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(
       // Handle l10n
       if (context != null) {
         // check if the attribute can be translated (default attribute)
+        // TODO(antarch): map '#/str#/' attributes correctly
         if (attribute.id.between(0, 23) &&
             context.mounted &&
             attribute.name.contains('#/str#/')) {
@@ -107,7 +108,8 @@ Future<Map<Attribute, List<Attribute>>> getAttributes(
       if (attribute.role == AttributeRole.parent) {
         // adds parent to map
         attributeMap.addAll({l10nAttribute ?? attribute: []});
-      } else {
+      } else if (attributeMap.keys
+          .any((element) => element.id == attribute.parentId)) {
         // get parent
         final parent = attributeMap.keys.singleWhere(
           (element) => element.id == (l10nAttribute ?? attribute).parentId,
